@@ -4,7 +4,7 @@
 Discogs::Discogs( QString key ){
 
     api_key = key;
-
+egrgr
 
 }
 
