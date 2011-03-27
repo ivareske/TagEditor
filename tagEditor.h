@@ -1,0 +1,102 @@
+#ifndef TAGEDITOR_H
+#define TAGEDITOR_H
+
+#include <QtGui>
+#include "TagItem.h"
+#include "searchForTagsDialog.h"
+#include "globalFunctions.h"
+#include "settingsDialog.h"
+#include "replaceDialog.h"
+#include "renameDialog.h"
+#include "textViewer.h"
+#include "searchDialog.h"
+#include <tbytevector.h>
+#include <mpegfile.h>
+#include <id3v2tag.h>
+#include <id3v2frame.h>
+#include <id3v2header.h>
+#include <apetag.h>
+#include <tag.h>
+#include <taglib.h>
+#include <fileref.h>
+#include <QtPlugin>
+//#include "ListWidget.h"
+#include "ui_tagEditor.h"
+#include "TreeWidget.h"
+
+
+Q_DECLARE_METATYPE(QList<int>)
+//Q_IMPORT_PLUGIN(qjpeg)
+
+class tagEditor : public QMainWindow, private Ui::tagEditor{
+    Q_OBJECT
+
+public:
+
+    tagEditor(QWidget *parent = 0);    
+
+private slots:
+
+    QList<QFileInfo> getDirContent( QString& aPath );
+    void addFiles();
+    void clearTextFields();
+    //bool compareListWidgetItems( const QListWidgetItem &s1, const QListWidgetItem &s2, QString string );
+    void resizeColumn();
+    void removeFiles();
+    void removeAllFiles();
+    void rewriteTag();
+    void renameFiles();
+    void showTagInfo();
+    void openStyleSheet();
+    void setGUIStyle( const QString &s );
+    void uncheckStyleActions();
+    void checkStyleAction( QString actionText, bool state );
+    bool loadStyleSheet( QString file );
+    void saveTag();
+    void serialize();
+    void showSettings();
+    void chooseDir();
+    void setSettings();
+    void createActions();
+    void searchOnline();
+    void readSettings();
+    void saveSettings();
+    void clearTags();
+    void removeFrames();
+    void replaceTags();
+    void searchAndAddFiles();
+
+    //protected:
+private:
+    void closeEvent( QCloseEvent *event );
+
+    QSettings *guiSettings;
+    QString startupFolder;
+    QStringList extensions;
+    QString api_key;
+    bool subfolders;
+    bool artistChecked;
+    bool titleChecked;
+    bool albumChecked;
+    bool yearChecked;
+    bool trackChecked;
+    bool genreChecked;
+    bool commentChecked;
+    QString renameFormat;
+    QString lastStyleSheetFolder;
+    QString style;
+    //QVector<tag> tags;
+    bool showSaveTagWarning;
+    QSize textViewerSize;
+    TreeWidget *treeWidget;
+
+};
+
+
+#endif
+
+
+
+
+
+
