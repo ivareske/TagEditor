@@ -28,12 +28,12 @@
 Q_DECLARE_METATYPE(QList<int>)
 //Q_IMPORT_PLUGIN(qjpeg)
 
-class tagEditor : public QMainWindow, private Ui::tagEditor{
+class TagEditor : public QMainWindow, private Ui::TagEditor{
     Q_OBJECT
 
 public:
 
-    tagEditor(QWidget *parent = 0);    
+    TagEditor(QWidget *parent = 0);    
 
 private slots:
 

@@ -27,7 +27,7 @@
 #prøve å kompilere taglib med qt? pro file ligge ved
 
 TEMPLATE = app
-TARGET = tagEditor
+TARGET = TagEditor
 
 CONFIG += qt release warn_on static
 CONFIG += console
@@ -40,20 +40,20 @@ INCLUDEPATH  += $$quote(C:/Program Files/taglib/include/taglib/)
 LIBS += $$quote(C:/Program Files/taglib/bin/libtag.dll)
 
 
-HEADERS  = tagEditor.h settingsDialog.h settingsClass.h searchDialog.h Album.h textViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h replaceDialog.h renameDialog.h searchForTagsDialog.h \
+HEADERS  = TagEditor.h settingsDialog.h settingsClass.h searchDialog.h Album.h textViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h replaceDialog.h renameDialog.h searchForTagsDialog.h \
     ReleaseEvent.h \
     Song.h \
     Artist.h \
     TreeWidget.h
-FORMS     = tagEditor.ui settingsDialog.ui searchDialog.ui textViewer.ui replaceDialog.ui renameDialog.ui searchForTagsDialog.ui
-SOURCES = main.cpp tagEditor.cpp settingsDialog.cpp settingsClass.cpp searchDialog.cpp Album.cpp textViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp replaceDialog.cpp renameDialog.cpp searchForTagsDialog.cpp \
+FORMS     = TagEditor.ui settingsDialog.ui searchDialog.ui textViewer.ui replaceDialog.ui renameDialog.ui searchForTagsDialog.ui
+SOURCES = main.cpp TagEditor.cpp settingsDialog.cpp settingsClass.cpp searchDialog.cpp Album.cpp textViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp replaceDialog.cpp renameDialog.cpp searchForTagsDialog.cpp \
     ReleaseEvent.cpp \
     Song.cpp \
     Artist.cpp \
     TreeWidget.cpp
 
-RC_FILE = tagEditor.rc
-RESOURCES += tagEditor.qrc
+RC_FILE = TagEditor.rc
+RESOURCES += TagEditor.qrc
 
 
 #fant ikke:

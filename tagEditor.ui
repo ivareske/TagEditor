@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>tagEditor</class>
- <widget class="QMainWindow" name="tagEditor">
+ <class>TagEditor</class>
+ <widget class="QMainWindow" name="TagEditor">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -472,7 +472,7 @@
                  <string/>
                 </property>
                 <property name="icon">
-                 <iconset resource="tagEditor.qrc">
+                 <iconset resource="TagEditor.qrc">
                   <normaloff>:/arrow_right.png</normaloff>:/arrow_right.png</iconset>
                 </property>
                 <property name="iconSize">
@@ -510,7 +510,7 @@
                  <string/>
                 </property>
                 <property name="icon">
-                 <iconset resource="tagEditor.qrc">
+                 <iconset resource="TagEditor.qrc">
                   <normaloff>:/arrow_left.png</normaloff>:/arrow_left.png</iconset>
                 </property>
                 <property name="iconSize">
@@ -727,7 +727,7 @@
   </action>
  </widget>
  <resources>
-  <include location="tagEditor.qrc"/>
+  <include location="TagEditor.qrc"/>
  </resources>
  <connections/>
 </ui>

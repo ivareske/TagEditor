@@ -5,7 +5,7 @@ searchDialog::searchDialog( QWidget *parent, QString apiKey, QList<QFileInfo> *i
 
     setupUi(this); // this sets up GUI
 
-    settings = new QSettings("tagEditor.ini",QSettings::IniFormat,this);
+    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
 
     api_key = apiKey;
     //infos = infosInput;

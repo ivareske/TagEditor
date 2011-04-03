@@ -200,7 +200,7 @@ If checked, artist, album, year and format are available and  will be shown.</st
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="tagEditor.qrc">
+            <iconset resource="TagEditor.qrc">
              <normaloff>:/arrow_left.png</normaloff>:/arrow_left.png</iconset>
            </property>
           </widget>
@@ -211,7 +211,7 @@ If checked, artist, album, year and format are available and  will be shown.</st
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="tagEditor.qrc">
+            <iconset resource="TagEditor.qrc">
              <normaloff>:/arrow_right.png</normaloff>:/arrow_right.png</iconset>
            </property>
           </widget>
@@ -915,7 +915,7 @@ If not checked, the name of the cover from discogs is used</string>
   </layout>
  </widget>
  <resources>
-  <include location="tagEditor.qrc"/>
+  <include location="TagEditor.qrc"/>
  </resources>
  <connections/>
 </ui>
