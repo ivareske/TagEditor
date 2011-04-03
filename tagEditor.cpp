@@ -141,7 +141,7 @@ void TagEditor::renameFiles(){
         items->append(item);
     }
 
-    renameDialog r(this,items,&renameFormat);
+    RenameDialog r(this,items,&renameFormat);
     r.setModal(false);
     r.exec();
 
@@ -238,7 +238,7 @@ void TagEditor::removeFrames(){
     p.setValue(indexes.size());
     statusBar()->showMessage("Finished removing frames/items", 8000);
     if(!log.isEmpty()){
-        textViewer t(this, &log);
+        TextViewer t(this, &log);
         t.resize(textViewerSize);
         t.exec();
         textViewerSize = t.size();
@@ -279,7 +279,7 @@ void TagEditor::rewriteTag(){
     p.setValue(indexes.size());
     statusBar()->showMessage("Finished rewriting tags", 8000);
     if(!log.isEmpty()){
-        textViewer t(this, &log);
+        TextViewer t(this, &log);
         t.resize(textViewerSize);
         t.exec();
         textViewerSize = t.size();
@@ -398,7 +398,7 @@ void TagEditor::chooseDir(){
 }
 
 void TagEditor::showSettings(){
-    settingsDialog s;
+    SettingsDialog s;
     if( s.exec()==QDialog::Accepted ){
         //obtain newly saved data from settingsdialog
         extensions = guiSettings->value("extensions","").toStringList();
@@ -450,7 +450,7 @@ void TagEditor::serialize(){
 
     statusBar()->showMessage("Finished serializing tracks", 8000);
     if(!log.isEmpty()){
-        textViewer t(this, &log);
+        TextViewer t(this, &log);
         t.resize(textViewerSize);
         t.exec();
         textViewerSize = t.size();
@@ -574,7 +574,7 @@ void TagEditor::saveTag(){
         statusBar()->showMessage("Tag saved", 8000);
     }
     if(!log.isEmpty()){
-        textViewer t(this, &log);
+        TextViewer t(this, &log);
         t.resize(textViewerSize);
         t.exec();
         textViewerSize = t.size();
@@ -699,7 +699,7 @@ void TagEditor::searchAndAddFiles(){
         }
     }
 
-    searchForTagsDialog r(infos,this);
+    SearchForTagsDialog r(infos,this);
     if( r.exec()==QDialog::Accepted){
         QList<QFileInfo> files = r.files();
         for(int j=0;j<files.size();j++){
@@ -798,7 +798,7 @@ void TagEditor::replaceTags(){
         //fileInfos->append(item->fileInfo());
         items.append(item);
     }
-    replaceDialog r(items,this);
+    ReplaceDialog r(items,this);
     if(r.exec()==QDialog::Accepted){
         treeWidget->updateItems(items);
     }
@@ -911,7 +911,7 @@ void TagEditor::searchOnline(){
         return;
     }
 
-    searchDialog d( this, api_key, &info );
+    SearchDialog d( this, api_key, &info );
     d.setModal(false);
     d.exec();
     /*

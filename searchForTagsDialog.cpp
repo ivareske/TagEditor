@@ -1,6 +1,6 @@
-#include "searchForTagsDialog.h"
+#include "SearchForTagsDialog.h"
 
-searchForTagsDialog::searchForTagsDialog( QList<QFileInfo> files, QWidget *parent ) : QDialog(parent){
+SearchForTagsDialog::SearchForTagsDialog( QList<QFileInfo> files, QWidget *parent ) : QDialog(parent){
     setupUi(this); // this sets up GUI
 
 
@@ -8,14 +8,14 @@ searchForTagsDialog::searchForTagsDialog( QList<QFileInfo> files, QWidget *paren
     fileInfos = files;
 
     QSettings settings("TagEditor.ini",QSettings::IniFormat,0);
-    CaseSensitive->setChecked( settings.value("searchForTagsDialog/CaseSensitive",false).toBool() );
-    artistCheckbox->setChecked( settings.value("searchForTagsDialog/artistChecked",true).toBool());
-    titleCheckbox->setChecked( settings.value("searchForTagsDialog/titleChecked",true).toBool());
-    albumCheckbox->setChecked( settings.value("searchForTagsDialog/albumChecked",true).toBool());
-    yearCheckbox->setChecked( settings.value("searchForTagsDialog/yearChecked",true).toBool());
-    trackCheckbox->setChecked( settings.value("searchForTagsDialog/trackChecked",true).toBool());
-    genreCheckbox->setChecked( settings.value("searchForTagsDialog/genreChecked",true).toBool());
-    commentCheckbox->setChecked( settings.value("searchForTagsDialog/commentChecked",true).toBool() );
+    CaseSensitive->setChecked( settings.value("SearchForTagsDialog/CaseSensitive",false).toBool() );
+    artistCheckbox->setChecked( settings.value("SearchForTagsDialog/artistChecked",true).toBool());
+    titleCheckbox->setChecked( settings.value("SearchForTagsDialog/titleChecked",true).toBool());
+    albumCheckbox->setChecked( settings.value("SearchForTagsDialog/albumChecked",true).toBool());
+    yearCheckbox->setChecked( settings.value("SearchForTagsDialog/yearChecked",true).toBool());
+    trackCheckbox->setChecked( settings.value("SearchForTagsDialog/trackChecked",true).toBool());
+    genreCheckbox->setChecked( settings.value("SearchForTagsDialog/genreChecked",true).toBool());
+    commentCheckbox->setChecked( settings.value("SearchForTagsDialog/commentChecked",true).toBool() );
 
     connect( this, SIGNAL( finished( int ) ), this, SLOT( finito( int ) ) );
     connect( addToWorkSpaceButton, SIGNAL( clicked() ), this, SLOT( accept() ) );
@@ -23,7 +23,7 @@ searchForTagsDialog::searchForTagsDialog( QList<QFileInfo> files, QWidget *paren
 }
 
 
-QList<QFileInfo> searchForTagsDialog::files(){
+QList<QFileInfo> SearchForTagsDialog::files(){
 
     QList<QFileInfo> files;
     for(int i=0;i<foundList->count();i++){        
@@ -33,20 +33,20 @@ QList<QFileInfo> searchForTagsDialog::files(){
 }
 
 
-void searchForTagsDialog::finito( int result ){
+void SearchForTagsDialog::finito( int result ){
     QSettings settings("TagEditor.ini",QSettings::IniFormat,0);
-    settings.setValue( "searchForTagsDialog/CaseSensitive", CaseSensitive->isChecked() );
-    settings.setValue("searchForTagsDialog/artistChecked", artistCheckbox->isChecked() );
-    settings.setValue("searchForTagsDialog/titleChecked", titleCheckbox->isChecked() );
-    settings.setValue("searchForTagsDialog/albumChecked", albumCheckbox->isChecked() );
-    settings.setValue("searchForTagsDialog/yearChecked", yearCheckbox->isChecked() );
-    settings.setValue("searchForTagsDialog/trackChecked", trackCheckbox->isChecked() );
-    settings.setValue("searchForTagsDialog/genreChecked", genreCheckbox->isChecked() );
-    settings.setValue("searchForTagsDialog/commentChecked", commentCheckbox->isChecked() );
+    settings.setValue( "SearchForTagsDialog/CaseSensitive", CaseSensitive->isChecked() );
+    settings.setValue("SearchForTagsDialog/artistChecked", artistCheckbox->isChecked() );
+    settings.setValue("SearchForTagsDialog/titleChecked", titleCheckbox->isChecked() );
+    settings.setValue("SearchForTagsDialog/albumChecked", albumCheckbox->isChecked() );
+    settings.setValue("SearchForTagsDialog/yearChecked", yearCheckbox->isChecked() );
+    settings.setValue("SearchForTagsDialog/trackChecked", trackCheckbox->isChecked() );
+    settings.setValue("SearchForTagsDialog/genreChecked", genreCheckbox->isChecked() );
+    settings.setValue("SearchForTagsDialog/commentChecked", commentCheckbox->isChecked() );
     settings.sync();
 }
 
-void searchForTagsDialog::compare( bool *include, QString tagtxt, QString txt, Qt::CaseSensitivity cs ){
+void SearchForTagsDialog::compare( bool *include, QString tagtxt, QString txt, Qt::CaseSensitivity cs ){
     if( txt.isEmpty() ){
         *include = *include || tagtxt.isEmpty();
     }else{
@@ -54,7 +54,7 @@ void searchForTagsDialog::compare( bool *include, QString tagtxt, QString txt, Q
     }
 }
 
-void searchForTagsDialog::search(){
+void SearchForTagsDialog::search(){
 
     foundList->clear();
 
@@ -123,7 +123,7 @@ void searchForTagsDialog::search(){
     p.setValue(fileInfos.size());
     Info->setText(QString::number(foundList->count())+" of "+QString::number(fileInfos.size())+" files matches the search criteria");
     if(!log.isEmpty()){
-        textViewer t(this, &log);
+        TextViewer t(this, &log);
         t.exec();
     }
 }

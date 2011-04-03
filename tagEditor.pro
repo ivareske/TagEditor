@@ -8,7 +8,7 @@
 #ensure only one tag type in file? not both id3v2 & id3v1 for instance
 #search for specific tags, replace in tags
 #id3v2 & ape frames/items
-#redistribute original files in searchDialog?
+#redistribute original files in SearchDialog?
 #amazon cover art. access key: AKIAJS6T6TP3SZVTPNKQ
 #http://docs.amazonwebservices.com/AlexaWebInfoService/1-0/RequestAuthentication.html
 #http://weblog.plexobject.com/?p=1555
@@ -40,13 +40,13 @@ INCLUDEPATH  += $$quote(C:/Program Files/taglib/include/taglib/)
 LIBS += $$quote(C:/Program Files/taglib/bin/libtag.dll)
 
 
-HEADERS  = TagEditor.h settingsDialog.h settingsClass.h searchDialog.h Album.h textViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h replaceDialog.h renameDialog.h searchForTagsDialog.h \
+HEADERS  = TagEditor.h SettingsDialog.h SettingsClass.h SearchDialog.h Album.h TextViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
     ReleaseEvent.h \
     Song.h \
     Artist.h \
     TreeWidget.h
-FORMS     = TagEditor.ui settingsDialog.ui searchDialog.ui textViewer.ui replaceDialog.ui renameDialog.ui searchForTagsDialog.ui
-SOURCES = main.cpp TagEditor.cpp settingsDialog.cpp settingsClass.cpp searchDialog.cpp Album.cpp textViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp replaceDialog.cpp renameDialog.cpp searchForTagsDialog.cpp \
+FORMS     = TagEditor.ui SettingsDialog.ui SearchDialog.ui TextViewer.ui ReplaceDialog.ui RenameDialog.ui SearchForTagsDialog.ui
+SOURCES = main.cpp TagEditor.cpp SettingsDialog.cpp SettingsClass.cpp SearchDialog.cpp Album.cpp TextViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp ReplaceDialog.cpp RenameDialog.cpp SearchForTagsDialog.cpp \
     ReleaseEvent.cpp \
     Song.cpp \
     Artist.cpp \

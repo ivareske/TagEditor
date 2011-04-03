@@ -3,8 +3,7 @@
  
 #include <QtGui>
 #include <QtNetwork>
-#include "structs.h"
-#include "textViewer.h"
+#include "TextViewer.h"
 #include "Album.h"
 #include <tag.h>
 #include <taglib.h>
@@ -16,12 +15,12 @@
 #include "ui_searchDialog.h"
 
 
-class searchDialog : public QDialog, private Ui::searchDialog{
+class SearchDialog : public QDialog, private Ui::SearchDialog{
     Q_OBJECT
  
 public:
 
-    searchDialog(QWidget *parent = 0, QString apiKey="", QList<QFileInfo> *infosInput = 0 );    
+    SearchDialog(QWidget *parent = 0, QString apiKey="", QList<QFileInfo> *infosInput = 0 );    
     enum matchByFlag{ MATCHBYTRACK, MATCHBYTITLE, DONTMATCH, MATCHBYTRACKTITLE, MATCHBYTITLETRACK, MATCHBYFILENAME };
     enum columnFlag{ FILENAME, CURRENTTITLE, CURRENTTRACK, TITLE, TRACK, COMMENT  };
     enum itemCol{ ORIGIN, RESULT  };

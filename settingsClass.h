@@ -4,10 +4,10 @@
 #include <QtGui>
 
 
-class settingsClass{
+class SettingsClass{
 
 public:
-	settingsClass();
+	SettingsClass();
 		
 	QString startupFolder;
 	QStringList extensions;

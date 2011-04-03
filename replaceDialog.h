@@ -2,18 +2,18 @@
 #define REPLACEDIALOG_H
 
 #include <QtGui>
-#include "textViewer.h"
+#include "TextViewer.h"
 #include "TagItem.h"
 #include "ui_replaceDialog.h"
 
 
-class replaceDialog : public QDialog, private Ui::replaceDialog
+class ReplaceDialog : public QDialog, private Ui::ReplaceDialog
 {
     Q_OBJECT
 
 public:
 
-    replaceDialog( const QList<TagItem*> &items, QWidget *parent = 0 );
+    ReplaceDialog( const QList<TagItem*> &items, QWidget *parent = 0 );
 
 public slots:
     void replace();

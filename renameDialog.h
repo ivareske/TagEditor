@@ -2,18 +2,18 @@
 #define RENAMEIALOG_H
 
 #include <QtGui>
-#include "textViewer.h"
+#include "TextViewer.h"
 #include "TagItem.h"
 #include "ui_renameDialog.h"
 
 
-class renameDialog : public QDialog, private Ui::renameDialog
+class RenameDialog : public QDialog, private Ui::RenameDialog
 {
     Q_OBJECT
 
 public:
 
-    renameDialog( QWidget *parent = 0, QList<TagItem*> *tagitems = 0, QString *renameFormat=0 );	
+    RenameDialog( QWidget *parent = 0, QList<TagItem*> *tagitems = 0, QString *renameFormat=0 );	
 
 public slots:
     void rename();

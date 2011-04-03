@@ -1,6 +1,6 @@
-#include "renameDialog.h"
+#include "RenameDialog.h"
 
-renameDialog::renameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString *renameformat ) : QDialog(parent){
+RenameDialog::RenameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString *renameformat ) : QDialog(parent){
     setupUi(this); // this sets up GUI
 
     settings = new QSettings("TagEditor.ini",QSettings::IniFormat,0);
@@ -8,7 +8,7 @@ renameDialog::renameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString 
     tagItems = tagitems;
     qDebug()<<1;
     defaultReplaceFormat<<"\\"<<"_"<<"/"<<"_"<<"*"<<"_"<<":"<<"_"<<"?"<<"_"<<"<"<<"_"<<">"<<"_"<<"|"<<"_"<<"\""<<"_";
-    replaceFormat = settings->value("renameDialog/replaceFormat",defaultReplaceFormat).toStringList();
+    replaceFormat = settings->value("RenameDialog/replaceFormat",defaultReplaceFormat).toStringList();
     notAllowedCharacters<<"\\"<<"/"<<"*"<<":"<<"?"<<"<"<<">"<<"|"<<"\"";
     Format->setText(*renameformat);
     renameFormat = renameformat;
@@ -45,24 +45,24 @@ renameDialog::renameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString 
     qDebug()<<4;
 }
 
-void renameDialog::updateReplaceFormat( QTableWidgetItem* item ){
+void RenameDialog::updateReplaceFormat( QTableWidgetItem* item ){
 
     int ind = (item->column()*ReplaceTable->rowCount()) + item->row();
     qDebug()<<ind;
     replaceFormat[ind] = item->text();
 }
 
-void renameDialog::updateFormat(  const QString &format ){
+void RenameDialog::updateFormat(  const QString &format ){
     *renameFormat = format;
 }
 
-void renameDialog::finito( int result ){
+void RenameDialog::finito( int result ){
 
-    settings->setValue( "renameDialog/replaceFormat", replaceFormat );
+    settings->setValue( "RenameDialog/replaceFormat", replaceFormat );
     settings->sync();
 }
 
-void renameDialog::setDefaultFormat(){
+void RenameDialog::setDefaultFormat(){
     int k=0;
     for(int i=0;i<replaceFormat.size();i=i+2){
         QTableWidgetItem *item1 = new QTableWidgetItem;
@@ -76,7 +76,7 @@ void renameDialog::setDefaultFormat(){
     }
 }
 
-void renameDialog::rename(){
+void RenameDialog::rename(){
 
     QString tmpformat;
     if( replaceFormat.size()%2 != 0 ){
@@ -153,7 +153,7 @@ void renameDialog::rename(){
     }
     p.setValue(tagItems->size());
     if(!log.isEmpty()){
-        textViewer t(this, &log);
+        TextViewer t(this, &log);
         t.exec();
     }
 

@@ -1,7 +1,7 @@
-#include "searchDialog.h"
+#include "SearchDialog.h"
 
 
-searchDialog::searchDialog( QWidget *parent, QString apiKey, QList<QFileInfo> *infos ){
+SearchDialog::SearchDialog( QWidget *parent, QString apiKey, QList<QFileInfo> *infos ){
 
     setupUi(this); // this sets up GUI
 
@@ -134,50 +134,50 @@ searchDialog::searchDialog( QWidget *parent, QString apiKey, QList<QFileInfo> *i
     readSettings();
 }
 
-void searchDialog::readSettings(){
+void SearchDialog::readSettings(){
 
-    this->resize(settings->value("searchDialog/size", QSize(700, 600)).toSize());
-    this->move( settings->value("searchDialog/pos", QPoint(200, 200)).toPoint() );
-    coverFormat->setText( settings->value("searchDialog/coverFormat","%artist% - %album%").toString() );
-    coverFormatCheckBox->setChecked( settings->value("searchDialog/coverFormatCheckBox",true).toBool() );
-    saveCoverCheckBox->setChecked( settings->value("searchDialog/saveCover",false).toBool() );
-    saveAllCoversCheckBox->setChecked( settings->value("searchDialog/saveAllCovers",true).toBool() );
-    artistLabel->setChecked( settings->value("searchDialog/artistLabel",true).toBool() );
-    albumLabel->setChecked( settings->value("searchDialog/albumLabel",true).toBool() );
-    genreLabel->setChecked( settings->value("searchDialog/genreLabel",true).toBool() );
-    yearLabel->setChecked( settings->value("searchDialog/yearLabel",true).toBool() );
-    rolesLabel->setChecked( settings->value("searchDialog/rolesLabel",false).toBool() );
-    formatLabel->setChecked( settings->value("searchDialog/formatLabel",false).toBool() );
-    countryLabel->setChecked( settings->value("searchDialog/countryLabel",false).toBool() );
-    labelLabel->setChecked( settings->value("searchDialog/labelLabel",false).toBool() );
-    notesLabel->setChecked( settings->value("searchDialog/notesLabel",false).toBool() );
-    clearPreviousComentsCheckBox->setChecked( settings->value("searchDialog/clearPreviousComents",false).toBool() );
-    downloadImmediately->setChecked( settings->value("searchDialog/downloadImmediately",true).toBool() );
-    autoResizeColumns = settings->value("searchDialog/autoResizeColumns",true).toBool();
+    this->resize(settings->value("SearchDialog/size", QSize(700, 600)).toSize());
+    this->move( settings->value("SearchDialog/pos", QPoint(200, 200)).toPoint() );
+    coverFormat->setText( settings->value("SearchDialog/coverFormat","%artist% - %album%").toString() );
+    coverFormatCheckBox->setChecked( settings->value("SearchDialog/coverFormatCheckBox",true).toBool() );
+    saveCoverCheckBox->setChecked( settings->value("SearchDialog/saveCover",false).toBool() );
+    saveAllCoversCheckBox->setChecked( settings->value("SearchDialog/saveAllCovers",true).toBool() );
+    artistLabel->setChecked( settings->value("SearchDialog/artistLabel",true).toBool() );
+    albumLabel->setChecked( settings->value("SearchDialog/albumLabel",true).toBool() );
+    genreLabel->setChecked( settings->value("SearchDialog/genreLabel",true).toBool() );
+    yearLabel->setChecked( settings->value("SearchDialog/yearLabel",true).toBool() );
+    rolesLabel->setChecked( settings->value("SearchDialog/rolesLabel",false).toBool() );
+    formatLabel->setChecked( settings->value("SearchDialog/formatLabel",false).toBool() );
+    countryLabel->setChecked( settings->value("SearchDialog/countryLabel",false).toBool() );
+    labelLabel->setChecked( settings->value("SearchDialog/labelLabel",false).toBool() );
+    notesLabel->setChecked( settings->value("SearchDialog/notesLabel",false).toBool() );
+    clearPreviousComentsCheckBox->setChecked( settings->value("SearchDialog/clearPreviousComents",false).toBool() );
+    downloadImmediately->setChecked( settings->value("SearchDialog/downloadImmediately",true).toBool() );
+    autoResizeColumns = settings->value("SearchDialog/autoResizeColumns",true).toBool();
     resizeColumns(autoResizeColumns);
-    autoResizeRows = settings->value("searchDialog/autoResizeRows",false).toBool();
+    autoResizeRows = settings->value("SearchDialog/autoResizeRows",false).toBool();
     resizeRows(autoResizeRows);
-    albumInfo->setSortingEnabled( settings->value("searchDialog/sortingEnabled",true).toBool() );
+    albumInfo->setSortingEnabled( settings->value("SearchDialog/sortingEnabled",true).toBool() );
     if( albumInfo->isSortingEnabled() ){
-        int sortColumn = settings->value("searchDialog/sortColumn",(int)CURRENTTRACK).toInt();
+        int sortColumn = settings->value("SearchDialog/sortColumn",(int)CURRENTTRACK).toInt();
         Qt::SortOrder sortOrder = (Qt::SortOrder)settings->value("discogs/sortOrder", (int)Qt::AscendingOrder ).toInt();
         albumInfo->sortByColumn( sortColumn, sortOrder );
         albumInfo->horizontalHeader()->setSortIndicator(sortColumn, sortOrder);
         albumInfo->horizontalHeader()->setSortIndicatorShown(true);
         albumInfo->horizontalHeader()->setClickable(true);
     }
-    matchByTrackChecked = settings->value("searchDialog/matchByTrack",false).toBool();
-    matchByTitleChecked = settings->value("searchDialog/matchByTitle",false).toBool();
-    dontMatchChecked = settings->value("searchDialog/dontMacth",true).toBool();
-    matchByTrackTitleChecked = settings->value("searchDialog/matchByTrackTitle",false).toBool();
-    matchByTitleTrackChecked = settings->value("searchDialog/matchByTitleTrack",false).toBool();
-    matchByFileNameChecked = settings->value("searchDialog/matchByFileName",false).toBool();
-    DatabaseComboBox->setCurrentIndex( settings->value("searchDialog/DatabaseComboBox",0).toInt() );
+    matchByTrackChecked = settings->value("SearchDialog/matchByTrack",false).toBool();
+    matchByTitleChecked = settings->value("SearchDialog/matchByTitle",false).toBool();
+    dontMatchChecked = settings->value("SearchDialog/dontMacth",true).toBool();
+    matchByTrackTitleChecked = settings->value("SearchDialog/matchByTrackTitle",false).toBool();
+    matchByTitleTrackChecked = settings->value("SearchDialog/matchByTitleTrack",false).toBool();
+    matchByFileNameChecked = settings->value("SearchDialog/matchByFileName",false).toBool();
+    DatabaseComboBox->setCurrentIndex( settings->value("SearchDialog/DatabaseComboBox",0).toInt() );
     databaseChanged( DatabaseComboBox->currentIndex() );
 }
 
 
-void searchDialog::search(){
+void SearchDialog::search(){
     //on search button press
 
 
@@ -196,7 +196,7 @@ void searchDialog::search(){
     
 }
 
-void searchDialog::getResults( QHash<QString,Album> results ){
+void SearchDialog::getResults( QHash<QString,Album> results ){
     //called after Database->search is finished
 
     Results = results;
@@ -223,7 +223,7 @@ void searchDialog::getResults( QHash<QString,Album> results ){
 }
 
 
-void searchDialog::setResultItem( QString text, QString key ){
+void SearchDialog::setResultItem( QString text, QString key ){
 
     bool enabled = albumInfo->isSortingEnabled();
     albumInfo->setSortingEnabled(false);
@@ -235,7 +235,7 @@ void searchDialog::setResultItem( QString text, QString key ){
 }
 
 
-void searchDialog::showResult( QListWidgetItem* item ){
+void SearchDialog::showResult( QListWidgetItem* item ){
     //called when row changed in listwidget searchResults
 
     if(!item){
@@ -251,7 +251,7 @@ void searchDialog::showResult( QListWidgetItem* item ){
 }
 
 
-void searchDialog::gotAlbums( QHash<QString,Album> albums ){
+void SearchDialog::gotAlbums( QHash<QString,Album> albums ){
 
     Albums = albums;
     QList<Album> tmpalbums = Albums.values();
@@ -264,7 +264,7 @@ void searchDialog::gotAlbums( QHash<QString,Album> albums ){
 
 }
 
-void searchDialog::showAlbumAndCover( Album album ){
+void SearchDialog::showAlbumAndCover( Album album ){
 
     if(album.images().size()==0){
         cover->setText("No cover found...");
@@ -276,7 +276,7 @@ void searchDialog::showAlbumAndCover( Album album ){
 
 }
 
-void searchDialog::showAlbumInfo( Album a ){
+void SearchDialog::showAlbumInfo( Album a ){
 
     int n = nFiles;
     if(a.songs().size()>nFiles){
@@ -391,18 +391,18 @@ void searchDialog::showAlbumInfo( Album a ){
     albumInfo->setSortingEnabled(enabled);
 }
 
-void searchDialog::showPrevCover(){
+void SearchDialog::showPrevCover(){
 
     currentCoverInd--;
     showCover( currentCoverInd );
 }
 
-void searchDialog::showNextCover(){
+void SearchDialog::showNextCover(){
     currentCoverInd++;
     showCover( currentCoverInd );
 }
 
-void searchDialog::showCover( int ind ){
+void SearchDialog::showCover( int ind ){
 
     int aind = searchResults->currentRow();
     if(aind==-1){
@@ -429,7 +429,7 @@ void searchDialog::showCover( int ind ){
     coverLabel->setText("Cover "+QString::number(ind+1)+" of "+QString::number(n));
 }
 
-void searchDialog::saveCoverNow(){
+void SearchDialog::saveCoverNow(){
     int ind = searchResults->currentRow();
     if(ind==-1){
         return;
@@ -443,7 +443,7 @@ void searchDialog::saveCoverNow(){
 }
 
 
-void searchDialog::saveAllCoversNow(){
+void SearchDialog::saveAllCoversNow(){
     int ind = searchResults->currentRow();
     if(ind==-1){
         return;
@@ -458,7 +458,7 @@ void searchDialog::saveAllCoversNow(){
     }
 }
 
-void searchDialog::setCoverFromReply(QNetworkReply* reply){
+void SearchDialog::setCoverFromReply(QNetworkReply* reply){
 
     QByteArray data = reply->readAll();
     QPixmap p;
@@ -470,18 +470,18 @@ void searchDialog::setCoverFromReply(QNetworkReply* reply){
 }
 
 
-void searchDialog::setCover( QUrl url ){
+void SearchDialog::setCover( QUrl url ){
 
     //qDebug()<<"showing cover"<<url;
     downloadImageManager.get(QNetworkRequest(url));
 
 }
 
-void searchDialog::saveCover( QUrl url ){
+void SearchDialog::saveCover( QUrl url ){
     saveCoverManager.get(QNetworkRequest(url));
 }
 
-void searchDialog::saveCoverFromReply(QNetworkReply* reply){
+void SearchDialog::saveCoverFromReply(QNetworkReply* reply){
     //image to be saved must exist in Album.images
 
     QByteArray data = reply->readAll();
@@ -532,7 +532,7 @@ void searchDialog::saveCoverFromReply(QNetworkReply* reply){
     }
 }
 
-QString searchDialog::createCoverName( int ind, QString ext ){	
+QString SearchDialog::createCoverName( int ind, QString ext ){	
 
     QString name = coverFormat->text();
     name.replace( "%artist%", Artist->text() );
@@ -544,7 +544,7 @@ QString searchDialog::createCoverName( int ind, QString ext ){
 }
 
 
-void searchDialog::moveRowTo(){
+void SearchDialog::moveRowTo(){
 
     bool ok;
     int n = albumInfo->rowCount();
@@ -564,7 +564,7 @@ void searchDialog::moveRowTo(){
     moveRow( current, row, t );
 }
 
-void searchDialog::moveRow( int from, int to, itemCol t ){
+void SearchDialog::moveRow( int from, int to, itemCol t ){
     //move current row to row
 
     int n = albumInfo->rowCount();
@@ -599,14 +599,14 @@ void searchDialog::moveRow( int from, int to, itemCol t ){
     albumInfo->setSortingEnabled(enabled);
 }
 
-void searchDialog::moveRowUp(){
+void SearchDialog::moveRowUp(){
     QAction *action = qobject_cast<QAction *>(sender());
     itemCol t = (itemCol)action->data().toInt();
     int current = albumInfo->currentRow();
     moveRow( current, current-1, t );
 }
 
-void searchDialog::moveRowDown(){
+void SearchDialog::moveRowDown(){
     QAction *action = qobject_cast<QAction *>(sender());
     itemCol t = (itemCol)action->data().toInt();
     int current = albumInfo->currentRow();
@@ -614,9 +614,9 @@ void searchDialog::moveRowDown(){
 }
 
 
-void searchDialog::closeEvent( QCloseEvent *event ){
+void SearchDialog::closeEvent( QCloseEvent *event ){
 
-    settings->beginGroup("searchDialog");
+    settings->beginGroup("SearchDialog");
     settings->setValue( "saveCover", saveCoverCheckBox->isChecked() );
     settings->setValue( "saveAllCovers", saveAllCoversCheckBox->isChecked() );
     settings->setValue( "pos", this->pos() );
@@ -652,7 +652,7 @@ void searchDialog::closeEvent( QCloseEvent *event ){
 }
 
 
-int searchDialog::matchResult( QVariant toMatch, int matchCol ){
+int SearchDialog::matchResult( QVariant toMatch, int matchCol ){
     //qDebug()<<"matching";
     int res=-1;
     for(int i=0;i<albumInfo->rowCount();i++){
@@ -692,7 +692,7 @@ int searchDialog::matchResult( QVariant toMatch, int matchCol ){
 
 
 
-void searchDialog::setNonEditable( int startrow, int stoprow ){
+void SearchDialog::setNonEditable( int startrow, int stoprow ){
 
     bool enabled = albumInfo->isSortingEnabled();
     albumInfo->setSortingEnabled(false);
@@ -714,7 +714,7 @@ void searchDialog::setNonEditable( int startrow, int stoprow ){
 
 }
 
-void searchDialog::save(){
+void SearchDialog::save(){
 
 
     QString log;
@@ -892,7 +892,7 @@ void searchDialog::save(){
     }
     //show log if any
     if(!log.isEmpty()){
-        textViewer t(this, &log);
+        TextViewer t(this, &log);
         t.exec();
     }
     info->setText("Tags saved");
@@ -901,7 +901,7 @@ void searchDialog::save(){
 
 
 
-void searchDialog::databaseChanged( int ind ){
+void SearchDialog::databaseChanged( int ind ){
 
     //delete Database;
 
@@ -929,14 +929,14 @@ void searchDialog::databaseChanged( int ind ){
 
 }
 
-void searchDialog::gotAlbum( Album a ){
+void SearchDialog::gotAlbum( Album a ){
 
     Albums.insert(a.key(),a);
     showAlbumAndCover( a );
 
 }
 
-void searchDialog::checkRows(){
+void SearchDialog::checkRows(){
 
     QAction *action = qobject_cast<QAction*>(sender());
     bool checked = action->data().toBool();
@@ -958,12 +958,12 @@ void searchDialog::checkRows(){
 
 }
 
-void searchDialog::updateSortingEnabled( bool enabled ){
+void SearchDialog::updateSortingEnabled( bool enabled ){
     albumInfo->setSortingEnabled(enabled);
 }
 
 
-void searchDialog::albumInfoContextMenu(const QPoint &p){
+void SearchDialog::albumInfoContextMenu(const QPoint &p){
 
     /*
     QModelIndex index = albumInfo->indexAt(p);
@@ -1097,7 +1097,7 @@ void searchDialog::albumInfoContextMenu(const QPoint &p){
     c->exec(globalPos);
 }
 
-void searchDialog::paste(){
+void SearchDialog::paste(){
 
     QList<QTableWidgetSelectionRange> ranges = albumInfo->selectedRanges();
     if(ranges.size()==0){
@@ -1141,7 +1141,7 @@ void searchDialog::paste(){
     albumInfo->setSortingEnabled(enabled);
 }
 
-void searchDialog::copyCells(){
+void SearchDialog::copyCells(){
 
     QList<QTableWidgetSelectionRange> ranges = albumInfo->selectedRanges();
     if(ranges.size()==0){
@@ -1168,7 +1168,7 @@ void searchDialog::copyCells(){
     QApplication::clipboard()->setText(str);
 }
 
-void searchDialog::removeRow(){
+void SearchDialog::removeRow(){
 
     int ind = albumInfo->currentRow();
     if(ind==-1){
@@ -1181,7 +1181,7 @@ void searchDialog::removeRow(){
     resize(size().height()+1,size().width());
 }
 
-void searchDialog::insertBlankItem(){
+void SearchDialog::insertBlankItem(){
 
     int ind = albumInfo->currentRow();
     if(ind==-1){
@@ -1233,7 +1233,7 @@ void searchDialog::insertBlankItem(){
 
 }
 
-void searchDialog::deleteCells(){
+void SearchDialog::deleteCells(){
 
     bool enabled = albumInfo->isSortingEnabled();
     albumInfo->setSortingEnabled(false);
@@ -1252,7 +1252,7 @@ void searchDialog::deleteCells(){
     resize(size().height()+1,size().width());
 }
 
-void searchDialog::unCheckMatchActions(){
+void SearchDialog::unCheckMatchActions(){
 
     matchByTrackChecked = false;
     matchByTitleChecked = false;
@@ -1262,7 +1262,7 @@ void searchDialog::unCheckMatchActions(){
     matchByFileNameChecked = false;
 }
 
-void searchDialog::matchBy(bool state){
+void SearchDialog::matchBy(bool state){
 
     QAction *action = qobject_cast<QAction*>(sender());
     if(state==false){
@@ -1288,7 +1288,7 @@ void searchDialog::matchBy(bool state){
 
 }
 
-void searchDialog::updateCell( int row, int col ){
+void SearchDialog::updateCell( int row, int col ){
 
     //only current track & title, and track and title
     if(col<1 || col>4 ){
@@ -1315,7 +1315,7 @@ void searchDialog::updateCell( int row, int col ){
 
 }
 
-void searchDialog::resizeHeader( QHeaderView *header, bool state ){
+void SearchDialog::resizeHeader( QHeaderView *header, bool state ){
     QHeaderView::ResizeMode mode;
     if(state){
         mode = QHeaderView::ResizeToContents;
@@ -1324,13 +1324,13 @@ void searchDialog::resizeHeader( QHeaderView *header, bool state ){
     }
     header->setResizeMode( mode );
 }
-void searchDialog::resizeColumns(bool state){
+void SearchDialog::resizeColumns(bool state){
     resizeHeader( albumInfo->horizontalHeader(), state );
     autoResizeColumns = state;
     //settings->setValue( "discogs/autoResizeColumns", state );
     //settings->sync();
 }
-void searchDialog::resizeRows(bool state){
+void SearchDialog::resizeRows(bool state){
     resizeHeader( albumInfo->verticalHeader(), state );
     autoResizeRows = state;
     //settings->setValue( "discogs/autoResizeRows", state );

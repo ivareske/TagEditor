@@ -7,7 +7,6 @@
 #include <tag.h>
 #include <taglib.h>
 #include <fileref.h>
-#include "structs.h"
 #include "Album.h"
 #include <QtXml>
 

@@ -1,7 +1,7 @@
-#include "textViewer.h"
+#include "TextViewer.h"
 
  
-textViewer::textViewer(QWidget *parent, QString *text) : QDialog(parent){
+TextViewer::TextViewer(QWidget *parent, QString *text) : QDialog(parent){
     setupUi(this); // this sets up GUI 	       	
 	if(!text->isNull()){
 		textEdit->setText( *text );
@@ -10,11 +10,11 @@ textViewer::textViewer(QWidget *parent, QString *text) : QDialog(parent){
 }
 
 
-void textViewer::setText( QString text ){
+void TextViewer::setText( QString text ){
 	textEdit->setText( text );
 }
 
-void textViewer::selectFont(){
+void TextViewer::selectFont(){
     bool ok;
     QFont font = QFontDialog::getFont(&ok, textEdit->font(), this);
     if(!ok){

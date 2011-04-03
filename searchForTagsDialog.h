@@ -2,18 +2,18 @@
 #define SEARCHFORTAGSDIALOG_H
 
 #include <QtGui>
-#include "textViewer.h"
+#include "TextViewer.h"
 #include "TagItem.h"
 #include "ui_searchForTagsDialog.h"
 
 
-class searchForTagsDialog : public QDialog, private Ui::searchForTagsDialog
+class SearchForTagsDialog : public QDialog, private Ui::SearchForTagsDialog
 {
     Q_OBJECT
 
 public:
 
-    searchForTagsDialog( QList<QFileInfo> files, QWidget *parent = 0 );
+    SearchForTagsDialog( QList<QFileInfo> files, QWidget *parent = 0 );
 
 public slots:
     void search();

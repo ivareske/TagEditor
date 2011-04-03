@@ -3,13 +3,13 @@
 
 #include <QtGui>
 #include "TagItem.h"
-#include "searchForTagsDialog.h"
+#include "SearchForTagsDialog.h"
 #include "globalFunctions.h"
-#include "settingsDialog.h"
-#include "replaceDialog.h"
-#include "renameDialog.h"
-#include "textViewer.h"
-#include "searchDialog.h"
+#include "SettingsDialog.h"
+#include "ReplaceDialog.h"
+#include "RenameDialog.h"
+#include "TextViewer.h"
+#include "SearchDialog.h"
 #include <tbytevector.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
