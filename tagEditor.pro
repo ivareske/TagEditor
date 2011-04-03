@@ -41,16 +41,12 @@ LIBS += $$quote(C:/Program Files/taglib/bin/libtag.dll)
 
 
 HEADERS  = TagEditor.h SettingsDialog.h SettingsClass.h SearchDialog.h Album.h TextViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
-    ReleaseEvent.h \
-    Song.h \
-    Artist.h \
-    TreeWidget.h
-FORMS     = TagEditor.ui SettingsDialog.ui SearchDialog.ui TextViewer.ui ReplaceDialog.ui RenameDialog.ui SearchForTagsDialog.ui
+            ReleaseEvent.h Song.h Artist.h TreeWidget.h #SetColumnsDialog.h
+
+FORMS     = TagEditor.ui SettingsDialog.ui SearchDialog.ui TextViewer.ui ReplaceDialog.ui RenameDialog.ui SearchForTagsDialog.ui #SetColumnsDialog.ui
+
 SOURCES = main.cpp TagEditor.cpp SettingsDialog.cpp SettingsClass.cpp SearchDialog.cpp Album.cpp TextViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp ReplaceDialog.cpp RenameDialog.cpp SearchForTagsDialog.cpp \
-    ReleaseEvent.cpp \
-    Song.cpp \
-    Artist.cpp \
-    TreeWidget.cpp
+    ReleaseEvent.cpp Song.cpp Artist.cpp TreeWidget.cpp #SetColumnsDialog.cpp
 
 RC_FILE = TagEditor.rc
 RESOURCES += TagEditor.qrc

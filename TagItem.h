@@ -36,7 +36,7 @@ public:
     bool tagOk() const;
     bool audioPropertiesOk() const;
     void setTag( TagItem::TagField field, const QVariant &tag );
-    void setColumnData();
+    void setColumnData(const QList<int> &columns);
 public slots:
 
 

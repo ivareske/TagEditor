@@ -2,10 +2,12 @@
 #define TAGEDITOR_H
 
 #include <QtGui>
-#include "TagItem.h"
-#include "SearchForTagsDialog.h"
-#include "globalFunctions.h"
+
+//#include "TagItem.h"
+//#include "SearchForTagsDialog.h"
+//#include "globalFunctions.h"
 #include "SettingsDialog.h"
+/*
 #include "ReplaceDialog.h"
 #include "RenameDialog.h"
 #include "TextViewer.h"
@@ -20,12 +22,12 @@
 #include <taglib.h>
 #include <fileref.h>
 #include <QtPlugin>
+*/
 //#include "ListWidget.h"
-#include "ui_tagEditor.h"
-#include "TreeWidget.h"
+#include "ui_TagEditor.h"
+//#include "TreeWidget.h"
 
 
-Q_DECLARE_METATYPE(QList<int>)
 //Q_IMPORT_PLUGIN(qjpeg)
 
 class TagEditor : public QMainWindow, private Ui::TagEditor{
@@ -36,9 +38,10 @@ public:
     TagEditor(QWidget *parent = 0);    
 
 private slots:
-
-    QList<QFileInfo> getDirContent( QString& aPath );
-    void addFiles();
+/*
+    QList<QFileInfo> getDirContent( const QString& aPath );
+    void addFiles( const QList<QFileInfo> &infos );
+    void getFiles();
     void clearTextFields();
     //bool compareListWidgetItems( const QListWidgetItem &s1, const QListWidgetItem &s2, QString string );
     void resizeColumn();
@@ -50,8 +53,8 @@ private slots:
     void openStyleSheet();
     void setGUIStyle( const QString &s );
     void uncheckStyleActions();
-    void checkStyleAction( QString actionText, bool state );
-    bool loadStyleSheet( QString file );
+    void checkStyleAction( const QString &actionText, bool state );
+    bool loadStyleSheet( const QString &file );
     void saveTag();
     void serialize();
     void showSettings();
@@ -65,10 +68,10 @@ private slots:
     void removeFrames();
     void replaceTags();
     void searchAndAddFiles();
-
+*/
     //protected:
 private:
-    void closeEvent( QCloseEvent *event );
+    //void closeEvent( QCloseEvent *event );
 
     QSettings *guiSettings;
     QString startupFolder;
@@ -88,7 +91,7 @@ private:
     //QVector<tag> tags;
     bool showSaveTagWarning;
     QSize textViewerSize;
-    TreeWidget *treeWidget;
+   // TreeWidget *treeWidget;
 
 };
 

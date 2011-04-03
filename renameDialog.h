@@ -4,7 +4,7 @@
 #include <QtGui>
 #include "TextViewer.h"
 #include "TagItem.h"
-#include "ui_renameDialog.h"
+#include "ui_RenameDialog.h"
 
 
 class RenameDialog : public QDialog, private Ui::RenameDialog

@@ -3,7 +3,7 @@
 RenameDialog::RenameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString *renameformat ) : QDialog(parent){
     setupUi(this); // this sets up GUI
 
-    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,0);
+    settings = new QSettings(Global::settingsFile,QSettings::IniFormat,0);
     connect( RenameButton, SIGNAL( clicked()  ), this, SLOT(rename() ) );
     tagItems = tagitems;
     qDebug()<<1;

@@ -12,7 +12,7 @@
 #include "MusicDatabase.h"
 #include "MusicBrainz.h"
 #include "Discogs.h"
-#include "ui_searchDialog.h"
+#include "ui_SearchDialog.h"
 
 
 class SearchDialog : public QDialog, private Ui::SearchDialog{

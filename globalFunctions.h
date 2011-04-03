@@ -10,30 +10,14 @@
 #include "Album.h"
 #include <QtXml>
 
+//Q_DECLARE_METATYPE(QList<int>)
 
 namespace Global{
 
-    enum ColumnType{ FileNameColumn, ArtistColumn, AlbumColumn, TitleColumn, YearColumn, TrackColumn, GenreColumn, LengthColumn, BitRateColumn, SampleRateColumn, ChannelsColumn }; //, CommentColumn
+    enum ColumnType{ FileNameColumn, ArtistColumn, AlbumColumn, TitleColumn, YearColumn, TrackColumn, GenreColumn, LengthColumn, BitRateColumn, SampleRateColumn, ChannelsColumn, CommentColumn, NColumns }; //,
 
-   // bool readFile(QIODevice &device, QSettings::SettingsMap &map);
-   // bool writeFile(QIODevice &device, const QSettings::SettingsMap &map);
-    /*
-bool writeXmlFile(QIODevice &device, const QSettings::SettingsMap &map);
-bool readXmlFile(QIODevice &device, QSettings::SettingsMap &map);
-bool sortXmlElements(const QString &s1, const QString &s2);
-*/
-/*
-    bool compareName( TagItem *s1, TagItem *s2 );
-    bool compareArtistTag( TagItem *s1, TagItem *s2 );
-    bool compareAlbumTag( TagItem *s1, TagItem *s2 );
-    bool compareTitleTag( TagItem *s1, TagItem *s2 );
-    bool compareTrackTag( TagItem *s1, TagItem *s2 );
-    bool compareYearTag( TagItem *s1, TagItem *s2 );
-    bool compareGenreTag( TagItem *s1, TagItem *s2 );
-    bool compareCommentTag( TagItem *s1, TagItem *s2 );
-*/
-    //bool compareResult( SearchResult s1, SearchResult s2 );
-
+    const QString settingsFile = Global::settingsFile;
+    QString columnText( Global::ColumnType t );
     bool compareAlbum(  const Album &a1, const Album &a2  );
     int naturalCompare( const QString &_a, const QString &_b, Qt::CaseSensitivity caseSensitivity );
 

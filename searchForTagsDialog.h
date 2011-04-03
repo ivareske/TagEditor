@@ -4,11 +4,10 @@
 #include <QtGui>
 #include "TextViewer.h"
 #include "TagItem.h"
-#include "ui_searchForTagsDialog.h"
+#include "ui_SearchForTagsDialog.h"
 
 
-class SearchForTagsDialog : public QDialog, private Ui::SearchForTagsDialog
-{
+class SearchForTagsDialog : public QDialog, private Ui::SearchForTagsDialog{
     Q_OBJECT
 
 public:

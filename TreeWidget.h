@@ -4,7 +4,9 @@
 #include <QtGui>
 #include "TagItem.h"
 #include "globalFunctions.h"
+//#include "SetColumnsDialog.h"
 
+class TagItem;
 
 class TreeWidget : public QTreeWidget{
     Q_OBJECT
@@ -15,6 +17,7 @@ public:
     bool showFullFileName() const;
     void setShowFullFileName( bool show );
     void addItem( QTreeWidgetItem *item );
+    void addTopLevelItems( const QList<QTreeWidgetItem*> &items );
     void updateItems( QList<TagItem*> items );
     bool showTagInfo() const;
     void setShowTagInfo( bool show );
@@ -28,10 +31,12 @@ private slots:
     void treeWidgetContextMenu(const QPoint &p);
     void updateFileNames( bool enable );    
     void updateShowTagInfo( bool enable );
-    void sortTreeWidget(const QString &string );
+    void editColumns();
+    void setColumns();
 private:
     bool showFullFileName_;
     bool showTagInfo_;
+    QList<int> columns_;
 
 };
 

@@ -4,7 +4,7 @@
 #include <QtGui>
 #include "TextViewer.h"
 #include "TagItem.h"
-#include "ui_replaceDialog.h"
+#include "ui_ReplaceDialog.h"
 
 
 class ReplaceDialog : public QDialog, private Ui::ReplaceDialog

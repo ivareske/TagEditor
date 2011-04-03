@@ -2,11 +2,40 @@
 
 TreeWidget::TreeWidget(QWidget *parent) : QTreeWidget(parent){
 
+    qDebug()<<1;
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(treeWidgetContextMenu(const QPoint &)));
     showTagInfo_ = false;
     showFullFileName_ = false;
+qDebug()<<2;
+    QSettings settings(Global::settingsFile,QSettings::IniFormat,this);
+   // columns_ = settings.value("columns",QVariant::fromValue< QList<int> >(columns_)).value< QList<int> >();
+    if( columns_.isEmpty() ){
+        for(int i=0;i<Global::NColumns;i++){
+            columns_.append(i);
+        }
+    }
+    qDebug()<<"setColumns1";
+    setColumns();
+    qDebug()<<"setColumns2";
+
+    setSortingEnabled(true);
+    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+}
+
+void TreeWidget::setColumns(){
+
     QStringList headers;
+    for(int i=0;i<columns_.size();i++){
+        if(columns_[i]!=-1){
+            QString str = Global::columnText(static_cast<Global::ColumnType>(columns_[i]));
+            headers.append(str);
+        }
+    }
+    setHeaderLabels( headers );
+    setColumnCount(headers.size());
+
+    /*
     headers.insert(Global::ArtistColumn,"Artist");
     headers.insert(Global::AlbumColumn,"Album");
     headers.insert(Global::FileNameColumn,"File name");
@@ -22,10 +51,38 @@ TreeWidget::TreeWidget(QWidget *parent) : QTreeWidget(parent){
     //headers<<"File name"<<"Artist"<<"Album"<<"Title"<<"Track"<<"Year"<<"Genre"<<"Comment"<<"Length (s)"<<"BitRate (kbps)"<<"SampleRate (Hz)"<<"Channels";
     setHeaderLabels( headers );
     setColumnCount(headers.size());
-    setSortingEnabled(true);
-    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    */
+
 }
 
+void TreeWidget::addTopLevelItems( const QList<QTreeWidgetItem*> &items ){
+
+    QString txt = "Adding files";
+    if( showTagInfo() ){
+        QString txt = "Adding files and reading tags";
+    }
+    QProgressDialog progress(txt, "Abort", 0, items.size(), this);
+    progress.setWindowModality(Qt::WindowModal);
+    for(int i=0;i<items.size();i++){
+        progress.setValue(i);
+        if(progress.wasCanceled()){
+            return;
+        }
+        TagItem *item_ = static_cast<TagItem*>(items[i]);
+        if( !item_->tagIsRead() && showTagInfo() ){
+            item_->readTags();
+        }
+        QString str = item_->fileInfo().fileName();
+        if( showFullFileName_ ){
+            str = item_->fileInfo().filePath();
+        }
+        item_->setText(Global::FileNameColumn,str);
+    }
+    progress.setValue(items.size());
+
+    QTreeWidget::addTopLevelItems(items);
+
+}
 
 void TreeWidget::addItem( QTreeWidgetItem *item ){
     TagItem *item_ = static_cast<TagItem*>(item);
@@ -52,7 +109,7 @@ bool TreeWidget::showTagInfo() const{
 void TreeWidget::updateItems( QList<TagItem*> items ){
 
     bool sort = isSortingEnabled();
-    setSortingEnabled(false);
+    setSortingEnabled(false);    
     for(int i=0;i<items.size();i++){
         TagItem *item_ = items[i];
         QString str = item_->fileInfo().absoluteFilePath();
@@ -60,7 +117,7 @@ void TreeWidget::updateItems( QList<TagItem*> items ){
             str = item_->fileInfo().fileName();
         }
         item_->setText( 0, str );
-        item_->setColumnData();
+        item_->setColumnData(columns_);
     }
     setSortingEnabled(sort);
 
@@ -89,57 +146,7 @@ void TreeWidget::setShowFullFileName( bool show ){
     showFullFileName_ = show;
 }
 
-void TreeWidget::sortTreeWidget(const QString &string ){
-/*
-    int n = count();
-    blockSignals(true);
-    QVector<TagItem*> items(n,NULL);
-    qDebug()<<count();
 
-
-    for(int i=n-1;i>=0;i--){
-        items[i] = (TagItem*)takeItem(i);
-        bool isSelected = items[i]->isSelected();
-        if(isSelected){
-            items[i]->setData(LOGICAL,QVariant(true));
-        }
-    }
-
-
-    if( string=="name" ){
-        qStableSort( items.begin(), items.end(), Global::compareName );
-    }else if( string=="artist"){
-        qStableSort( items.begin(), items.end(), Global::compareArtistTag );
-    }else if( string=="album"){
-        qStableSort( items.begin(), items.end(), Global::compareAlbumTag );
-    }else if( string=="title"){
-        qStableSort( items.begin(), items.end(), Global::compareTitleTag );
-    }else if( string=="track"){
-        qStableSort( items.begin(), items.end(), Global::compareTrackTag );
-    }else if( string=="year"){
-        qStableSort( items.begin(), items.end(), Global::compareYearTag );
-    }else if( string=="genre"){
-        qStableSort( items.begin(), items.end(), Global::compareGenreTag );
-    }else if( string=="comment"){
-        qStableSort( items.begin(), items.end(), Global::compareCommentTag );
-    }else{
-        qStableSort( items.begin(), items.end(), Global::compareName );
-    }
-
-
-    clear();
-    for(int i=0;i<items.size();i++){
-        addItem( items[i] );
-        if( items[i]->data(LOGICAL).toBool()==true ){
-            item(i)->setSelected(true);
-        }
-
-    }
-
-    blockSignals(false);
-    //statusBar()->showMessage("Finished sorting tags by "+string, 8000);
-    */
-}
 
 void TreeWidget::updateShowTagInfo( bool enable ){
     //må bytte til qtreeview om man skal ha flere kolonner
@@ -152,9 +159,17 @@ void TreeWidget::updateShowTagInfo( bool enable ){
 
     bool sort = isSortingEnabled();
     setSortingEnabled(false);
-    QVector<TagItem*> items_; items_.resize(topLevelItemCount());
+    int n = topLevelItemCount();
+    QVector<TagItem*> items_; items_.resize(n);
     int k=0;
-    for(int i=topLevelItemCount()-1;i>=0;i--){
+    QProgressDialog progress("Reading tags...", "Abort", 0, n, this);
+    progress.setWindowModality(Qt::WindowModal);
+    for(int i=n-1;i>=0;i--){
+        progress.setValue(i-n+1);
+        if(progress.wasCanceled()){
+            showTagInfo_ = false;
+            break;
+        }
         TagItem *item_ = static_cast<TagItem*>(takeTopLevelItem(i));
         if(!item_->tagIsRead()){
             item_->readTags();
@@ -167,6 +182,7 @@ void TreeWidget::updateShowTagInfo( bool enable ){
         addItem(items_[i]);
     }
     setSortingEnabled(sort);
+    progress.setValue(n);
 
 
 }
@@ -175,48 +191,6 @@ void TreeWidget::treeWidgetContextMenu(const QPoint &p){
     QMenu *c = new QMenu(this);
 
     qDebug()<<"TreeWidgetContextMenu";
-
-    /*
-    QSignalMapper *signalMapper = new QSignalMapper(this);
-
-    QAction* sortByNameAction = new QAction(tr("Sort files by name"), this);
-    connect(sortByNameAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    QAction* sortByArtistAction = new QAction(tr("Sort files by artist"), this);
-    connect(sortByArtistAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    QAction* sortByAlbumAction = new QAction(tr("Sort files by album"), this);
-    connect(sortByAlbumAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    QAction* sortByTitleAction = new QAction(tr("Sort files by title"), this);
-    connect(sortByTitleAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    QAction* sortByTrackAction = new QAction(tr("Sort files by track"), this);
-    connect(sortByTrackAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    QAction* sortByYearAction = new QAction(tr("Sort files by year"), this);
-    connect(sortByYearAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    QAction* sortByGenreAction = new QAction(tr("Sort files by genre"), this);
-    connect(sortByGenreAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    QAction* sortByCommentAction = new QAction(tr("Sort files by comment"), this);
-    connect(sortByCommentAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-
-    signalMapper->setMapping(sortByNameAction, QString("name"));
-    signalMapper->setMapping(sortByArtistAction, QString("artist"));
-    signalMapper->setMapping(sortByAlbumAction, QString("album"));
-    signalMapper->setMapping(sortByTitleAction, QString("title"));
-    signalMapper->setMapping(sortByTrackAction, QString("track"));
-    signalMapper->setMapping(sortByYearAction, QString("year"));
-    signalMapper->setMapping(sortByGenreAction, QString("genre"));
-    signalMapper->setMapping(sortByCommentAction, QString("comment"));
-
-    connect(signalMapper, SIGNAL(mapped(const QString &)), this, SLOT(sortTreeWidget(const QString &)));
-
-    c->addAction(sortByNameAction);
-    c->addAction(sortByArtistAction);
-    c->addAction(sortByAlbumAction);
-    c->addAction(sortByTitleAction);
-    c->addAction(sortByTrackAction);
-    c->addAction(sortByYearAction);
-    c->addAction(sortByGenreAction);
-    c->addAction(sortByCommentAction);
-    c->addSeparator();
-*/
 
     //enable sorting
     QAction* enableSortAction = new QAction(tr("Enable sorting"), this);
@@ -238,13 +212,32 @@ void TreeWidget::treeWidgetContextMenu(const QPoint &p){
     QAction* resizeColumnsAction = new QAction(tr("Resize columns to contents"), this);
     connect(resizeColumnsAction, SIGNAL(triggered()), this, SLOT(resizeColumns()));
 
+    //show full file names
+    QAction* editColumnsAction = new QAction(tr("Edit columns..."), this);
+    connect(editColumnsAction, SIGNAL(triggered()), this, SLOT(editColumns()));
+
     c->addAction(showFullNamesAction);
     c->addAction(showTagInfoAction);
     c->addAction(enableSortAction);
     c->addAction(resizeColumnsAction);
+    c->addAction(editColumnsAction);
 
     QPoint globalPos = mapToGlobal(p);
     c->exec(globalPos);
+}
+
+void TreeWidget::editColumns(){
+
+
+    /*SetColumnsDialog d(columns_,this);
+    if(d.exec()==QDialog::Accepted){
+        columns_ = d.columns();
+        QSettings settings(Global::settingsFile,QSettings::IniFormat,this);
+        settings.setValue("columns", QVariant::fromValue< QList<int> >(columns_) );
+        setColumns();
+    }
+    */
+
 }
 
 void TreeWidget::resizeColumns(){
