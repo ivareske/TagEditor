@@ -45,13 +45,15 @@ HEADERS  = tagEditor.h settingsDialog.h settingsClass.h searchDialog.h Album.h t
     ReleaseEvent.h \
     Song.h \
     Artist.h \
-    TreeWidget.h
-FORMS     = tagEditor.ui settingsDialog.ui searchDialog.ui textViewer.ui replaceDialog.ui renameDialog.ui searchForTagsDialog.ui
+    TreeWidget.h SetColumnsDialog.h
+
+FORMS     = tagEditor.ui settingsDialog.ui searchDialog.ui textViewer.ui replaceDialog.ui renameDialog.ui searchForTagsDialog.ui SetColumnsDialog.ui
+
 SOURCES = main.cpp tagEditor.cpp settingsDialog.cpp settingsClass.cpp searchDialog.cpp Album.cpp textViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp replaceDialog.cpp renameDialog.cpp searchForTagsDialog.cpp \
     ReleaseEvent.cpp \
     Song.cpp \
     Artist.cpp \
-    TreeWidget.cpp
+    TreeWidget.cpp SetColumnsDialog.cpp
 
 RC_FILE = tagEditor.rc
 RESOURCES += tagEditor.qrc

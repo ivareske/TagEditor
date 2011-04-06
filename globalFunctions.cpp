@@ -2,63 +2,7 @@
 
 
 namespace Global{
-/*
 
-    bool compareName( TagItem *s1, TagItem *s2 ){
-        int res = naturalCompare( s1->fileInfo().fileName().toLower(), s2->fileInfo().fileName().toLower(), Qt::CaseInsensitive );
-        return  res<0 ;
-    }
-    bool compareArtistTag( TagItem *s1, TagItem *s2 ){
-        QString comp1 = s1->getTag(TagItem::Artist).toString().toLower();
-        QString comp2 = s2->getTag(TagItem::Artist).toString().toLower();
-        int res = naturalCompare( comp1, comp2, Qt::CaseInsensitive );
-        return res<0;
-    }
-    bool compareAlbumTag( TagItem *s1, TagItem *s2 ){
-        QString comp1 = s1->getTag(TagItem::Album).toString().toLower();
-        QString comp2 = s2->getTag(TagItem::Album).toString().toLower();
-        int res = naturalCompare( comp1, comp2, Qt::CaseInsensitive );
-        return res<0;
-    }
-    bool compareTitleTag( TagItem *s1, TagItem *s2 ){
-        QString comp1 = s1->getTag(TagItem::Title).toString().toLower();
-        QString comp2 = s2->getTag(TagItem::Title).toString().toLower();
-        int res = naturalCompare( comp1, comp2, Qt::CaseInsensitive );
-        return res<0;
-    }
-    bool compareTrackTag( TagItem *s1, TagItem *s2 ){
-        int comp1 = s1->getTag(TagItem::Track).toInt();
-        int comp2 = s2->getTag(TagItem::Track).toInt();
-        return comp1 < comp2;
-    }
-    bool compareYearTag( TagItem *s1, TagItem *s2 ){
-        int comp1 = s1->getTag(TagItem::Year).toInt();
-        int comp2 = s2->getTag(TagItem::Year).toInt();
-        return comp1 < comp2;
-    }
-    bool compareGenreTag( TagItem *s1, TagItem *s2 ){
-        QString comp1 = s1->getTag(TagItem::Genre).toString().toLower();
-        QString comp2 = s2->getTag(TagItem::Genre).toString().toLower();
-        int res = naturalCompare( comp1, comp2, Qt::CaseInsensitive );
-        return res<0;
-    }
-    bool compareCommentTag( TagItem *s1, TagItem *s2 ){
-        QString comp1 = s1->getTag(TagItem::Comment).toString().toLower();
-        QString comp2 = s2->getTag(TagItem::Comment).toString().toLower();
-        int res = naturalCompare( comp1, comp2, Qt::CaseInsensitive );
-        return res<0;
-    }
-*/
-    /*
-bool compareResult( SearchResult s1, SearchResult s2 ){
-        int res = naturalCompare( s1.format, s2.format, Qt::CaseInsensitive );
-        if(res==0){
-                return s1.year < s2.year;
-        }else{
-                return res<0;
-        }
-}
-*/
 
     bool compareAlbum( const Album &a1, const Album &a2 ){
         int res = naturalCompare( a1.format(), a2.format(), Qt::CaseInsensitive );
