@@ -70,11 +70,13 @@ ShowUnInstDetails show
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
+  File $%QTDIR%\bin\QtCore4.dll
+  File $%QTDIR%\bin\QtGui4.dll
   File "release\tagEditor.exe"
   File "release\libtag.dll"
   File "C:\MinGW\bin\zlib1.dll"
   File "C:\MinGW\bin\libstdc++-6.dll"
-  File "C:\MinGW\bin\libgcc_s_dw2-1.dll"
+  File "C:\MinGW\bin\libgcc_s_dw2-1.dll"  
 
 
 ; Shortcuts
@@ -201,7 +203,9 @@ Section Uninstall
   Delete "$INSTDIR\zlib1.dll"
   Delete "$INSTDIR\libstdc++-6.dll"
   Delete "$INSTDIR\libgcc_s_dw2-1.dll"
-    
+  Delete "$INSTDIR\QtCore4.dll"
+  Delete "$INSTDIR\QtGui4.dll"  
+  
   Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_NAME} website.lnk"
   Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
