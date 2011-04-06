@@ -3,7 +3,6 @@
 #define DISCOGSALBUM_H
 
 #include <QtGui>
-#include "structs.h"
 #include "Song.h"
 
 class Album{

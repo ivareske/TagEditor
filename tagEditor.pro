@@ -25,12 +25,13 @@
 #stream operators, cleanup/move files
 #legg til taglib kompilerings instruksjoner + debuglogger
 #prøve å kompilere taglib med qt? pro file ligge ved
+#rename klasser til å starte med stor bokstav
 
 TEMPLATE = app
 TARGET = tagEditor
 
-CONFIG += qt release warn_on static
-CONFIG += console
+CONFIG += qt release warn_on
+CONFIG += console silent
 QT += network webkit
 QT += xml
 #QTPLUGIN += qjpeg

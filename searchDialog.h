@@ -3,7 +3,6 @@
  
 #include <QtGui>
 #include <QtNetwork>
-#include "structs.h"
 #include "textViewer.h"
 #include "Album.h"
 #include <tag.h>
