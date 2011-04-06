@@ -29,24 +29,27 @@
 TEMPLATE = app
 TARGET = TagEditor
 
-CONFIG += qt release warn_on static
+CONFIG += qt release warn_on
 CONFIG += console
 QT += network webkit
 QT += xml
 #QTPLUGIN += qjpeg
 
 
-INCLUDEPATH  += $$quote(C:/Program Files/taglib/include/taglib/)
-LIBS += $$quote(C:/Program Files/taglib/bin/libtag.dll)
+#INCLUDEPATH  += $$quote(C:/Program Files/taglib/include/taglib/)
+INCLUDEPATH  += ./taglib/include/taglib
+INCLUDEPATH  += $$PWD
+#LIBS += $$quote(C:/Program Files/taglib/bin/libtag.dll)
+LIBS += ./taglib/bin/libtag.dll
 
 
-HEADERS  = TagEditor.h SettingsDialog.h SettingsClass.h SearchDialog.h Album.h TextViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
-            ReleaseEvent.h Song.h Artist.h TreeWidget.h #SetColumnsDialog.h
+HEADERS  = TagEditor.h ReleaseEvent.h Song.h Artist.h Album.h MusicDatabase.h Discogs.h MusicBrainz.h TextViewer.h globalFunctions.h TableWidgetItem.h SettingsDialog.h SettingsClass.h SearchDialog.h TagItem.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
+             TreeWidget.h SetColumnsDialog.h
 
-FORMS     = TagEditor.ui SettingsDialog.ui SearchDialog.ui TextViewer.ui ReplaceDialog.ui RenameDialog.ui SearchForTagsDialog.ui #SetColumnsDialog.ui
+FORMS     = TagEditor.ui SettingsDialog.ui SearchDialog.ui TextViewer.ui ReplaceDialog.ui RenameDialog.ui SearchForTagsDialog.ui SetColumnsDialog.ui
 
-SOURCES = main.cpp TagEditor.cpp SettingsDialog.cpp SettingsClass.cpp SearchDialog.cpp Album.cpp TextViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp ReplaceDialog.cpp RenameDialog.cpp SearchForTagsDialog.cpp \
-    ReleaseEvent.cpp Song.cpp Artist.cpp TreeWidget.cpp #SetColumnsDialog.cpp
+SOURCES = main.cpp TagEditor.cpp ReleaseEvent.cpp Song.cpp Artist.cpp Album.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp TextViewer.cpp globalFunctions.cpp TableWidgetItem.cpp SettingsDialog.cpp SettingsClass.cpp SearchDialog.cpp TagItem.cpp ReplaceDialog.cpp RenameDialog.cpp SearchForTagsDialog.cpp \
+     TreeWidget.cpp SetColumnsDialog.cpp
 
 RC_FILE = TagEditor.rc
 RESOURCES += TagEditor.qrc

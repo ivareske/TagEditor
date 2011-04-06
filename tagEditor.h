@@ -2,12 +2,10 @@
 #define TAGEDITOR_H
 
 #include <QtGui>
-
-//#include "TagItem.h"
-//#include "SearchForTagsDialog.h"
-//#include "globalFunctions.h"
+#include "TagItem.h"
+#include "SearchForTagsDialog.h"
+#include "globalFunctions.h"
 #include "SettingsDialog.h"
-/*
 #include "ReplaceDialog.h"
 #include "RenameDialog.h"
 #include "TextViewer.h"
@@ -22,10 +20,10 @@
 #include <taglib.h>
 #include <fileref.h>
 #include <QtPlugin>
-*/
-//#include "ListWidget.h"
+
+#include "ListWidget.h"
 #include "ui_TagEditor.h"
-//#include "TreeWidget.h"
+#include "TreeWidget.h"
 
 
 //Q_IMPORT_PLUGIN(qjpeg)
