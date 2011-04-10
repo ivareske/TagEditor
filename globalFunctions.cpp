@@ -3,21 +3,22 @@
 
 namespace Global{
 
-QString columnText( Global::ColumnType t ){
+
+QString columnText( Global::TagField t ){
 
     switch (t){
-    case FileNameColumn: return "File name";
-    case ArtistColumn: return "Artist";
-    case AlbumColumn: return "Album";
-    case TitleColumn: return "Title";
-    case YearColumn: return "Year";
-    case TrackColumn: return "Track";
-    case GenreColumn: return "Genre";
-    case LengthColumn: return "Length [s]";
-    case BitRateColumn: return "Bitrate [kbps]";
-    case SampleRateColumn: return "Sample rate [Hz]";
-    case ChannelsColumn: return "Channels";
-    case CommentColumn: return "Comments";
+    case Global::FileName: return "File name";
+    case Global::Artist: return "Artist";
+    case Global::AlbumField: return "Album";
+    case Global::Title: return "Title";
+    case Global::Year: return "Year";
+    case Global::Track: return "Track";
+    case Global::Genre: return "Genre";
+    case Global::Length: return "Length [s]";
+    case Global::BitRate: return "Bitrate [kbps]";
+    case Global::SampleRate: return "Sample rate [Hz]";
+    case Global::Channels: return "Channels";
+    case Global::Comment: return "Comments";
     default: return "";
     }
 }

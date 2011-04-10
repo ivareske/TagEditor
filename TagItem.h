@@ -11,13 +11,13 @@ class TagItem : public QTreeWidgetItem{
     //Q_OBJECT
 
 public:
-    enum TagField{ Artist, Title, Album, Comment, Genre, Year, Track, Length, BitRate, SampleRate, Channels };
+
     TagItem(const QString &fullfile="", int type = QTreeWidgetItem::Type, QTreeWidget *parent = 0);
     TagItem( const TagItem &other );
     void clearTags();
-    void readTags();
+    void readTags();    
     void changeName( const QString &newFullFileName );
-    QVariant getTag( TagItem::TagField field );
+    QVariant getTag( Global::TagField field );
 
     QString artist() const;
     QString title() const;
@@ -35,8 +35,8 @@ public:
     bool tagIsRead() const;
     bool tagOk() const;
     bool audioPropertiesOk() const;
-    void setTag( TagItem::TagField field, const QVariant &tag );
-    void setColumnData();
+    void setTag( Global::TagField field, const QVariant &tag );
+    void setColumnData( const QList<Global::TagField> &columns );
 public slots:
 
 

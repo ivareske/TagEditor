@@ -104,17 +104,17 @@ void RenameDialog::rename(){
         }
 
         if( item->tagOk() ){
-            tmpformat.replace( "%artist%", item->getTag( TagItem::Artist ).toString() );
-            tmpformat.replace( "%album%", item->getTag( TagItem::Album ).toString() );
-            tmpformat.replace( "%title%", item->getTag( TagItem::Title ).toString() );
-            tmpformat.replace( "%genre%", item->getTag( TagItem::Genre ).toString() );
-            tmpformat.replace( "%track%", QString::number( item->getTag( TagItem::Track ).toInt() ) );
-            tmpformat.replace( "%year%", QString::number( item->getTag( TagItem::Year ).toInt() ) );
-            tmpformat.replace( "%comment%", item->getTag( TagItem::Comment ).toString() );
-            tmpformat.replace( "%bitrate%", QString::number( item->getTag( TagItem::BitRate ).toInt() ) );
-            tmpformat.replace( "%samplerate%", QString::number( item->getTag( TagItem::SampleRate ).toInt() ) );
-            tmpformat.replace( "%length%", QString::number( item->getTag( TagItem::Length ).toInt() ) );
-            tmpformat.replace( "%channels%", QString::number( item->getTag( TagItem::Channels ).toInt() ) );
+            tmpformat.replace( "%artist%", item->getTag( Global::Artist ).toString() );
+            tmpformat.replace( "%album%", item->getTag( Global::AlbumField ).toString() );
+            tmpformat.replace( "%title%", item->getTag( Global::Title ).toString() );
+            tmpformat.replace( "%genre%", item->getTag( Global::Genre ).toString() );
+            tmpformat.replace( "%track%", QString::number( item->getTag( Global::Track ).toInt() ) );
+            tmpformat.replace( "%year%", QString::number( item->getTag( Global::Year ).toInt() ) );
+            tmpformat.replace( "%comment%", item->getTag( Global::Comment ).toString() );
+            tmpformat.replace( "%bitrate%", QString::number( item->getTag( Global::BitRate ).toInt() ) );
+            tmpformat.replace( "%samplerate%", QString::number( item->getTag( Global::SampleRate ).toInt() ) );
+            tmpformat.replace( "%length%", QString::number( item->getTag( Global::Length ).toInt() ) );
+            tmpformat.replace( "%channels%", QString::number( item->getTag( Global::Channels ).toInt() ) );
 
             for(int i=0;i<replaceFormat.size();i=i+2){
                 tmpformat.replace( replaceFormat[i], replaceFormat[i+1] );

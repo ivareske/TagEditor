@@ -437,7 +437,7 @@ void TagEditor::serialize(){
         f = TagLib::FileRef( fullfile.toStdString().c_str() );
         if( f.tag() ){
             f.tag()->setTrack( track );
-            item->setTag( TagItem::Track, track );
+            item->setTag( Global::Track, track );
             bool ok = f.save();
             if(!ok){
                 log.append("\nCould not save tag for "+fullfile);
@@ -511,15 +511,15 @@ void TagEditor::saveTag(){
 
         if(artistCheckbox->isChecked()){
             f.tag()->setArtist( Artist->text().toStdString().c_str() );
-            item->setTag( TagItem::Artist, Artist->text() );
+            item->setTag( Global::Artist, Artist->text() );
         }
         if(titleCheckbox->isChecked()){
             f.tag()->setTitle( Title->text().toStdString().c_str() );
-            item->setTag( TagItem::Title, Title->text() );
+            item->setTag( Global::Title, Title->text() );
         }
         if(albumCheckbox->isChecked()){
             f.tag()->setAlbum( Album->text().toStdString().c_str() );
-            item->setTag( TagItem::Album, Album->text() );
+            item->setTag( Global::AlbumField, Album->text() );
         }
         if(yearCheckbox->isChecked()){
             bool ok;
@@ -531,10 +531,10 @@ void TagEditor::saveTag(){
                                       fullfile+":\nYear has to be an positive integer value!",
                                       QMessageBox::Ok, QMessageBox::Ok);
                 //Year->setText( item->getTag("year").toString() );
-                Year->setText( QString::number(item->getTag(TagItem::Year).toInt()) );
+                Year->setText( QString::number(item->getTag(Global::Year).toInt()) );
             }else{
                 f.tag()->setYear( year );
-                item->setTag( TagItem::Year, year );
+                item->setTag( Global::Year, year );
             }
         }
         if(trackCheckbox->isChecked()){
@@ -545,19 +545,19 @@ void TagEditor::saveTag(){
                 QMessageBox::critical(this, "",
                                       fullfile+":\nTrack has to be an positive integer value!",
                                       QMessageBox::Ok, QMessageBox::Ok);
-                Track->setText( QString::number(item->getTag(TagItem::Track).toInt()) );
+                Track->setText( QString::number(item->getTag(Global::Track).toInt()) );
             }else{
                 f.tag()->setTrack( track );
-                item->setTag( TagItem::Track, track );
+                item->setTag( Global::Track, track );
             }
         }
         if(genreCheckbox->isChecked()){
             f.tag()->setGenre( Genre->text().toStdString().c_str() );
-            item->setTag( TagItem::Genre, Genre->text() );
+            item->setTag( Global::Genre, Genre->text() );
         }
         if(commentCheckbox->isChecked()){
             f.tag()->setComment( Comment->toPlainText().toStdString().c_str() );
-            item->setTag( TagItem::Comment, Comment->toPlainText() );
+            item->setTag( Global::Comment, Comment->toPlainText() );
         }
 
         bool ok = f.save();
@@ -634,19 +634,19 @@ void TagEditor::showTagInfo(){
     }
 
     if( item->tagOk() ){
-        Artist->setText( item->getTag( TagItem::Artist ).toString() );
-        Title->setText( item->getTag( TagItem::Title ).toString() );
-        Album->setText( item->getTag( TagItem::Album ).toString() );
-        Year->setText( QString::number( item->getTag( TagItem::Year ).toInt() ) );
-        Track->setText( QString::number( item->getTag( TagItem::Track ).toInt() ) );
-        Genre->setText( item->getTag( TagItem::Genre ).toString() );
-        Comment->setText( item->getTag( TagItem::Comment ).toString() );
+        Artist->setText( item->getTag( Global::Artist ).toString() );
+        Title->setText( item->getTag( Global::Title ).toString() );
+        Album->setText( item->getTag( Global::AlbumField ).toString() );
+        Year->setText( QString::number( item->getTag( Global::Year ).toInt() ) );
+        Track->setText( QString::number( item->getTag( Global::Track ).toInt() ) );
+        Genre->setText( item->getTag( Global::Genre ).toString() );
+        Comment->setText( item->getTag( Global::Comment ).toString() );
     }else{
         clearTextFields();
     }
     //audioproperties
     if( item->audioPropertiesOk() ){
-        fileLabel->setText( fileLabel->text() + "\n(Bitrate: "+QString::number(item->getTag( TagItem::BitRate ).toInt())+" kb/s, samplerate: "+QString::number(item->getTag( TagItem::SampleRate ).toInt())+" Hz, length: "+QString::number(item->getTag( TagItem::Length ).toInt())+" s, chanels: "+QString::number(item->getTag( TagItem::Channels ).toInt())+")" );
+        fileLabel->setText( fileLabel->text() + "\n(Bitrate: "+QString::number(item->getTag( Global::BitRate ).toInt())+" kb/s, samplerate: "+QString::number(item->getTag( Global::SampleRate ).toInt())+" Hz, length: "+QString::number(item->getTag( Global::Length ).toInt())+" s, chanels: "+QString::number(item->getTag( Global::Channels ).toInt())+")" );
     }else{
         fileLabel->setText( fileLabel->text() + "\n(Could not read tag...)");
     }
