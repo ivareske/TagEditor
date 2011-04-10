@@ -1,7 +1,7 @@
-#include "settingsClass.h"
+#include "SettingsClass.h"
 
  
-settingsClass::settingsClass(){
+SettingsClass::SettingsClass(){
     
 	startupFolder="C:\\";
 	extensions << "*.mp3"<<"*.wma"<<"*.wav"<<"*.ogg"<<"*.aac"<<"*.ac3"<<"*.ape";
@@ -20,7 +20,7 @@ settingsClass::settingsClass(){
 	lastStyleSheetFolder="";
 }
 
-void settingsClass::readSettings( QString settingsFile ){
+void SettingsClass::readSettings( QString settingsFile ){
 
 	
 	QFile file( settingsFile );
@@ -111,7 +111,7 @@ void settingsClass::readSettings( QString settingsFile ){
 	return;
 }
 
-void settingsClass::saveSettings( QString settingsFile ){
+void SettingsClass::saveSettings( QString settingsFile ){
 
 	QFile f( settingsFile );
 

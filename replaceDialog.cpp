@@ -1,6 +1,6 @@
-#include "replaceDialog.h"
+#include "ReplaceDialog.h"
 
-replaceDialog::replaceDialog( const QList<TagItem*> &items, QWidget *parent ) : QDialog(parent){
+ReplaceDialog::ReplaceDialog( const QList<TagItem*> &items, QWidget *parent ) : QDialog(parent){
     setupUi(this); // this sets up GUI
 
     connect( ReplaceButton, SIGNAL( clicked()  ), this, SLOT(replace() ) );
@@ -8,19 +8,19 @@ replaceDialog::replaceDialog( const QList<TagItem*> &items, QWidget *parent ) : 
     QStringList list; list<<"Artist"<<"Album"<<"Title"<<"Year"<<"Track"<<"Genre"<<"Comment";
     tagComboBox->addItems(list);
 
-    settings = new QSettings("tagEditor.ini",QSettings::IniFormat,0);
-    CaseSensitive->setChecked( settings->value("replaceDialog/CaseSensitive",false).toBool() );
+    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,0);
+    CaseSensitive->setChecked( settings->value("ReplaceDialog/CaseSensitive",false).toBool() );
 
     connect( this, SIGNAL( finished( int ) ), this, SLOT( finito( int ) ) );
 
 }
 
-void replaceDialog::finito( int result ){
-    settings->setValue( "replaceDialog/CaseSensitive", CaseSensitive->isChecked() );
+void ReplaceDialog::finito( int result ){
+    settings->setValue( "ReplaceDialog/CaseSensitive", CaseSensitive->isChecked() );
     settings->sync();
 }
 
-void replaceDialog::replace(){
+void ReplaceDialog::replace(){
 
     QProgressDialog p("Replacing tags...", "Cancel", 0, items_.size(), 0);
     p.setWindowModality(Qt::WindowModal);
@@ -111,7 +111,7 @@ void replaceDialog::replace(){
     }
     log.append("\n\nReplaced "+Before->text()+" with "+After->text()+" in "+QString::number(nReplaced)+" tags");
     p.setValue(items_.size());
-    textViewer t(0, &log);
+    TextViewer t(0, &log);
     t.exec();
 
     accept();

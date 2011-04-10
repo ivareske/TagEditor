@@ -1,11 +1,11 @@
 #include <QApplication>
-#include "tagEditor.h"
+#include "TagEditor.h"
 
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);    
-    tagEditor tag;
+    TagEditor tag;
     tag.show();
     return app.exec();
 }

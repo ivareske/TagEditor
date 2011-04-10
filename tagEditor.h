@@ -3,13 +3,13 @@
 
 #include <QtGui>
 #include "TagItem.h"
-#include "searchForTagsDialog.h"
+#include "SearchForTagsDialog.h"
 #include "globalFunctions.h"
 #include "settingsDialog.h"
-#include "replaceDialog.h"
-#include "renameDialog.h"
-#include "textViewer.h"
-#include "searchDialog.h"
+#include "ReplaceDialog.h"
+#include "RenameDialog.h"
+#include "TextViewer.h"
+#include "SearchDialog.h"
 #include <tbytevector.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
@@ -28,12 +28,12 @@
 Q_DECLARE_METATYPE(QList<int>)
 //Q_IMPORT_PLUGIN(qjpeg)
 
-class tagEditor : public QMainWindow, private Ui::tagEditor{
+class TagEditor : public QMainWindow, private Ui::TagEditor{
     Q_OBJECT
 
 public:
 
-    tagEditor(QWidget *parent = 0);    
+    TagEditor(QWidget *parent = 0);    
 
 private slots:
 
