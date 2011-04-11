@@ -8,17 +8,17 @@ TagItem::TagItem( const QString &fullfile, int type, QTreeWidget *parent ) : QTr
     album_="";
     comment_="";
     genre_="";
-    year_=-1;
-    track_=-1;
+    year_=0;
+    track_=0;
     fileInfo_ = QFileInfo( fullfile );
     tagIsRead_=false;
     tagOk_=false;
     audioPropertiesOk_=false;
 
-    length_=-1;
-    bitRate_=-1;
-    sampleRate_=-1;
-    channels_=-1;
+    length_=0;
+    bitRate_=0;
+    sampleRate_=0;
+    channels_=0;
 
     setToolTip( 0, fullfile );
     //setColumnData();
@@ -27,11 +27,20 @@ TagItem::TagItem( const QString &fullfile, int type, QTreeWidget *parent ) : QTr
 
 }
 
-void TagItem::setColumnData( const QList<Global::TagField> &columns ){
+void TagItem::setColumnData( const QList<Global::TagField> &columns, bool showFullFileName, bool readTags_ ){
+
+    if(readTags_){
+        readTags();
+    }
 
     int k=0;
     for(int i=0;i<columns.size();i++){
-        setData( k, Qt::DisplayRole, getTag( columns[i] ).toString() );
+
+        QString str = getTag( columns[i] ).toString();
+        if(columns[i]==Global::FileName && showFullFileName){
+            str = fileInfo_.absoluteFilePath();
+        }
+        setData( k, Qt::DisplayRole, str );
         k++;
     }
     /*
@@ -101,24 +110,24 @@ QString TagItem::genre() const{
     return genre_;
 }
 
-int TagItem::year() const{
+uint TagItem::year() const{
     return year_;
 }
 
-int TagItem::track() const{
+uint TagItem::track() const{
     return track_;
 }
 
-int TagItem::length() const{
+uint TagItem::length() const{
     return length_;
 }
-int TagItem::bitRate() const{
+uint TagItem::bitRate() const{
     return bitRate_;
 }
-int TagItem::sampleRate() const{
+uint TagItem::sampleRate() const{
     return sampleRate_;
 }
-int TagItem::channels() const{
+uint TagItem::channels() const{
     return channels_;
 }
 
@@ -165,11 +174,13 @@ QFileInfo TagItem::fileInfo() const{
     return fileInfo_;
 }
 
-QVariant TagItem::getTag( Global::TagField field ){
+QVariant TagItem::getTag( Global::TagField field, bool read ){
 
-    if(!tagIsRead_){
+
+    if(!tagIsRead_ && read){
         readTags();
     }
+
 
     QVariant result;
     if(field==Global::Artist){
@@ -222,7 +233,7 @@ void TagItem::readTags(){
         track_ = f.tag()->track();
         tagOk_=true;
     }
-    if( f.audioProperties()!=NULL ){
+    if( f.audioProperties()!=0 ){
         length_ = f.audioProperties()->length();
         bitRate_ = f.audioProperties()->bitrate();
         sampleRate_ = f.audioProperties()->sampleRate();

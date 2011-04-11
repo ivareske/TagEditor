@@ -3,7 +3,6 @@
 #include "TagEditor.h"
 
 
-
 TagEditor::TagEditor(QWidget *parent) : QMainWindow(parent){
     setupUi(this); // this sets up GUI
 
@@ -316,6 +315,8 @@ void TagEditor::saveSettings(){
     guiSettings->setValue("sortOrder", treeWidget->header()->sortIndicatorOrder() );
     guiSettings->setValue("windowState", saveState() );    
     guiSettings->setValue("geometry", saveGeometry());
+    QList<Global::TagField> cols = treeWidget->columns();
+    guiSettings->setValue("columns", QVariant::fromValue< QList<Global::TagField> >(cols) );
     //guiSettings->setValue("splittersizes", QVariant::fromValue< QList<int> >(splitter->sizes()) );
 
 
@@ -351,9 +352,13 @@ void TagEditor::readSettings(){
     treeWidget->setShowFullFileName( guiSettings->value("showFullFileName",false).toBool() );
     treeWidget->setShowTagInfo( guiSettings->value("showTagInfo",false).toBool() );
     treeWidget->setSortingEnabled( guiSettings->value("sortingEnabled",true).toBool() );
-    treeWidget->header()->setSortIndicator( guiSettings->value("sortColumn",0).toInt(), static_cast<Qt::SortOrder>(guiSettings->value("sortOrder",0).toInt()) );
+    treeWidget->header()->setSortIndicator( guiSettings->value("sortColumn",0).toInt(), static_cast<Qt::SortOrder>(guiSettings->value("sortOrder",0).toInt()) );    
+    treeWidget->setColumnsList( guiSettings->value("columns").value< QList<Global::TagField> >() );
+    qDebug()<<guiSettings->value("columns");
+    must fix storing QList<Global::TagField> to qsettings
     restoreState(guiSettings->value("windowState").toByteArray());
     restoreGeometry(guiSettings->value("geometry").toByteArray());
+
     //splitter->setSizes(guiSettings->value("splittersizes").value< QList<int> >() );
 
 }
@@ -485,7 +490,7 @@ void TagEditor::saveTag(){
     //aply to all selected files
     QString log;
     int n = indexes.size();
-    QProgressDialog *p=NULL;
+    QProgressDialog *p=0;
     if(n>1){
         p = new QProgressDialog("Saving tags...", "Cancel", 0, indexes.size(), this);
         p->setWindowModality(Qt::WindowModal);
@@ -605,7 +610,7 @@ void TagEditor::showTagInfo(){
     if( indexes.size()==1 && indexes[0].row()>=treeWidget->topLevelItemCount() ){
         return;
     }
-    if( treeWidget->currentItem()==NULL ){
+    if( treeWidget->currentItem()==0 ){
         return;
     }
 
@@ -632,6 +637,7 @@ void TagEditor::showTagInfo(){
     if( !item->tagIsRead() ){
         item->readTags();
     }
+    treeWidget->setColumnData(item);
 
     if( item->tagOk() ){
         Artist->setText( item->getTag( Global::Artist ).toString() );

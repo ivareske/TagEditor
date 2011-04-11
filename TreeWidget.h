@@ -20,6 +20,10 @@ public:
     bool showTagInfo() const;
     void setShowTagInfo( bool show );
     TagItem* tagItem( int index );
+    void setColumnData( TagItem* item );
+    QList<Global::TagField> columns() const;
+    void setColumnsList( const QList<Global::TagField> &columns );
+
 signals:
 
 public slots:
@@ -36,6 +40,7 @@ private:
     bool showFullFileName_;
     bool showTagInfo_;
     QList<Global::TagField> columns_;
+    QList<Global::TagField> defaultColumns_;
 
 };
 

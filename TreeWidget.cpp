@@ -5,48 +5,52 @@ TreeWidget::TreeWidget(QWidget *parent) : QTreeWidget(parent){
 
     for(int i=0;i<Global::NTagFields;i++){
         if(static_cast<Global::TagField>(i)!=Global::Comment){
+            //dont include comment field as default
             columns_.append(static_cast<Global::TagField>(i));
         }
     }
+    defaultColumns_ = columns_;
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(treeWidgetContextMenu(const QPoint &)));
     showTagInfo_ = false;
     showFullFileName_ = false;
-    /*
-    QStringList headers;
-    headers.insert(Global::ArtistColumn,"Artist");
-    headers.insert(Global::AlbumColumn,"Album");
-    headers.insert(Global::FileNameColumn,"File name");
-    headers.insert(Global::TitleColumn,"Title");
-    headers.insert(Global::TrackColumn,"Track");
-    headers.insert(Global::YearColumn,"Year");
-    headers.insert(Global::GenreColumn,"Genre");
-    //headers.insert(Global::CommentColumn,"Comment");
-    headers.insert(Global::LengthColumn,"Length (s)");
-    headers.insert(Global::BitRateColumn,"Bitrate (kbps)");
-    headers.insert(Global::SampleRateColumn,"Sample rate (Hz)");
-    headers.insert(Global::ChannelsColumn,"Channels");
-    //headers<<"File name"<<"Artist"<<"Album"<<"Title"<<"Track"<<"Year"<<"Genre"<<"Comment"<<"Length (s)"<<"BitRate (kbps)"<<"SampleRate (Hz)"<<"Channels";
-    setHeaderLabels( headers );
-    setColumnCount(headers.size());    
-    */
+
+
+    setColumns();
 
     setSortingEnabled(true);
     this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
+void TreeWidget::setColumnsList( const QList<Global::TagField> &columns ){
+    qDebug()<<"TreeWidget::setColumnsList columns: "<<columns;
+    columns_ = columns;
+    if(columns.isEmpty()){
+        columns_ = defaultColumns_;
+    }
+    setColumns();
+}
+
+QList<Global::TagField> TreeWidget::columns() const{
+    return columns_;
+}
+
+void TreeWidget::setColumnData( TagItem* item ){
+    item->setColumnData( columns_, showFullFileName_, showTagInfo_ );
+}
 
 void TreeWidget::setColumns(){
 
     QStringList headers;
     for(int i=0;i<columns_.size();i++){
         headers.append(Global::columnText(columns_[i]));
-    }
-    setColumnCount(headers.size());
+    }    
     setHeaderLabels( headers );
+    setColumnCount(headers.size());
+    qDebug()<<headers<<columnCount();
     for(int i=0;i<this->topLevelItemCount();i++){
-        this->tagItem(i)->setColumnData( columns_ );
+        this->tagItem(i)->setColumnData( columns_, showFullFileName_, showTagInfo_ );
     }
 }
 
@@ -71,7 +75,7 @@ void TreeWidget::addItem( QTreeWidgetItem *item ){
     if( showTagInfo_ ){
         item_->readTags();        
     }
-    item_->setColumnData(columns_);
+    item_->setColumnData(columns_,showFullFileName_ ,showTagInfo_);
     QTreeWidget::addTopLevelItem(item_);    
 
 }
@@ -95,7 +99,7 @@ void TreeWidget::updateItems( QList<TagItem*> items ){
             str = item_->fileInfo().fileName();
         }
         item_->setText( 0, str );
-        item_->setColumnData(columns_);
+        item_->setColumnData(columns_,showFullFileName_ ,showTagInfo_);
     }
     setSortingEnabled(sort);
 

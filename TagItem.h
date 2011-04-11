@@ -17,26 +17,26 @@ public:
     void clearTags();
     void readTags();    
     void changeName( const QString &newFullFileName );
-    QVariant getTag( Global::TagField field );
+    QVariant getTag( Global::TagField field, bool read = false );
 
     QString artist() const;
     QString title() const;
     QString album() const;
     QString comment() const;
     QString genre() const;
-    int year() const;
-    int track() const;
-    int length() const;
-    int bitRate() const;
-    int sampleRate() const;
-    int channels() const;
+    uint year() const;
+    uint track() const;
+    uint length() const;
+    uint bitRate() const;
+    uint sampleRate() const;
+    uint channels() const;
 
     QFileInfo fileInfo() const;
     bool tagIsRead() const;
     bool tagOk() const;
     bool audioPropertiesOk() const;
     void setTag( Global::TagField field, const QVariant &tag );
-    void setColumnData( const QList<Global::TagField> &columns );
+    void setColumnData( const QList<Global::TagField> &columns, bool showFullFileName, bool readTags_ );
 public slots:
 
 

@@ -24,7 +24,7 @@
 #include "ui_tagEditor.h"
 #include "TreeWidget.h"
 
-
+Q_DECLARE_METATYPE(QList<Global::TagField>)
 Q_DECLARE_METATYPE(QList<int>)
 //Q_IMPORT_PLUGIN(qjpeg)
 
