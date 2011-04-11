@@ -398,7 +398,7 @@ void TagEditor::chooseDir(){
 }
 
 void TagEditor::showSettings(){
-    settingsDialog s;
+    SettingsDialog s;
     if( s.exec()==QDialog::Accepted ){
         //obtain newly saved data from settingsdialog
         extensions = guiSettings->value("extensions","").toStringList();

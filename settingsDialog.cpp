@@ -1,8 +1,8 @@
-#include "settingsDialog.h"
+#include "SettingsDialog.h"
 
 //SettingsClass globalSettings;
 
-settingsDialog::settingsDialog(QWidget *parent){
+SettingsDialog::SettingsDialog(QWidget *parent){
     setupUi(this); // this sets up GUI
 
     settings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
@@ -20,7 +20,7 @@ settingsDialog::settingsDialog(QWidget *parent){
 }
 
 
-void settingsDialog::finito( int result ){
+void SettingsDialog::finito( int result ){
 
     if( result==QDialog::Accepted ){
         settings->setValue( "subfolders", subfolders->isChecked() );

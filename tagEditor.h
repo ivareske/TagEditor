@@ -5,7 +5,7 @@
 #include "TagItem.h"
 #include "SearchForTagsDialog.h"
 #include "globalFunctions.h"
-#include "settingsDialog.h"
+#include "SettingsDialog.h"
 #include "ReplaceDialog.h"
 #include "RenameDialog.h"
 #include "TextViewer.h"

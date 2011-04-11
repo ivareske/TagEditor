@@ -6,13 +6,13 @@
 #include "ui_settingsDialog.h"
  
  
-class settingsDialog : public QDialog, private Ui::settingsDialog
+class SettingsDialog : public QDialog, private Ui::SettingsDialog
 {
     Q_OBJECT
  
 public:
 
-    settingsDialog(QWidget *parent = 0);
+    SettingsDialog(QWidget *parent = 0);
 	
 	
 public slots:
