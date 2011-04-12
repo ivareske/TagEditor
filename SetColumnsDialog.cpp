@@ -4,8 +4,9 @@ SetColumnsDialog::SetColumnsDialog(const QList<Global::TagField> &columns,QWidge
 
     setupUi(this);
 
-    connect( OkButton, SIGNAL( clicked() ), this, SLOT( accept() ) );
+    connect( OkButton, SIGNAL( clicked() ), this, SLOT( save() ) );
     connect( CancelButton, SIGNAL( clicked() ), this, SLOT( reject() ) );
+
 
     QStringList columnStrs;
     columnStrs.append("Dont show");
@@ -32,6 +33,17 @@ SetColumnsDialog::SetColumnsDialog(const QList<Global::TagField> &columns,QWidge
         }
     }
 
+
+}
+
+void SetColumnsDialog::save(){
+
+    QList<Global::TagField> cols = this->columns();
+    if(cols.size()==0){
+        QMessageBox::critical(this,"","You must specify at least one column...");
+        return;
+    }
+    accept();
 
 }
 

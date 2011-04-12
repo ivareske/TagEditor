@@ -316,10 +316,14 @@ void TagEditor::saveSettings(){
     guiSettings->setValue("windowState", saveState() );    
     guiSettings->setValue("geometry", saveGeometry());
     QList<Global::TagField> cols = treeWidget->columns();
-    guiSettings->setValue("columns", QVariant::fromValue< QList<Global::TagField> >(cols) );
+    QVariantList colslist;
+    for(int i=0;i<cols.size();i++){
+        colslist.append(cols[i]);
+    }
+    //qDebug()<<"QVariant::fromValue< QList<Global::TagField> >(cols) "<<QVariant::fromValue< QList<Global::TagField> >(cols);
+    //guiSettings->setValue("columns", QVariant::fromValue< QList<Global::TagField> >(cols) );
+    guiSettings->setValue("columns", colslist );
     //guiSettings->setValue("splittersizes", QVariant::fromValue< QList<int> >(splitter->sizes()) );
-
-
 
     guiSettings->sync();
 }
@@ -353,9 +357,15 @@ void TagEditor::readSettings(){
     treeWidget->setShowTagInfo( guiSettings->value("showTagInfo",false).toBool() );
     treeWidget->setSortingEnabled( guiSettings->value("sortingEnabled",true).toBool() );
     treeWidget->header()->setSortIndicator( guiSettings->value("sortColumn",0).toInt(), static_cast<Qt::SortOrder>(guiSettings->value("sortOrder",0).toInt()) );    
-    treeWidget->setColumnsList( guiSettings->value("columns").value< QList<Global::TagField> >() );
-    qDebug()<<guiSettings->value("columns");
-    must fix storing QList<Global::TagField> to qsettings
+    //treeWidget->setColumnsList( guiSettings->value("columns").value< QList<Global::TagField> >() );
+    QVariantList colstmp = guiSettings->value("columns").toList();
+    QList<Global::TagField> cols;
+    for(int i=0;i<colstmp.size();i++){
+        qDebug()<<"colstmp[i] "<<colstmp[i];
+        cols.append(static_cast<Global::TagField>(colstmp[i].toInt()));
+    }
+    treeWidget->setColumnsList(cols);
+
     restoreState(guiSettings->value("windowState").toByteArray());
     restoreGeometry(guiSettings->value("geometry").toByteArray());
 

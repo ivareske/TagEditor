@@ -16,6 +16,10 @@ signals:
 
 public slots:
 
+protected:
+
+private slots:
+    void save();
 private:
     QList<QComboBox*> comboboxes;
 };
