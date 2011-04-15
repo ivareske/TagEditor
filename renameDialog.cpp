@@ -104,17 +104,17 @@ void RenameDialog::rename(){
         }
 
         if( item->tagOk() ){
-            tmpformat.replace( "%artist%", item->getTag( Global::Artist ).toString() );
-            tmpformat.replace( "%album%", item->getTag( Global::AlbumField ).toString() );
-            tmpformat.replace( "%title%", item->getTag( Global::Title ).toString() );
-            tmpformat.replace( "%genre%", item->getTag( Global::Genre ).toString() );
-            tmpformat.replace( "%track%", QString::number( item->getTag( Global::Track ).toInt() ) );
-            tmpformat.replace( "%year%", QString::number( item->getTag( Global::Year ).toInt() ) );
-            tmpformat.replace( "%comment%", item->getTag( Global::Comment ).toString() );
-            tmpformat.replace( "%bitrate%", QString::number( item->getTag( Global::BitRate ).toInt() ) );
-            tmpformat.replace( "%samplerate%", QString::number( item->getTag( Global::SampleRate ).toInt() ) );
-            tmpformat.replace( "%length%", QString::number( item->getTag( Global::Length ).toInt() ) );
-            tmpformat.replace( "%channels%", QString::number( item->getTag( Global::Channels ).toInt() ) );
+            tmpformat.replace( "%artist%", item->artist() );
+            tmpformat.replace( "%album%", item->album() );
+            tmpformat.replace( "%title%", item->title() );
+            tmpformat.replace( "%genre%", item->genre() );
+            tmpformat.replace( "%track%", QString::number( item->track() ) );
+            tmpformat.replace( "%year%", QString::number( item->year() ) );
+            tmpformat.replace( "%comment%", item->comment() );
+            tmpformat.replace( "%bitrate%", QString::number( item->bitRate() ) );
+            tmpformat.replace( "%samplerate%", QString::number( item->sampleRate() ) );
+            tmpformat.replace( "%length%", QString::number( item->length() ) );
+            tmpformat.replace( "%channels%", QString::number( item->channels() ) );
 
             for(int i=0;i<replaceFormat.size();i=i+2){
                 tmpformat.replace( replaceFormat[i], replaceFormat[i+1] );
@@ -133,7 +133,7 @@ void RenameDialog::rename(){
 
             QString ext = fi.suffix();
             QString newname = fi.absolutePath()+"/"+tmpformat+"."+ext;
-            QString newnameShort = tmpformat+"."+ext;
+            //QString newnameShort = tmpformat+"."+ext;
             bool ok = QFile::rename( fi.absoluteFilePath(), newname );
 
             if(!ok){

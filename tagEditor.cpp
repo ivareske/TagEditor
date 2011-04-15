@@ -356,7 +356,10 @@ void TagEditor::readSettings(){
     treeWidget->setShowFullFileName( guiSettings->value("showFullFileName",false).toBool() );
     treeWidget->setShowTagInfo( guiSettings->value("showTagInfo",false).toBool() );
     treeWidget->setSortingEnabled( guiSettings->value("sortingEnabled",true).toBool() );
-    treeWidget->header()->setSortIndicator( guiSettings->value("sortColumn",0).toInt(), static_cast<Qt::SortOrder>(guiSettings->value("sortOrder",0).toInt()) );    
+    if(treeWidget->isSortingEnabled()){
+        treeWidget->header()->setSortIndicator( guiSettings->value("sortColumn",0).toInt(), static_cast<Qt::SortOrder>(guiSettings->value("sortOrder",0).toInt()) );
+        treeWidget->header()->setSortIndicatorShown(true);
+    }
     //treeWidget->setColumnsList( guiSettings->value("columns").value< QList<Global::TagField> >() );
     QVariantList colstmp = guiSettings->value("columns").toList();
     QList<Global::TagField> cols;
@@ -435,8 +438,7 @@ void TagEditor::serialize(){
     }
 
     bool ok;
-    uint track = QInputDialog::getInt(this, "",
-                                      tr("Starting index:"), 1, 0, 99999, 1, &ok);
+    uint track = QInputDialog::getInt(this, "",tr("Starting index:"), 1, 0, 99999, 1, &ok);
 
     qDebug()<<ok;
     if(!ok){
@@ -447,7 +449,7 @@ void TagEditor::serialize(){
     QString log;
     TagLib::FileRef f;
     for(int i=0;i<indexes.size();i++){
-        TagItem *item = ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ));
+        TagItem *item = treeWidget->tagItem(indexes[i].row()); // ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ));
         QString fullfile = item->fileInfo().absoluteFilePath();
         f = TagLib::FileRef( fullfile.toStdString().c_str() );
         if( f.tag() ){
@@ -546,7 +548,7 @@ void TagEditor::saveTag(){
                                       fullfile+":\nYear has to be an positive integer value!",
                                       QMessageBox::Ok, QMessageBox::Ok);
                 //Year->setText( item->getTag("year").toString() );
-                Year->setText( QString::number(item->getTag(Global::Year).toInt()) );
+                Year->setText( QString::number(item->year()) );
             }else{
                 f.tag()->setYear( year );
                 item->setTag( Global::Year, year );
@@ -560,7 +562,7 @@ void TagEditor::saveTag(){
                 QMessageBox::critical(this, "",
                                       fullfile+":\nTrack has to be an positive integer value!",
                                       QMessageBox::Ok, QMessageBox::Ok);
-                Track->setText( QString::number(item->getTag(Global::Track).toInt()) );
+                Track->setText( QString::number(item->track()) );
             }else{
                 f.tag()->setTrack( track );
                 item->setTag( Global::Track, track );
@@ -650,19 +652,21 @@ void TagEditor::showTagInfo(){
     treeWidget->setColumnData(item);
 
     if( item->tagOk() ){
-        Artist->setText( item->getTag( Global::Artist ).toString() );
-        Title->setText( item->getTag( Global::Title ).toString() );
-        Album->setText( item->getTag( Global::AlbumField ).toString() );
-        Year->setText( QString::number( item->getTag( Global::Year ).toInt() ) );
-        Track->setText( QString::number( item->getTag( Global::Track ).toInt() ) );
-        Genre->setText( item->getTag( Global::Genre ).toString() );
-        Comment->setText( item->getTag( Global::Comment ).toString() );
+        Artist->setText( item->artist() );
+        Title->setText( item->title() );
+        Album->setText( item->album() );
+        Year->setText( QString::number( item->year() ) );
+        Track->setText( QString::number( item->track() ) );
+        Genre->setText( item->genre() );
+        Comment->setText( item->comment() );
     }else{
         clearTextFields();
     }
     //audioproperties
     if( item->audioPropertiesOk() ){
-        fileLabel->setText( fileLabel->text() + "\n(Bitrate: "+QString::number(item->getTag( Global::BitRate ).toInt())+" kb/s, samplerate: "+QString::number(item->getTag( Global::SampleRate ).toInt())+" Hz, length: "+QString::number(item->getTag( Global::Length ).toInt())+" s, chanels: "+QString::number(item->getTag( Global::Channels ).toInt())+")" );
+        fileLabel->setText( fileLabel->text() + "\n(Bitrate: "+QString::number(item->bitRate())+" kb/s, samplerate: "+
+                           QString::number(item->sampleRate())+" Hz, length: "+QString::number(item->length())+
+                           " s, chanels: "+QString::number(item->channels())+")" );
     }else{
         fileLabel->setText( fileLabel->text() + "\n(Could not read tag...)");
     }

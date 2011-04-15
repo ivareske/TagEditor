@@ -16,8 +16,7 @@ public:
     TagItem( const TagItem &other );
     void clearTags();
     void readTags();    
-    void changeName( const QString &newFullFileName );
-    QVariant getTag( Global::TagField field, bool read = false );
+    void changeName( const QString &newFullFileName );    
 
     QString artist() const;
     QString title() const;
@@ -42,6 +41,7 @@ public slots:
 
     //protected:
 private:    
+    QVariant getTag( Global::TagField field, bool read = false );
 
     QFileInfo fileInfo_;
     QString artist_;
