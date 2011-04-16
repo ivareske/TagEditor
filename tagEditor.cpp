@@ -451,6 +451,7 @@ void TagEditor::serialize(){
     for(int i=0;i<indexes.size();i++){
         TagItem *item = treeWidget->tagItem(indexes[i].row()); // ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ));
         QString fullfile = item->fileInfo().absoluteFilePath();
+        /*
         f = TagLib::FileRef( fullfile.toStdString().c_str() );
         if( f.tag() ){
             f.tag()->setTrack( track );
@@ -461,6 +462,12 @@ void TagEditor::serialize(){
             }
         }else{
             log.append("\nCould not read tag for "+fullfile);
+        }
+        */
+        item->setTrack(track);
+        bool ok = item->saveTag();
+        if(!ok){
+            log.append("\nCould not save tag for "+fullfile);
         }
         track++;
     }
@@ -517,26 +524,30 @@ void TagEditor::saveTag(){
         }
 	
         int row = indexes[i].row();
-        TagItem *item = (TagItem*)treeWidget->topLevelItem( row );
+        //TagItem *item = (TagItem*)treeWidget->topLevelItem( row );
+        TagItem *item = treeWidget->tagItem(row);
         QString fullfile = item->fileInfo().absoluteFilePath();
         qDebug()<<fullfile;
-        TagLib::FileRef f( fullfile.toStdString().c_str() );
-        if( !f.tag() ){
+        //TagLib::FileRef f( fullfile.toStdString().c_str() );
+        if( !item->tagOk() ){
             log.append("\nCould not read tag for "+fullfile);
             continue;
         }
 
         if(artistCheckbox->isChecked()){
-            f.tag()->setArtist( Artist->text().toStdString().c_str() );
-            item->setTag( Global::Artist, Artist->text() );
+            //f.tag()->setArtist( Artist->text().toStdString().c_str() );
+            //item->setTag( Global::Artist, Artist->text() );
+            item->setArtist(Artist->text());
         }
         if(titleCheckbox->isChecked()){
-            f.tag()->setTitle( Title->text().toStdString().c_str() );
-            item->setTag( Global::Title, Title->text() );
+            //f.tag()->setTitle( Title->text().toStdString().c_str() );
+            //item->setTag( Global::Title, Title->text() );
+            item->setTitle(Title->text());
         }
         if(albumCheckbox->isChecked()){
-            f.tag()->setAlbum( Album->text().toStdString().c_str() );
-            item->setTag( Global::AlbumField, Album->text() );
+            //f.tag()->setAlbum( Album->text().toStdString().c_str() );
+            //item->setTag( Global::AlbumField, Album->text() );
+            item->setAlbum(Album->text());
         }
         if(yearCheckbox->isChecked()){
             bool ok;
@@ -550,8 +561,9 @@ void TagEditor::saveTag(){
                 //Year->setText( item->getTag("year").toString() );
                 Year->setText( QString::number(item->year()) );
             }else{
-                f.tag()->setYear( year );
-                item->setTag( Global::Year, year );
+                //f.tag()->setYear( year );
+                //item->setTag( Global::Year, year );
+                item->setYear(year);
             }
         }
         if(trackCheckbox->isChecked()){
@@ -564,20 +576,23 @@ void TagEditor::saveTag(){
                                       QMessageBox::Ok, QMessageBox::Ok);
                 Track->setText( QString::number(item->track()) );
             }else{
-                f.tag()->setTrack( track );
-                item->setTag( Global::Track, track );
+                //f.tag()->setTrack( track );
+                //item->setTag( Global::Track, track );
+                item->setTrack(track);
             }
         }
         if(genreCheckbox->isChecked()){
-            f.tag()->setGenre( Genre->text().toStdString().c_str() );
-            item->setTag( Global::Genre, Genre->text() );
+            //f.tag()->setGenre( Genre->text().toStdString().c_str() );
+            //item->setTag( Global::Genre, Genre->text() );
+            item->setGenre(Genre->text());
         }
         if(commentCheckbox->isChecked()){
-            f.tag()->setComment( Comment->toPlainText().toStdString().c_str() );
-            item->setTag( Global::Comment, Comment->toPlainText() );
+            //f.tag()->setComment( Comment->toPlainText().toStdString().c_str() );
+            //item->setTag( Global::Comment, Comment->toPlainText() );
+            item->setComment(Comment->toPlainText());
         }
 
-        bool ok = f.save();
+        bool ok = item->saveTag();//f.save();
         if(!ok){
             log.append("\nCould not save tag for "+fullfile);
         }
@@ -887,11 +902,7 @@ void TagEditor::createActions(){
 
 
 void TagEditor::clearTags(){
-
-    for(int i=0;i<treeWidget->topLevelItemCount();i++){
-        TagItem *item = (TagItem*)treeWidget->topLevelItem(i);
-        item->clearTags();
-    }
+    treeWidget->clearTags();
     statusBar()->showMessage("Tags cleared", 8000);
 
 }

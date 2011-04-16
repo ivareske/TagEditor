@@ -23,6 +23,15 @@ TreeWidget::TreeWidget(QWidget *parent) : QTreeWidget(parent){
     this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
+void TreeWidget::clearTags(){
+
+    for(int i=0;i<topLevelItemCount();i++){
+        TagItem *item = tagItem(i);
+        item->clearTags();
+        item->setColumnData(columns_,showFullFileName_,showTagInfo_);
+    }
+}
+
 void TreeWidget::setColumnsList( const QList<Global::TagField> &columns ){
     qDebug()<<"TreeWidget::setColumnsList columns: "<<columns;
     columns_ = columns;

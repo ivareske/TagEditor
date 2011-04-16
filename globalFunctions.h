@@ -3,10 +3,6 @@
 #define GLOBALFUNCTIONS_H
 
 #include <QtGui>
-//#include "TagItem.h"
-#include <tag.h>
-#include <taglib.h>
-#include <fileref.h>
 #include "Album.h"
 #include <QtXml>
 

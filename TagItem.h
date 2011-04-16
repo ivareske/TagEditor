@@ -16,7 +16,16 @@ public:
     TagItem( const TagItem &other );
     void clearTags();
     void readTags();    
+    bool saveTag();
     void changeName( const QString &newFullFileName );    
+
+    void setArtist( const QString &artist );
+    void setAlbum( const QString &album );
+    void setTitle( const QString &title );
+    void setGenre( const QString &genre );
+    void setComment( const QString &comment );
+    void setTrack( uint track );
+    void setYear( uint year );
 
     QString artist() const;
     QString title() const;
@@ -30,18 +39,19 @@ public:
     uint sampleRate() const;
     uint channels() const;
 
+    bool unSavedChanges() const;
     QFileInfo fileInfo() const;
     bool tagIsRead() const;
     bool tagOk() const;
-    bool audioPropertiesOk() const;
-    void setTag( Global::TagField field, const QVariant &tag );
+    bool audioPropertiesOk() const;    
+    QVariant getTag( Global::TagField field, bool read = false );
     void setColumnData( const QList<Global::TagField> &columns, bool showFullFileName, bool readTags_ );
 public slots:
 
 
     //protected:
 private:    
-    QVariant getTag( Global::TagField field, bool read = false );
+    //bool setTag( Global::TagField field, const QVariant &tag );
 
     QFileInfo fileInfo_;
     QString artist_;
@@ -49,16 +59,17 @@ private:
     QString album_;
     QString comment_;
     QString genre_;
-    int year_;
-    int track_;
-    bool tagIsRead_;
+    uint year_;
+    uint track_;
+    uint length_;
+    uint bitRate_;
+    uint sampleRate_;
+    uint channels_;
     bool tagOk_;
     bool audioPropertiesOk_;
+    bool unSavedChanges_;
 
-    int length_;
-    int bitRate_;
-    int sampleRate_;
-    int channels_;
+    bool tagIsRead_;    
 
 };
 

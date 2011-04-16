@@ -23,6 +23,7 @@ public:
     void setColumnData( TagItem* item );
     QList<Global::TagField> columns() const;
     void setColumnsList( const QList<Global::TagField> &columns );
+    void clearTags();
 
 signals:
 
