@@ -31,7 +31,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0" colspan="3">
-        <widget class="QLabel" name="fileLabel">
+        <widget class="QLabel" name="FileLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -76,7 +76,7 @@
         </spacer>
        </item>
        <item row="3" column="2" rowspan="2">
-        <widget class="QPushButton" name="saveButton">
+        <widget class="QPushButton" name="SaveButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -132,7 +132,7 @@
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QCheckBox" name="artistCheckbox">
+           <widget class="QCheckBox" name="ArtistCheckbox">
             <property name="toolTip">
              <string>The fields that are checked will be saved when pressing the save button</string>
             </property>
@@ -165,7 +165,7 @@
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QCheckBox" name="titleCheckbox">
+           <widget class="QCheckBox" name="TitleCheckbox">
             <property name="toolTip">
              <string>The fields that are checked will be saved when pressing the save button</string>
             </property>
@@ -198,7 +198,7 @@
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QCheckBox" name="albumCheckbox">
+           <widget class="QCheckBox" name="AlbumCheckbox">
             <property name="toolTip">
              <string>The fields that are checked will be saved when pressing the save button</string>
             </property>
@@ -231,7 +231,7 @@
            </widget>
           </item>
           <item row="3" column="2">
-           <widget class="QCheckBox" name="yearCheckbox">
+           <widget class="QCheckBox" name="YearCheckbox">
             <property name="toolTip">
              <string>The fields that are checked will be saved when pressing the save button</string>
             </property>
@@ -264,7 +264,7 @@
            </widget>
           </item>
           <item row="4" column="2">
-           <widget class="QCheckBox" name="trackCheckbox">
+           <widget class="QCheckBox" name="TrackCheckbox">
             <property name="toolTip">
              <string>The fields that are checked will be saved when pressing the save button</string>
             </property>
@@ -297,7 +297,7 @@
            </widget>
           </item>
           <item row="5" column="2">
-           <widget class="QCheckBox" name="genreCheckbox">
+           <widget class="QCheckBox" name="GenreCheckbox">
             <property name="toolTip">
              <string>The fields that are checked will be saved when pressing the save button</string>
             </property>
@@ -336,7 +336,7 @@
            </widget>
           </item>
           <item row="6" column="2">
-           <widget class="QCheckBox" name="commentCheckbox">
+           <widget class="QCheckBox" name="CommentCheckbox">
             <property name="toolTip">
              <string>The fields that are checked will be saved when pressing the save button</string>
             </property>
@@ -393,7 +393,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="1" column="0">
-            <widget class="QTreeView" name="treeView">
+            <widget class="QTreeView" name="TreeView">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>5</horstretch>
@@ -424,7 +424,7 @@
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
               <item row="0" column="0">
-               <widget class="QPushButton" name="chooseDirButton">
+               <widget class="QPushButton" name="ChooseDirButton">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -446,7 +446,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QPushButton" name="addButton">
+               <widget class="QPushButton" name="AddButton">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -484,7 +484,7 @@
                </widget>
               </item>
               <item row="3" column="0">
-               <widget class="QPushButton" name="removeButton">
+               <widget class="QPushButton" name="RemoveButton">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -522,7 +522,7 @@
                </widget>
               </item>
               <item row="5" column="0">
-               <widget class="QPushButton" name="clearButton">
+               <widget class="QPushButton" name="ClearButton">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -599,7 +599,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="0" column="0">
-            <widget class="QLabel" name="listWidgetLabel">
+            <widget class="QLabel" name="ListWidgetLabel">
              <property name="text">
               <string>Workspace</string>
              </property>

@@ -114,6 +114,7 @@ void TreeWidget::updateItems( QList<TagItem*> items ){
 
 }
 
+
 void TreeWidget::updateFileNames( bool enable ){
 
     showFullFileName_ = enable;

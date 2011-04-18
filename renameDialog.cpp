@@ -1,19 +1,20 @@
 #include "RenameDialog.h"
 
-RenameDialog::RenameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString *renameformat ) : QDialog(parent){
+RenameDialog::RenameDialog( QList<TagItem*> tagitems, QWidget *parent ) : QDialog(parent){
     setupUi(this); // this sets up GUI
 
     settings = new QSettings("TagEditor.ini",QSettings::IniFormat,0);
     connect( RenameButton, SIGNAL( clicked()  ), this, SLOT(rename() ) );
     tagItems = tagitems;
-    qDebug()<<1;
+
     defaultReplaceFormat<<"\\"<<"_"<<"/"<<"_"<<"*"<<"_"<<":"<<"_"<<"?"<<"_"<<"<"<<"_"<<">"<<"_"<<"|"<<"_"<<"\""<<"_";
     replaceFormat = settings->value("RenameDialog/replaceFormat",defaultReplaceFormat).toStringList();
     notAllowedCharacters<<"\\"<<"/"<<"*"<<":"<<"?"<<"<"<<">"<<"|"<<"\"";
-    Format->setText(*renameformat);
-    renameFormat = renameformat;
+    QString renameFormat = settings->value("RenameDialog/renameFormat","%artist% - %title%").toString();
+    this->restoreGeometry(settings->value("RenameDialog/geometry").toByteArray());
+    Format->setText(renameFormat);
     int k=0;
-    qDebug()<<replaceFormat.size();
+
     ReplaceTable->setRowCount(2);
     ReplaceTable->setColumnCount(9);
     for(int i=0;i<replaceFormat.size();i=i+2){
@@ -24,7 +25,7 @@ RenameDialog::RenameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString 
         item2->setText(replaceFormat[i+1]);
         ReplaceTable->setItem(0,k,item1);
         ReplaceTable->setItem(1,k,item2);
-        qDebug()<<replaceFormat[i]<<replaceFormat[i+1]<<k;
+        //qDebug()<<replaceFormat[i]<<replaceFormat[i+1]<<k;
         k++;
     }
 
@@ -34,7 +35,7 @@ RenameDialog::RenameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString 
 
 
     connect( this, SIGNAL( finished( int ) ), this, SLOT( finito( int ) ) );
-    connect( Format, SIGNAL( textChanged( const QString & ) ), this, SLOT( updateFormat(  const QString & ) ) );
+    //connect( Format, SIGNAL( textChanged( const QString & ) ), this, SLOT( updateFormat(  const QString & ) ) );
     connect( ReplaceTable, SIGNAL( itemChanged( QTableWidgetItem* ) ), this, SLOT( updateReplaceFormat(  QTableWidgetItem* ) ) );
 
     QAction* setDefaultFormatAction = new QAction(tr("Inset default replace format"), this);
@@ -42,6 +43,8 @@ RenameDialog::RenameDialog( QWidget *parent, QList<TagItem*> *tagitems, QString 
 
     ReplaceTable->setContextMenuPolicy(Qt::ActionsContextMenu);
     ReplaceTable->addAction(setDefaultFormatAction);
+    ReplaceTable->resizeColumnsToContents();
+    Info->setText(QString::number(tagitems.size())+" files selected");
 
 }
 
@@ -52,17 +55,16 @@ void RenameDialog::updateReplaceFormat( QTableWidgetItem* item ){
     replaceFormat[ind] = item->text();
 }
 
-void RenameDialog::updateFormat(  const QString &format ){
-    *renameFormat = format;
-}
-
 void RenameDialog::finito( int result ){
 
     settings->setValue( "RenameDialog/replaceFormat", replaceFormat );
+    settings->setValue( "RenameDialog/renameFormat", Format->text() );
+    settings->setValue( "RenameDialog/geometry", saveGeometry() );
     settings->sync();
 }
 
 void RenameDialog::setDefaultFormat(){
+
     int k=0;
     for(int i=0;i<replaceFormat.size();i=i+2){
         QTableWidgetItem *item1 = new QTableWidgetItem;
@@ -87,15 +89,15 @@ void RenameDialog::rename(){
     }
 
     QString log;
-    QProgressDialog p("Renaming files...", "Cancel", 0, tagItems->size(), 0);
-    for(int i=0;i<tagItems->size();i++){
+    QProgressDialog p("Renaming files...", "Cancel", 0, tagItems.size(), this);
+    for(int i=0;i<tagItems.size();i++){
 
         p.setValue(i);
         if( p.wasCanceled() ){
             break;
         }
 
-        TagItem *item = tagItems->at(i);
+        TagItem *item = tagItems[i];
         QFileInfo fi = item->fileInfo();
         tmpformat = Format->text();
 
@@ -103,55 +105,55 @@ void RenameDialog::rename(){
             item->readTags();
         }
 
-        if( item->tagOk() ){
-            tmpformat.replace( "%artist%", item->artist() );
-            tmpformat.replace( "%album%", item->album() );
-            tmpformat.replace( "%title%", item->title() );
-            tmpformat.replace( "%genre%", item->genre() );
-            tmpformat.replace( "%track%", QString::number( item->track() ) );
-            tmpformat.replace( "%year%", QString::number( item->year() ) );
-            tmpformat.replace( "%comment%", item->comment() );
-            tmpformat.replace( "%bitrate%", QString::number( item->bitRate() ) );
-            tmpformat.replace( "%samplerate%", QString::number( item->sampleRate() ) );
-            tmpformat.replace( "%length%", QString::number( item->length() ) );
-            tmpformat.replace( "%channels%", QString::number( item->channels() ) );
+        if( !item->tagOk() ){
+            log.append("\nCould not read tag for "+fi.absoluteFilePath());
+            continue;
+        }
+        tmpformat.replace( "%artist%", item->artist() );
+        tmpformat.replace( "%album%", item->album() );
+        tmpformat.replace( "%title%", item->title() );
+        tmpformat.replace( "%genre%", item->genre() );
+        tmpformat.replace( "%track%", QString::number( item->track() ) );
+        tmpformat.replace( "%year%", QString::number( item->year() ) );
+        tmpformat.replace( "%comment%", item->comment() );
+        tmpformat.replace( "%bitrate%", QString::number( item->bitRate() ) );
+        tmpformat.replace( "%samplerate%", QString::number( item->sampleRate() ) );
+        tmpformat.replace( "%length%", QString::number( item->length() ) );
+        tmpformat.replace( "%channels%", QString::number( item->channels() ) );
 
-            for(int i=0;i<replaceFormat.size();i=i+2){
-                tmpformat.replace( replaceFormat[i], replaceFormat[i+1] );
+        for(int i=0;i<replaceFormat.size();i=i+2){
+            tmpformat.replace( replaceFormat[i], replaceFormat[i+1] );
+        }
+
+        bool formatok=true;
+        for(int i=0;i<notAllowedCharacters.size();i++){
+            if( tmpformat.contains(notAllowedCharacters[i]) ){
+                log.append("\nCharacter "+notAllowedCharacters[i]+" is not allowed in filename and must be replaced.");
+                formatok = false;
             }
+        }
+        if(!formatok){
+            continue;
+        }
 
-            bool formatok=true;
-            for(int i=0;i<notAllowedCharacters.size();i++){
-                if( tmpformat.contains(notAllowedCharacters[i]) ){
-                    log.append("\nCharacter "+notAllowedCharacters[i]+" is not allowed in filename and must be replaced.");
-                    formatok = false;
-                }
-            }
-            if(!formatok){
-                continue;
-            }
+        QString ext = fi.suffix();
+        QString newname = fi.absolutePath()+"/"+tmpformat+"."+ext;
+        //QString newnameShort = tmpformat+"."+ext;
+        bool ok = QFile::rename( fi.absoluteFilePath(), newname );
 
-            QString ext = fi.suffix();
-            QString newname = fi.absolutePath()+"/"+tmpformat+"."+ext;
-            //QString newnameShort = tmpformat+"."+ext;
-            bool ok = QFile::rename( fi.absoluteFilePath(), newname );
-
-            if(!ok){
-                if(fi.absoluteFilePath()==newname){
-                    //log.append("\nCould not rename "+fi.absoluteFilePath()+" to "+newname);
-                }else{
-                    log.append("\nCould not rename "+fi.absoluteFilePath()+" to "+newname);
-                }
+        if(!ok){
+            if(fi.absoluteFilePath()==newname){
+                //log.append("\nCould not rename "+fi.absoluteFilePath()+" to "+newname);
             }else{
-                //update listWidgetItem with new name
-                item->changeName( newname );
+                log.append("\nCould not rename "+fi.absoluteFilePath()+" to "+newname);
             }
         }else{
-            log.append("\nCould not read tag for "+fi.absoluteFilePath());
-            //delete f;
+            //update listWidgetItem with new name
+            item->changeName( newname );
         }
+
     }
-    p.setValue(tagItems->size());
+    p.setValue(tagItems.size());
     if(!log.isEmpty()){
         TextViewer t(this, &log);
         t.exec();

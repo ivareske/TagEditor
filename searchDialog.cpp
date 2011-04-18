@@ -15,19 +15,19 @@ SearchDialog::SearchDialog( QWidget *parent, QString apiKey, QList<QFileInfo> *i
     resultCols <<3<<4;
 
     nFiles = infos->size();
-    albumInfo->setRowCount(infos->size());
-    albumInfo->setColumnCount(6);
+    AlbumInfo->setRowCount(infos->size());
+    AlbumInfo->setColumnCount(6);
     QStringList headers;
     headers << "File" << "Current title" << "Current track" << "Found title" << "Found track"<<"Current comments";
-    albumInfo->setHorizontalHeaderLabels(headers);
+    AlbumInfo->setHorizontalHeaderLabels(headers);
 
     QString artist = "";
     QString album = "";
     QString year = "";
     QString genre = "";
 
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
     for(int i=0;i<infos->size();i++){
 	
         QString fullfile = infos->at(i).filePath();
@@ -42,7 +42,7 @@ SearchDialog::SearchDialog( QWidget *parent, QString apiKey, QList<QFileInfo> *i
         newItem->setFlags( newItem->flags() | Qt::ItemIsUserCheckable );
         newItem->setFlags( newItem->flags() ^ Qt::ItemIsEditable );
         newItem->setCheckState(Qt::Checked);
-        albumInfo->setItem(i, FILENAME, newItem);
+        AlbumInfo->setItem(i, FILENAME, newItem);
 
         TagLib::FileRef f( fullfile.toStdString().c_str() );
         QString tagTitle="Could not get tag title...";
@@ -65,8 +65,8 @@ SearchDialog::SearchDialog( QWidget *parent, QString apiKey, QList<QFileInfo> *i
                 genre = QString( f.tag()->genre().toCString());
             }
             if(i==0){
-                searchStr->setText( artist );
-                searchTitle->setText( album );
+                SearchStr->setText( artist );
+                SearchTitle->setText( album );
             }
         }
 
@@ -74,49 +74,49 @@ SearchDialog::SearchDialog( QWidget *parent, QString apiKey, QList<QFileInfo> *i
         newItem1->setText( tagTitle );
         newItem1->setFont(font);
         newItem1->setFlags( newItem1->flags() ^ Qt::ItemIsEditable );
-        albumInfo->setItem(i, CURRENTTITLE, newItem1);
+        AlbumInfo->setItem(i, CURRENTTITLE, newItem1);
 
         TableWidgetItem *newItem2 = new TableWidgetItem;
         newItem2->setText( tagTrack );
         newItem2->setFont(font);
         newItem2->setFlags( newItem2->flags() ^ Qt::ItemIsEditable );
-        albumInfo->setItem(i, CURRENTTRACK, newItem2);
+        AlbumInfo->setItem(i, CURRENTTRACK, newItem2);
 
         TableWidgetItem *newItem3 = new TableWidgetItem;
         newItem3->setText( tagComment );
-        albumInfo->setItem(i, COMMENT, newItem3);
+        AlbumInfo->setItem(i, COMMENT, newItem3);
 
         TableWidgetItem *newItem4 = new TableWidgetItem;
-        albumInfo->setItem(i, TITLE, newItem4);
+        AlbumInfo->setItem(i, TITLE, newItem4);
         TableWidgetItem *newItem5 = new TableWidgetItem;
-        albumInfo->setItem(i, TRACK, newItem5);
+        AlbumInfo->setItem(i, TRACK, newItem5);
     }
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
     Artist->setText(artist);
     AlbumField->setText(album);
     Year->setText(year);
     Genre->setText(genre);
 
-    artistLabel->setText("Artist (current: "+artist+" ): ");
-    albumLabel->setText("Album (current: "+album+" ): ");
-    genreLabel->setText("Genre (current: "+genre+" ): ");
-    yearLabel->setText("Year (current: "+year+" ): ");
+    ArtistLabel->setText("Artist (current: "+artist+" ): ");
+    AlbumLabel->setText("Album (current: "+album+" ): ");
+    GenreLabel->setText("Genre (current: "+genre+" ): ");
+    YearLabel->setText("Year (current: "+year+" ): ");
 
 
     // signals/slots mechanism in action		
-    connect( prevCoverButton, SIGNAL( clicked() ), this, SLOT( showPrevCover() ) );
-    connect( nextCoverButton, SIGNAL( clicked() ), this, SLOT( showNextCover() ) );
-    connect( searchButton, SIGNAL( clicked() ), this, SLOT( search() ) );
-    connect( saveButton, SIGNAL( clicked() ), this, SLOT( save() ) ); 
+    connect( PrevCoverButton, SIGNAL( clicked() ), this, SLOT( showPrevCover() ) );
+    connect( NextCoverButton, SIGNAL( clicked() ), this, SLOT( showNextCover() ) );
+    connect( SearchButton, SIGNAL( clicked() ), this, SLOT( search() ) );
+    connect( SaveButton, SIGNAL( clicked() ), this, SLOT( save() ) );
     connect(&downloadImageManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(setCoverFromReply(QNetworkReply*)));
     connect(&saveCoverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(saveCoverFromReply(QNetworkReply*)));
-    connect( searchResults, SIGNAL( itemClicked( QListWidgetItem * )  ), this, SLOT( showResult(QListWidgetItem *) ) );
-    connect( albumInfo, SIGNAL( cellChanged( int, int )  ), this, SLOT( updateCell(int, int) ) );
+    connect( SearchResults, SIGNAL( itemClicked( QListWidgetItem * )  ), this, SLOT( showResult(QListWidgetItem *) ) );
+    connect( AlbumInfo, SIGNAL( cellChanged( int, int )  ), this, SLOT( updateCell(int, int) ) );
     connect( DatabaseComboBox, SIGNAL( currentIndexChanged( int )  ), this, SLOT( databaseChanged(int) ) );
 
 
-    albumInfo->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(albumInfo, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(albumInfoContextMenu(const QPoint &)));
+    AlbumInfo->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(AlbumInfo, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(albumInfoContextMenu(const QPoint &)));
 
 
     //save cover now action
@@ -139,32 +139,32 @@ void SearchDialog::readSettings(){
     this->resize(settings->value("SearchDialog/size", QSize(700, 600)).toSize());
     this->move( settings->value("SearchDialog/pos", QPoint(200, 200)).toPoint() );
     coverFormat->setText( settings->value("SearchDialog/coverFormat","%artist% - %album%").toString() );
-    coverFormatCheckBox->setChecked( settings->value("SearchDialog/coverFormatCheckBox",true).toBool() );
-    saveCoverCheckBox->setChecked( settings->value("SearchDialog/saveCover",false).toBool() );
-    saveAllCoversCheckBox->setChecked( settings->value("SearchDialog/saveAllCovers",true).toBool() );
-    artistLabel->setChecked( settings->value("SearchDialog/artistLabel",true).toBool() );
-    albumLabel->setChecked( settings->value("SearchDialog/albumLabel",true).toBool() );
-    genreLabel->setChecked( settings->value("SearchDialog/genreLabel",true).toBool() );
-    yearLabel->setChecked( settings->value("SearchDialog/yearLabel",true).toBool() );
-    rolesLabel->setChecked( settings->value("SearchDialog/rolesLabel",false).toBool() );
-    formatLabel->setChecked( settings->value("SearchDialog/formatLabel",false).toBool() );
-    countryLabel->setChecked( settings->value("SearchDialog/countryLabel",false).toBool() );
-    labelLabel->setChecked( settings->value("SearchDialog/labelLabel",false).toBool() );
-    notesLabel->setChecked( settings->value("SearchDialog/notesLabel",false).toBool() );
-    clearPreviousComentsCheckBox->setChecked( settings->value("SearchDialog/clearPreviousComents",false).toBool() );
-    downloadImmediately->setChecked( settings->value("SearchDialog/downloadImmediately",true).toBool() );
+    CoverFormatCheckBox->setChecked( settings->value("SearchDialog/CoverFormatCheckBox",true).toBool() );
+    SaveCoverCheckBox->setChecked( settings->value("SearchDialog/saveCover",false).toBool() );
+    SaveAllCoversCheckBox->setChecked( settings->value("SearchDialog/saveAllCovers",true).toBool() );
+    ArtistLabel->setChecked( settings->value("SearchDialog/ArtistLabel",true).toBool() );
+    AlbumLabel->setChecked( settings->value("SearchDialog/AlbumLabel",true).toBool() );
+    GenreLabel->setChecked( settings->value("SearchDialog/GenreLabel",true).toBool() );
+    YearLabel->setChecked( settings->value("SearchDialog/YearLabel",true).toBool() );
+    RolesLabel->setChecked( settings->value("SearchDialog/RolesLabel",false).toBool() );
+    FormatLabel->setChecked( settings->value("SearchDialog/FormatLabel",false).toBool() );
+    CountryLabel->setChecked( settings->value("SearchDialog/CountryLabel",false).toBool() );
+    LabelLabel->setChecked( settings->value("SearchDialog/LabelLabel",false).toBool() );
+    NotesLabel->setChecked( settings->value("SearchDialog/NotesLabel",false).toBool() );
+    ClearPreviousComentsCheckBox->setChecked( settings->value("SearchDialog/clearPreviousComents",false).toBool() );
+    DownloadImmediately->setChecked( settings->value("SearchDialog/DownloadImmediately",true).toBool() );
     autoResizeColumns = settings->value("SearchDialog/autoResizeColumns",true).toBool();
     resizeColumns(autoResizeColumns);
     autoResizeRows = settings->value("SearchDialog/autoResizeRows",false).toBool();
     resizeRows(autoResizeRows);
-    albumInfo->setSortingEnabled( settings->value("SearchDialog/sortingEnabled",true).toBool() );
-    if( albumInfo->isSortingEnabled() ){
+    AlbumInfo->setSortingEnabled( settings->value("SearchDialog/sortingEnabled",true).toBool() );
+    if( AlbumInfo->isSortingEnabled() ){
         int sortColumn = settings->value("SearchDialog/sortColumn",(int)CURRENTTRACK).toInt();
         Qt::SortOrder sortOrder = (Qt::SortOrder)settings->value("discogs/sortOrder", (int)Qt::AscendingOrder ).toInt();
-        albumInfo->sortByColumn( sortColumn, sortOrder );
-        albumInfo->horizontalHeader()->setSortIndicator(sortColumn, sortOrder);
-        albumInfo->horizontalHeader()->setSortIndicatorShown(true);
-        albumInfo->horizontalHeader()->setClickable(true);
+        AlbumInfo->sortByColumn( sortColumn, sortOrder );
+        AlbumInfo->horizontalHeader()->setSortIndicator(sortColumn, sortOrder);
+        AlbumInfo->horizontalHeader()->setSortIndicatorShown(true);
+        AlbumInfo->horizontalHeader()->setClickable(true);
     }
     matchByTrackChecked = settings->value("SearchDialog/matchByTrack",false).toBool();
     matchByTitleChecked = settings->value("SearchDialog/matchByTitle",false).toBool();
@@ -181,18 +181,18 @@ void SearchDialog::search(){
     //on search button press
 
 
-    if( searchStr->text().isEmpty() && searchTitle->text().isEmpty() ){
+    if( SearchStr->text().isEmpty() && SearchTitle->text().isEmpty() ){
         QMessageBox::critical(this, "Error",
                               "Empty search not allowed...", QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
     QString url;
     if(DatabaseComboBox->currentText()=="Discogs"){
-        url = "http://www.discogs.com/search?type=all&q="+searchStr->text()+"+"+searchTitle->text()+"&f=xml&api_key="+api_key;
+        url = "http://www.discogs.com/search?type=all&q="+SearchStr->text()+"+"+SearchTitle->text()+"&f=xml&api_key="+api_key;
     }else{
-        url = "http://musicbrainz.org/ws/1/release/?type=xml&artist="+searchStr->text()+"&title="+searchTitle->text();
+        url = "http://musicbrainz.org/ws/1/release/?type=xml&artist="+SearchStr->text()+"&title="+SearchTitle->text();
     }
-    Database->search( url, downloadImmediately->isChecked() );
+    Database->search( url, DownloadImmediately->isChecked() );
     
 }
 
@@ -200,9 +200,9 @@ void SearchDialog::getResults( QHash<QString,Album> results ){
     //called after Database->search is finished
 
     Results = results;
-    searchResults->clear();
+    SearchResults->clear();
     Albums.clear();
-    if( downloadImmediately->isChecked() ){
+    if( DownloadImmediately->isChecked() ){
         Database->downloadAllAlbums( Results ); //downloads and appends to Albums
         //gotAlbums is then called, albums are sorted and result items created
     }else{
@@ -225,18 +225,18 @@ void SearchDialog::getResults( QHash<QString,Album> results ){
 
 void SearchDialog::setResultItem( QString text, QString key ){
 
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
     QListWidgetItem *newItem = new QListWidgetItem;
     newItem->setText(text);
     newItem->setData(Qt::UserRole,key);
-    searchResults->addItem( newItem );
-    albumInfo->setSortingEnabled(enabled);
+    SearchResults->addItem( newItem );
+    AlbumInfo->setSortingEnabled(enabled);
 }
 
 
 void SearchDialog::showResult( QListWidgetItem* item ){
-    //called when row changed in listwidget searchResults
+    //called when row changed in listwidget SearchResults
 
     if(!item){
         return;
@@ -256,7 +256,7 @@ void SearchDialog::gotAlbums( QHash<QString,Album> albums ){
     Albums = albums;
     QList<Album> tmpalbums = Albums.values();
     std::sort( tmpalbums.begin(), tmpalbums.end(), Global::compareAlbum );
-    searchResults->clear();
+    SearchResults->clear();
     for(int i=0;i<tmpalbums.size();i++){
         setResultItem( tmpalbums[i].displayArtist()+" - "+tmpalbums[i].title()+" ("+tmpalbums[i].format()+","+QString::number(tmpalbums[i].year())+")", tmpalbums[i].key() );
     }
@@ -283,14 +283,14 @@ void SearchDialog::showAlbumInfo( Album a ){
         n = a.songs().size();
     }
     qDebug()<<nFiles<<n;
-    albumInfo->setRowCount(n);
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
+    AlbumInfo->setRowCount(n);
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
     setNonEditable( nFiles, n );
-    /*int n = albumInfo->rowCount();
+    /*int n = AlbumInfo->rowCount();
 	//qDebug()<<"updating table:"<<a.songs.size();
 	if(n<a.songs.size()){
-		albumInfo->setRowCount(a.songs.size());
+                AlbumInfo->setRowCount(a.songs.size());
 		setNonEditable( n, a.songs.size() );
 	}
 	*/
@@ -308,9 +308,9 @@ void SearchDialog::showAlbumInfo( Album a ){
         Notes->setText( a.notes() );
     }
     //delete old results
-    for(int i=0;i<albumInfo->rowCount();i++){
-        delete albumInfo->takeItem(i,TITLE);
-        delete albumInfo->takeItem(i,TRACK);
+    for(int i=0;i<AlbumInfo->rowCount();i++){
+        delete AlbumInfo->takeItem(i,TITLE);
+        delete AlbumInfo->takeItem(i,TRACK);
     }
 
     int k=0;
@@ -358,20 +358,20 @@ void SearchDialog::showAlbumInfo( Album a ){
         newItem->setText(songs[0].title());
         QFont f = newItem->font();f.setPointSize(10);
         newItem->setFont(f);
-        albumInfo->setItem(row, TITLE, newItem);
+        AlbumInfo->setItem(row, TITLE, newItem);
 
         TableWidgetItem *newItem1 = new TableWidgetItem;
         newItem1->setText(songs[0].track());
         newItem1->setFont(f);
-        albumInfo->setItem(row, TRACK, newItem1);
+        AlbumInfo->setItem(row, TRACK, newItem1);
 
         songs.removeAt(0);
     }
     for(int i=0;i<leftOverSongs.size();i++){
-        int n = albumInfo->rowCount();
+        int n = AlbumInfo->rowCount();
         int row=n+1;
         for(int j=0;j<n;j++){
-            if(!albumInfo->item(j,TITLE)){
+            if(!AlbumInfo->item(j,TITLE)){
                 row=j;
                 break;
             }
@@ -381,14 +381,14 @@ void SearchDialog::showAlbumInfo( Album a ){
         newItem->setText(leftOverSongs[i].title());
         QFont f = newItem->font();f.setPointSize(10);
         newItem->setFont(f);
-        albumInfo->setItem(row, TITLE, newItem);
+        AlbumInfo->setItem(row, TITLE, newItem);
 
         TableWidgetItem *newItem1 = new TableWidgetItem;
         newItem1->setText(leftOverSongs[i].track());
         newItem1->setFont(f);
-        albumInfo->setItem(row, TRACK, newItem1);
+        AlbumInfo->setItem(row, TRACK, newItem1);
     }
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
 }
 
 void SearchDialog::showPrevCover(){
@@ -404,11 +404,11 @@ void SearchDialog::showNextCover(){
 
 void SearchDialog::showCover( int ind ){
 
-    int aind = searchResults->currentRow();
+    int aind = SearchResults->currentRow();
     if(aind==-1){
         return;
     }
-    Album album = Albums[searchResults->currentItem()->data(Qt::UserRole).toString()];
+    Album album = Albums[SearchResults->currentItem()->data(Qt::UserRole).toString()];
 
     QList<QUrl> images = album.images();
     int n = images.size();
@@ -430,11 +430,11 @@ void SearchDialog::showCover( int ind ){
 }
 
 void SearchDialog::saveCoverNow(){
-    int ind = searchResults->currentRow();
+    int ind = SearchResults->currentRow();
     if(ind==-1){
         return;
     }
-    Album album = Albums[searchResults->currentItem()->data(Qt::UserRole).toString()];
+    Album album = Albums[SearchResults->currentItem()->data(Qt::UserRole).toString()];
     if(album.images().size()==0){
         return;
     }
@@ -444,11 +444,11 @@ void SearchDialog::saveCoverNow(){
 
 
 void SearchDialog::saveAllCoversNow(){
-    int ind = searchResults->currentRow();
+    int ind = SearchResults->currentRow();
     if(ind==-1){
         return;
     }
-    Album album = Albums[searchResults->currentItem()->data(Qt::UserRole).toString()];
+    Album album = Albums[SearchResults->currentItem()->data(Qt::UserRole).toString()];
     if(album.images().size()==0){
         return;
     }
@@ -490,11 +490,11 @@ void SearchDialog::saveCoverFromReply(QNetworkReply* reply){
     p.convertToFormat(QImage::Format_RGB32);
     reply->deleteLater();
 
-    int aind = searchResults->currentRow();
+    int aind = SearchResults->currentRow();
     if(aind==-1){
         return;
     }
-    Album album = Albums[searchResults->currentItem()->data(Qt::UserRole).toString()];
+    Album album = Albums[SearchResults->currentItem()->data(Qt::UserRole).toString()];
     QList<QUrl> images = album.images();
     QString url = reply->url().toString();
     int cInd=-1;
@@ -515,7 +515,7 @@ void SearchDialog::saveCoverFromReply(QNetworkReply* reply){
         ind = name.lastIndexOf("\\");
     }
     name = name.remove(0,ind+1);
-    if(coverFormatCheckBox->isChecked()){
+    if(CoverFormatCheckBox->isChecked()){
         int suffInd = name.lastIndexOf(".");
         QString ext = name.right(name.size()-suffInd);
         name = createCoverName( cInd+1, ext );
@@ -547,13 +547,13 @@ QString SearchDialog::createCoverName( int ind, QString ext ){
 void SearchDialog::moveRowTo(){
 
     bool ok;
-    int n = albumInfo->rowCount();
+    int n = AlbumInfo->rowCount();
     int row = QInputDialog::getInt(this, "",
                                    tr("Move to row:"), 1, 1, n, 1, &ok)-1; // -1,let rows start at 1 instead of 0 for user
     if(!ok){
         return;
     }
-    int current = albumInfo->currentRow();
+    int current = AlbumInfo->currentRow();
     if( row<0 || row>=n ){
         QMessageBox::critical(this, "Move row "+QString::number(current)+" to:",
                               "Row nr out of bounds",QMessageBox::Ok,QMessageBox::Ok);
@@ -567,7 +567,7 @@ void SearchDialog::moveRowTo(){
 void SearchDialog::moveRow( int from, int to, itemCol t ){
     //move current row to row
 
-    int n = albumInfo->rowCount();
+    int n = AlbumInfo->rowCount();
     if( n==0 ){
         return;
     }
@@ -582,34 +582,34 @@ void SearchDialog::moveRow( int from, int to, itemCol t ){
         qDebug()<<"moving result columns";
         inds = resultCols;
     }
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
     for(int i=0;i<inds.size();i++){
         int col = inds[i];
         QList<TableWidgetItem*> tmp;
         for(int row=0;row<n;row++){
-            tmp << (TableWidgetItem*)albumInfo->takeItem( row, col );
+            tmp << (TableWidgetItem*)AlbumInfo->takeItem( row, col );
         }
         qDebug()<<"moving column "<<col<<" from "<<from<<"to "<<to;
         tmp.insert( to, tmp.takeAt(from) );
         for(int row=0;row<n;row++){
-            albumInfo->setItem( row, col, tmp.at(row) );
+            AlbumInfo->setItem( row, col, tmp.at(row) );
         }
     }
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
 }
 
 void SearchDialog::moveRowUp(){
     QAction *action = qobject_cast<QAction *>(sender());
     itemCol t = (itemCol)action->data().toInt();
-    int current = albumInfo->currentRow();
+    int current = AlbumInfo->currentRow();
     moveRow( current, current-1, t );
 }
 
 void SearchDialog::moveRowDown(){
     QAction *action = qobject_cast<QAction *>(sender());
     itemCol t = (itemCol)action->data().toInt();
-    int current = albumInfo->currentRow();
+    int current = AlbumInfo->currentRow();
     moveRow( current, current+1, t );
 }
 
@@ -617,35 +617,35 @@ void SearchDialog::moveRowDown(){
 void SearchDialog::closeEvent( QCloseEvent *event ){
 
     settings->beginGroup("SearchDialog");
-    settings->setValue( "saveCover", saveCoverCheckBox->isChecked() );
-    settings->setValue( "saveAllCovers", saveAllCoversCheckBox->isChecked() );
+    settings->setValue( "saveCover", SaveCoverCheckBox->isChecked() );
+    settings->setValue( "saveAllCovers", SaveAllCoversCheckBox->isChecked() );
     settings->setValue( "pos", this->pos() );
     settings->setValue( "size", this->size() );
     settings->setValue( "coverFormat", coverFormat->text() );
-    settings->setValue( "coverFormatCheckBox", coverFormatCheckBox->isChecked() );
-    settings->setValue( "artistLabel", artistLabel->isChecked() );
-    settings->setValue( "albumLabel", albumLabel->isChecked() );
-    settings->setValue( "genreLabel", genreLabel->isChecked() );
-    settings->setValue( "yearLabel", yearLabel->isChecked() );
-    settings->setValue( "rolesLabel", rolesLabel->isChecked() );
-    settings->setValue( "formatLabel", formatLabel->isChecked() );
-    settings->setValue( "countryLabel", countryLabel->isChecked() );
-    settings->setValue( "labelLabel", labelLabel->isChecked() );
-    settings->setValue( "notesLabel", notesLabel->isChecked() );
+    settings->setValue( "CoverFormatCheckBox", CoverFormatCheckBox->isChecked() );
+    settings->setValue( "ArtistLabel", ArtistLabel->isChecked() );
+    settings->setValue( "AlbumLabel", AlbumLabel->isChecked() );
+    settings->setValue( "GenreLabel", GenreLabel->isChecked() );
+    settings->setValue( "YearLabel", YearLabel->isChecked() );
+    settings->setValue( "RolesLabel", RolesLabel->isChecked() );
+    settings->setValue( "FormatLabel", FormatLabel->isChecked() );
+    settings->setValue( "CountryLabel", CountryLabel->isChecked() );
+    settings->setValue( "LabelLabel", LabelLabel->isChecked() );
+    settings->setValue( "NotesLabel", NotesLabel->isChecked() );
     settings->setValue( "matchByTrack", matchByTrackChecked );
     settings->setValue( "matchByTitle", matchByTitleChecked );
-    settings->setValue( "downloadImmediately", downloadImmediately->isChecked() );
+    settings->setValue( "DownloadImmediately", DownloadImmediately->isChecked() );
     settings->setValue( "dontMacth", dontMatchChecked );
     settings->setValue( "matchByTrackTitle", matchByTrackTitleChecked );
     settings->setValue( "matchByTitleTrack", matchByTitleTrackChecked );
     settings->setValue( "matchByFileName", matchByFileNameChecked );
-    settings->setValue( "clearPreviousComents", clearPreviousComentsCheckBox->isChecked() );
+    settings->setValue( "clearPreviousComents", ClearPreviousComentsCheckBox->isChecked() );
     settings->setValue( "autoResizeColumns", autoResizeColumns );
     settings->setValue( "autoResizeRows", autoResizeRows );
     settings->setValue( "DatabaseComboBox", DatabaseComboBox->currentIndex() );
-    settings->setValue( "sortColumn", albumInfo->horizontalHeader()->sortIndicatorSection() );
-    settings->setValue( "sortOrder", (int)albumInfo->horizontalHeader()->sortIndicatorOrder() );
-    settings->setValue( "sortingEnabled", albumInfo->isSortingEnabled() );
+    settings->setValue( "sortColumn", AlbumInfo->horizontalHeader()->sortIndicatorSection() );
+    settings->setValue( "sortOrder", (int)AlbumInfo->horizontalHeader()->sortIndicatorOrder() );
+    settings->setValue( "sortingEnabled", AlbumInfo->isSortingEnabled() );
     settings->endGroup();
     settings->sync();
 
@@ -655,15 +655,15 @@ void SearchDialog::closeEvent( QCloseEvent *event ){
 int SearchDialog::matchResult( QVariant toMatch, int matchCol ){
     //qDebug()<<"matching";
     int res=-1;
-    for(int i=0;i<albumInfo->rowCount();i++){
-        if( albumInfo->item(i,TITLE) || albumInfo->item(i,TRACK) || !albumInfo->item(i,matchCol) ){
+    for(int i=0;i<AlbumInfo->rowCount();i++){
+        if( AlbumInfo->item(i,TITLE) || AlbumInfo->item(i,TRACK) || !AlbumInfo->item(i,matchCol) ){
             //if an item already set there, or item to compare to doesn`t exist, continue
             continue;
         }
         if( (columnFlag)matchCol==CURRENTTRACK ){
             //compare track as int if can be converted, else as strings
             bool ok1,ok2;
-            int comp1 = albumInfo->item(i,matchCol)->text().toInt(&ok1);
+            int comp1 = AlbumInfo->item(i,matchCol)->text().toInt(&ok1);
             int comp2 = toMatch.toInt(&ok2);
             if( ok1 && ok2){
                 if( comp1==comp2 ){
@@ -671,15 +671,15 @@ int SearchDialog::matchResult( QVariant toMatch, int matchCol ){
                     res = i;
                     break;
                 }
-            }else if( albumInfo->item(i,matchCol)->text()==toMatch ){
-                //qDebug()<<"string "<<albumInfo->item(i,matchCol)->text()<<"=="<<toMatch.toString();
+            }else if( AlbumInfo->item(i,matchCol)->text()==toMatch ){
+                //qDebug()<<"string "<<AlbumInfo->item(i,matchCol)->text()<<"=="<<toMatch.toString();
                 res = i;
                 break;
             }
         }else{
             //compare title or filename by contains
-            if(albumInfo->item(i,matchCol)->text().contains( toMatch.toString() )){
-                //qDebug()<<"string "<<albumInfo->item(i,matchCol)->text()<<"contains"<<toMatch.toString();
+            if(AlbumInfo->item(i,matchCol)->text().contains( toMatch.toString() )){
+                //qDebug()<<"string "<<AlbumInfo->item(i,matchCol)->text()<<"contains"<<toMatch.toString();
                 res = i;
                 break;
             }
@@ -694,23 +694,23 @@ int SearchDialog::matchResult( QVariant toMatch, int matchCol ){
 
 void SearchDialog::setNonEditable( int startrow, int stoprow ){
 
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
     for(int i=0;i<(int)TITLE;i++){
         for(int j=startrow;j<stoprow;j++){
-            if( j>=albumInfo->rowCount() ){
+            if( j>=AlbumInfo->rowCount() ){
                 continue;
             }
-            if( !albumInfo->item(j,i) ){
+            if( !AlbumInfo->item(j,i) ){
                 TableWidgetItem *item = new TableWidgetItem;
                 item->setFlags( item->flags() ^ Qt::ItemIsEditable );
-                albumInfo->setItem( j, i, item );
+                AlbumInfo->setItem( j, i, item );
             }else{
-                albumInfo->item(j,i)->setFlags( albumInfo->item(j,i)->flags() ^ Qt::ItemIsEditable );
+                AlbumInfo->item(j,i)->setFlags( AlbumInfo->item(j,i)->flags() ^ Qt::ItemIsEditable );
             }
         }
     }
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
 
 }
 
@@ -718,26 +718,26 @@ void SearchDialog::save(){
 
 
     QString log;
-    int aind = searchResults->currentRow();
+    int aind = SearchResults->currentRow();
     if(aind==-1){
         QMessageBox::critical(this, "Save",
                               "Please select a serach result first", QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
-    Album album = Albums[searchResults->currentItem()->data(Qt::UserRole).toString()];
+    Album album = Albums[SearchResults->currentItem()->data(Qt::UserRole).toString()];
     //save tags
     bool trackOk;bool yearOk; QHash<QString,QString> commentsList;
-    for(int i=0;i<albumInfo->rowCount();i++){
-        if( !albumInfo->item(i,FILENAME) ){
+    for(int i=0;i<AlbumInfo->rowCount();i++){
+        if( !AlbumInfo->item(i,FILENAME) ){
             continue;
         }
-        if( albumInfo->item(i,FILENAME)->text().isEmpty() ){
+        if( AlbumInfo->item(i,FILENAME)->text().isEmpty() ){
             continue;
         }
-        if(albumInfo->item(i,FILENAME)->checkState()!=Qt::Checked){
+        if(AlbumInfo->item(i,FILENAME)->checkState()!=Qt::Checked){
             continue;
         }
-        QString fullfile = albumInfo->item(i,FILENAME)->data(Qt::UserRole).toString();
+        QString fullfile = AlbumInfo->item(i,FILENAME)->data(Qt::UserRole).toString();
         TagLib::FileRef f( fullfile.toStdString().c_str() );
         if( f.isNull() || !f.tag() ){
             log.append("\nCould not read tag for "+fullfile);
@@ -745,66 +745,66 @@ void SearchDialog::save(){
         }
         qDebug()<<"saving "<<fullfile;
         //title
-        if(albumInfo->item(i,TITLE)){
-            f.tag()->setTitle( albumInfo->item(i,TITLE)->text().toStdString().c_str() );
+        if(AlbumInfo->item(i,TITLE)){
+            f.tag()->setTitle( AlbumInfo->item(i,TITLE)->text().toStdString().c_str() );
         }
 
         //track
-        if(albumInfo->item(i,TRACK)){
-            int tmp = albumInfo->item(i,TRACK)->text().toInt(&trackOk,10);
+        if(AlbumInfo->item(i,TRACK)){
+            int tmp = AlbumInfo->item(i,TRACK)->text().toInt(&trackOk,10);
             if(trackOk){
                 f.tag()->setTrack( tmp );
             }
         }
         //add extra info to comments if checked
         QString comments = "";
-        if( albumInfo->item(i,COMMENT) && !clearPreviousComentsCheckBox->isChecked() ){
-            comments = albumInfo->item(i,COMMENT)->text();
+        if( AlbumInfo->item(i,COMMENT) && !ClearPreviousComentsCheckBox->isChecked() ){
+            comments = AlbumInfo->item(i,COMMENT)->text();
         }
         QString tmp="Format: "+Format->text();
-        if(formatLabel->isVisible() && formatLabel->isChecked() && !comments.contains(tmp) && !Format->text().isEmpty() ){
+        if(FormatLabel->isVisible() && FormatLabel->isChecked() && !comments.contains(tmp) && !Format->text().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
         tmp="Country: "+Country->text();
-        if(countryLabel->isVisible() && countryLabel->isChecked() && !comments.contains(tmp) && !Country->text().isEmpty() ){
+        if(CountryLabel->isVisible() && CountryLabel->isChecked() && !comments.contains(tmp) && !Country->text().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
         tmp="Label: "+Label->text();
-        if(labelLabel->isVisible() && labelLabel->isChecked() && !comments.contains(tmp) && !Label->text().isEmpty() ){
+        if(LabelLabel->isVisible() && LabelLabel->isChecked() && !comments.contains(tmp) && !Label->text().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
         tmp="Roles: "+Roles->toPlainText();
-        if(rolesLabel->isVisible() && rolesLabel->isChecked() && !comments.contains(tmp) && !Roles->toPlainText().isEmpty() ){
+        if(RolesLabel->isVisible() && RolesLabel->isChecked() && !comments.contains(tmp) && !Roles->toPlainText().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
         tmp="Notes: "+Notes->toPlainText();
-        if(notesLabel->isVisible() && notesLabel->isChecked() && !comments.contains(tmp) && !Notes->toPlainText().isEmpty() ){
+        if(NotesLabel->isVisible() && NotesLabel->isChecked() && !comments.contains(tmp) && !Notes->toPlainText().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
         commentsList.insert(fullfile,comments);
         //comments
-        if(albumInfo->item(i,COMMENT)){
+        if(AlbumInfo->item(i,COMMENT)){
             f.tag()->setComment( comments.toStdString().c_str() );
         }
         //album
-        if(albumLabel->isChecked()){
+        if(AlbumLabel->isChecked()){
             f.tag()->setAlbum( AlbumField->text().toStdString().c_str() );
         }
         //artist
-        if(artistLabel->isChecked()){
+        if(ArtistLabel->isChecked()){
             f.tag()->setArtist( Artist->text().toStdString().c_str() );
         }
         //genre
-        if(genreLabel->isVisible() && genreLabel->isChecked()){
+        if(GenreLabel->isVisible() && GenreLabel->isChecked()){
             f.tag()->setGenre( Genre->text().toStdString().c_str() );
         }
         //year
-        if(yearLabel->isChecked()){
+        if(YearLabel->isChecked()){
             int tmp = Year->text().toInt(&yearOk,10);
             if(yearOk){                
                 f.tag()->setYear( tmp );
@@ -818,72 +818,72 @@ void SearchDialog::save(){
 
     //at last, update saved data in table and labels
     //so far not done by reading tags again, to speed things up
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
-    for(int i=0;i<albumInfo->rowCount();i++){
-        if( !albumInfo->item(i,FILENAME) ){
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
+    for(int i=0;i<AlbumInfo->rowCount();i++){
+        if( !AlbumInfo->item(i,FILENAME) ){
             continue;
         }
-        if( albumInfo->item(i,FILENAME)->text().isEmpty() ){
+        if( AlbumInfo->item(i,FILENAME)->text().isEmpty() ){
             continue;
         }
-        if(albumInfo->item(i,FILENAME)->checkState()!=Qt::Checked){
+        if(AlbumInfo->item(i,FILENAME)->checkState()!=Qt::Checked){
             continue;
         }
         //title
         TableWidgetItem *newItem1 = new TableWidgetItem;
         QFont font = newItem1->font();font.setBold(true);
         newItem1->setFont(font);
-        if(albumInfo->item(i,TITLE)){
-            newItem1->setText( albumInfo->item(i,TITLE)->text() );
+        if(AlbumInfo->item(i,TITLE)){
+            newItem1->setText( AlbumInfo->item(i,TITLE)->text() );
         }else{
-            newItem1->setText( albumInfo->item(i,CURRENTTITLE)->text() );
+            newItem1->setText( AlbumInfo->item(i,CURRENTTITLE)->text() );
         }
         //newItem1->setFont(font);
         newItem1->setFlags( newItem1->flags() ^ Qt::ItemIsEditable );
-        albumInfo->setItem(i, CURRENTTITLE, newItem1);
+        AlbumInfo->setItem(i, CURRENTTITLE, newItem1);
 	
         //track
         if(trackOk){
             TableWidgetItem *newItem2 = new TableWidgetItem;
             newItem2->setFont(font);
-            if(albumInfo->item(i,TRACK)){
-                newItem2->setText( albumInfo->item(i,TRACK)->text() );
+            if(AlbumInfo->item(i,TRACK)){
+                newItem2->setText( AlbumInfo->item(i,TRACK)->text() );
             }else{
-                newItem2->setText( albumInfo->item(i,CURRENTTRACK)->text() );
+                newItem2->setText( AlbumInfo->item(i,CURRENTTRACK)->text() );
             }
             //newItem2->setFont(font);
             newItem2->setFlags( newItem2->flags() ^ Qt::ItemIsEditable );
-            albumInfo->setItem(i, CURRENTTRACK, newItem2);
+            AlbumInfo->setItem(i, CURRENTTRACK, newItem2);
         }
         //comments
         TableWidgetItem *newItem3 = new TableWidgetItem;
         //newItem3->setFont(font);
-        newItem3->setText( commentsList[albumInfo->item(i,FILENAME)->data(Qt::UserRole).toString()] );
+        newItem3->setText( commentsList[AlbumInfo->item(i,FILENAME)->data(Qt::UserRole).toString()] );
         //newItem3->setFont(font);
         //newItem3->setFlags( newItem3->flags() ^ Qt::ItemIsEditable );
-        albumInfo->setItem(i, COMMENT, newItem3);
+        AlbumInfo->setItem(i, COMMENT, newItem3);
 
     }
-    if(artistLabel->isChecked()){
-        artistLabel->setText("Artist (current: "+Artist->text()+" ): ");
+    if(ArtistLabel->isChecked()){
+        ArtistLabel->setText("Artist (current: "+Artist->text()+" ): ");
     }
-    if(albumLabel->isChecked()){
-        albumLabel->setText("Album (current: "+AlbumField->text()+" ): ");
+    if(AlbumLabel->isChecked()){
+        AlbumLabel->setText("Album (current: "+AlbumField->text()+" ): ");
     }
-    if(genreLabel->isChecked()){
-        genreLabel->setText("Genre (current: "+Genre->text()+" ): ");
+    if(GenreLabel->isChecked()){
+        GenreLabel->setText("Genre (current: "+Genre->text()+" ): ");
     }
-    if(yearLabel->isChecked() && yearOk){
-        yearLabel->setText("Year (current: "+Year->text()+" ): ");
+    if(YearLabel->isChecked() && yearOk){
+        YearLabel->setText("Year (current: "+Year->text()+" ): ");
     }
     //save covers at last, in case tags are used to name covers
-    if( saveCoverCheckBox->isChecked() && !saveAllCoversCheckBox->isChecked() ){
+    if( SaveCoverCheckBox->isChecked() && !SaveAllCoversCheckBox->isChecked() ){
         if( currentCoverInd>=0 && currentCoverInd<album.images().size() ){
             QList<QUrl> images = album.images();
             saveCover( images[currentCoverInd] );
         }
-    }else if( saveAllCoversCheckBox->isChecked() ){
+    }else if( SaveAllCoversCheckBox->isChecked() ){
 	//save all covers
         QList<QUrl> images = album.images();
         for(int i=0;i<images.size();i++){
@@ -896,7 +896,7 @@ void SearchDialog::save(){
         t.exec();
     }
     info->setText("Tags saved");
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
 }
 
 
@@ -910,17 +910,17 @@ void SearchDialog::databaseChanged( int ind ){
         Roles->show();
         Notes->show();
         Genre->show();
-        rolesLabel->show();
-        notesLabel->show();
-        genreLabel->show();
+        RolesLabel->show();
+        NotesLabel->show();
+        GenreLabel->show();
     }else{
         Database = new MusicBrainz();
         Roles->hide();
         Notes->hide();
         Genre->hide();
-        rolesLabel->hide();
-        notesLabel->hide();
-        genreLabel->hide();
+        RolesLabel->hide();
+        NotesLabel->hide();
+        GenreLabel->hide();
     }
 
     connect( Database, SIGNAL( resultsDownloaded( QHash<QString,Album> ) ), this, SLOT( getResults( QHash<QString,Album> ) ) );
@@ -940,33 +940,33 @@ void SearchDialog::checkRows(){
 
     QAction *action = qobject_cast<QAction*>(sender());
     bool checked = action->data().toBool();
-    QList<QTableWidgetSelectionRange> ranges = albumInfo->selectedRanges();
+    QList<QTableWidgetSelectionRange> ranges = AlbumInfo->selectedRanges();
     if(ranges.size()==0){
         return;
     }
     QTableWidgetSelectionRange range = ranges[0];
     for(int i=range.topRow(); i<=range.bottomRow(); ++i) {
-        if(!albumInfo->item(i,0)){
+        if(!AlbumInfo->item(i,0)){
             continue;
         }
         if(checked){
-            albumInfo->item(i,0)->setCheckState(Qt::Checked);
+            AlbumInfo->item(i,0)->setCheckState(Qt::Checked);
         }else{
-            albumInfo->item(i,0)->setCheckState(Qt::Unchecked);
+            AlbumInfo->item(i,0)->setCheckState(Qt::Unchecked);
         }
     }
 
 }
 
 void SearchDialog::updateSortingEnabled( bool enabled ){
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
 }
 
 
 void SearchDialog::albumInfoContextMenu(const QPoint &p){
 
     /*
-    QModelIndex index = albumInfo->indexAt(p);
+    QModelIndex index = AlbumInfo->indexAt(p);
     int col = index.column();
     //int row = index.row();
     QString str = "file";
@@ -976,79 +976,79 @@ void SearchDialog::albumInfoContextMenu(const QPoint &p){
         t = RESULT;
     }
     */
-    QMenu *c = new QMenu(albumInfo);
+    QMenu *c = new QMenu(AlbumInfo);
 
 
-    QAction* selectAction = new QAction("Check selected rows", albumInfo);
+    QAction* selectAction = new QAction("Check selected rows", AlbumInfo);
     selectAction->setData(true);
     connect(selectAction, SIGNAL(triggered()), this, SLOT(checkRows()));
-    QAction* deselectAction = new QAction("Uncheck selected rows", albumInfo);
+    QAction* deselectAction = new QAction("Uncheck selected rows", AlbumInfo);
     deselectAction->setData(false);
     connect(deselectAction, SIGNAL(triggered()), this, SLOT(checkRows()));
 
-    //move up/down actions for albumInfo
-    QAction* moveResultUpAction = new QAction("Move result up", albumInfo);
+    //move up/down actions for AlbumInfo
+    QAction* moveResultUpAction = new QAction("Move result up", AlbumInfo);
     moveResultUpAction->setData((int)RESULT);
     connect(moveResultUpAction, SIGNAL(triggered()), this, SLOT(moveRowUp()));
-    QAction* moveResultDownAction = new QAction("Move result down", albumInfo);
+    QAction* moveResultDownAction = new QAction("Move result down", AlbumInfo);
     moveResultDownAction->setData((int)RESULT);
     connect(moveResultDownAction, SIGNAL(triggered()), this, SLOT(moveRowDown()));
-    QAction* moveResultToAction = new QAction("Move result to...", albumInfo);
+    QAction* moveResultToAction = new QAction("Move result to...", AlbumInfo);
     moveResultToAction->setData((int)RESULT);
     connect(moveResultToAction, SIGNAL(triggered()), this, SLOT(moveRowTo()));
 
-    QAction* moveOriginUpAction = new QAction("Move file up", albumInfo);
+    QAction* moveOriginUpAction = new QAction("Move file up", AlbumInfo);
     moveOriginUpAction->setData((int)ORIGIN);
     connect(moveOriginUpAction, SIGNAL(triggered()), this, SLOT(moveRowUp()));
-    QAction* moveOriginDownAction = new QAction("Move file down", albumInfo);
+    QAction* moveOriginDownAction = new QAction("Move file down", AlbumInfo);
     moveOriginDownAction->setData((int)ORIGIN);
     connect(moveOriginDownAction, SIGNAL(triggered()), this, SLOT(moveRowDown()));
-    QAction* moveOriginToAction = new QAction("Move file to...", albumInfo);
+    QAction* moveOriginToAction = new QAction("Move file to...", AlbumInfo);
     moveOriginToAction->setData((int)ORIGIN);
     connect(moveOriginToAction, SIGNAL(triggered()), this, SLOT(moveRowTo()));
 
-    QAction* sortEnabledAction = new QAction(tr("Sorting enabled"), albumInfo);
-    sortEnabledAction->setCheckable(true); sortEnabledAction->setChecked( albumInfo->isSortingEnabled() );
+    QAction* sortEnabledAction = new QAction(tr("Sorting enabled"), AlbumInfo);
+    sortEnabledAction->setCheckable(true); sortEnabledAction->setChecked( AlbumInfo->isSortingEnabled() );
     connect(sortEnabledAction, SIGNAL(toggled(bool)), this, SLOT(updateSortingEnabled(bool)));
 
-    QAction* resizeColumnAction = new QAction(tr("Auto resize columns"), albumInfo);
+    QAction* resizeColumnAction = new QAction(tr("Auto resize columns"), AlbumInfo);
     resizeColumnAction->setCheckable(true);
     //resizeColumnAction->setShortcut(tr("Ctrl+C"));
     connect(resizeColumnAction, SIGNAL(toggled(bool)), this, SLOT(resizeColumns(bool)));    
-    QAction* resizeRowAction = new QAction(tr("Auto resize rows"), albumInfo);
+    QAction* resizeRowAction = new QAction(tr("Auto resize rows"), AlbumInfo);
     resizeRowAction->setCheckable(true);
     //resizeRowAction->setShortcut(tr("Ctrl+R"));
     connect(resizeRowAction, SIGNAL(toggled(bool)), this, SLOT(resizeRows(bool)));
-    QAction* deleteAction = new QAction(tr("Clear selection"), albumInfo);
+    QAction* deleteAction = new QAction(tr("Clear selection"), AlbumInfo);
     //deleteAction->setShortcut(tr("Ctrl+Del"));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteCells()));
 
-    QAction* insertBlankFileAction = new QAction("Insert empty file before", albumInfo);
+    QAction* insertBlankFileAction = new QAction("Insert empty file before", AlbumInfo);
     insertBlankFileAction->setData((int)ORIGIN);
     connect(insertBlankFileAction, SIGNAL(triggered()), this, SLOT(insertBlankItem()));
-    QAction* insertBlankResultAction = new QAction("Insert empty result before", albumInfo);
+    QAction* insertBlankResultAction = new QAction("Insert empty result before", AlbumInfo);
     insertBlankResultAction->setData((int)RESULT);
     connect(insertBlankResultAction, SIGNAL(triggered()), this, SLOT(insertBlankItem()));
 
-    QAction* removeRowAction = new QAction(tr("Remove entire row"), albumInfo);
+    QAction* removeRowAction = new QAction(tr("Remove entire row"), AlbumInfo);
     connect(removeRowAction, SIGNAL(triggered()), this, SLOT(removeRow()));
-    QAction* copyAction = new QAction(tr("Copy selection"), albumInfo);
+    QAction* copyAction = new QAction(tr("Copy selection"), AlbumInfo);
     connect(copyAction, SIGNAL(triggered()), this, SLOT(copyCells()));
-    QAction* pasteAction = new QAction(tr("Paste"), albumInfo);
+    QAction* pasteAction = new QAction(tr("Paste"), AlbumInfo);
     connect(pasteAction, SIGNAL(triggered()), this, SLOT(paste()));
 
-    QMenu* matchByMenu = new QMenu(tr("Match results by..."), albumInfo);
-    QAction* matchByTrackAction = new QAction(tr("Match by track"), albumInfo); matchByTrackAction->setData( (int)MATCHBYTRACK );
+    QMenu* matchByMenu = new QMenu(tr("Match results by..."), AlbumInfo);
+    QAction* matchByTrackAction = new QAction(tr("Match by track"), AlbumInfo); matchByTrackAction->setData( (int)MATCHBYTRACK );
     matchByTrackAction->setCheckable(true); connect(matchByTrackAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* matchByTitleAction = new QAction(tr("Match by title"), albumInfo); matchByTitleAction->setData( (int)MATCHBYTITLE );
+    QAction* matchByTitleAction = new QAction(tr("Match by title"), AlbumInfo); matchByTitleAction->setData( (int)MATCHBYTITLE );
     matchByTitleAction->setCheckable(true); connect(matchByTitleAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* dontMatchAction = new QAction(tr("Do not match"), albumInfo); dontMatchAction->setData( (int)DONTMATCH );
+    QAction* dontMatchAction = new QAction(tr("Do not match"), AlbumInfo); dontMatchAction->setData( (int)DONTMATCH );
     dontMatchAction->setCheckable(true); connect(dontMatchAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* matchByTrackTitleAction = new QAction(tr("Match by track, then title, then title to filename"), albumInfo); matchByTrackTitleAction->setData( (int)MATCHBYTRACKTITLE );
+    QAction* matchByTrackTitleAction = new QAction(tr("Match by track, then title, then title to filename"), AlbumInfo); matchByTrackTitleAction->setData( (int)MATCHBYTRACKTITLE );
     matchByTrackTitleAction->setCheckable(true); connect(matchByTrackTitleAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* matchByTitleTrackAction = new QAction(tr("Match by title, then track, then title to filename"), albumInfo); matchByTitleTrackAction->setData( (int)MATCHBYTITLETRACK );
+    QAction* matchByTitleTrackAction = new QAction(tr("Match by title, then track, then title to filename"), AlbumInfo); matchByTitleTrackAction->setData( (int)MATCHBYTITLETRACK );
     matchByTitleTrackAction->setCheckable(true); connect(matchByTitleTrackAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* matchByFileNameAction = new QAction(tr("Match title to filename"), albumInfo); matchByFileNameAction->setData( (int)MATCHBYFILENAME );
+    QAction* matchByFileNameAction = new QAction(tr("Match title to filename"), AlbumInfo); matchByFileNameAction->setData( (int)MATCHBYFILENAME );
     matchByFileNameAction->setCheckable(true); connect(matchByFileNameAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
     matchByMenu->addAction( dontMatchAction );
     matchByMenu->addAction( matchByTitleAction );
@@ -1092,14 +1092,14 @@ void SearchDialog::albumInfoContextMenu(const QPoint &p){
     resizeRowAction->setChecked(autoResizeRows);
     resizeColumnAction->setChecked(autoResizeColumns);
 
-    QPoint globalPos = albumInfo->mapToGlobal(p);
+    QPoint globalPos = AlbumInfo->mapToGlobal(p);
     //menu->exec( globalPos );
     c->exec(globalPos);
 }
 
 void SearchDialog::paste(){
 
-    QList<QTableWidgetSelectionRange> ranges = albumInfo->selectedRanges();
+    QList<QTableWidgetSelectionRange> ranges = AlbumInfo->selectedRanges();
     if(ranges.size()==0){
         return;
     }
@@ -1122,28 +1122,28 @@ void SearchDialog::paste(){
                                     "and paste areas aren't the same size."));
         return;
     }
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
     for(int i=0; i<numRows; ++i) {
         QStringList columns = rows[i].split('\t');
         for(int j=0; j<numColumns; ++j) {
             int row = range.topRow() +i;
             int column = range.leftColumn() +j;
-            if(row < albumInfo->rowCount() && column < albumInfo->columnCount()){
-                if(!albumInfo->item(row,column)){
+            if(row < AlbumInfo->rowCount() && column < AlbumInfo->columnCount()){
+                if(!AlbumInfo->item(row,column)){
                     TableWidgetItem *item = new TableWidgetItem;
-                    albumInfo->setItem(row,column,item);
+                    AlbumInfo->setItem(row,column,item);
                 }
-                albumInfo->item(row,column)->setText(columns[j]);
+                AlbumInfo->item(row,column)->setText(columns[j]);
             }
         }
     }
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
 }
 
 void SearchDialog::copyCells(){
 
-    QList<QTableWidgetSelectionRange> ranges = albumInfo->selectedRanges();
+    QList<QTableWidgetSelectionRange> ranges = AlbumInfo->selectedRanges();
     if(ranges.size()==0){
         return;
     }
@@ -1157,11 +1157,11 @@ void SearchDialog::copyCells(){
             if(j>0){
                 str += "\t";
             }
-            if(!albumInfo->item(i,j)){
+            if(!AlbumInfo->item(i,j)){
                 str += "";
             }else{
-                str += albumInfo->item(range.topRow() +i, range.leftColumn()+j)->text();
-                qDebug()<<"adding to clipbard: "<<albumInfo->item(range.topRow() +i, range.leftColumn()+j)->text();
+                str += AlbumInfo->item(range.topRow() +i, range.leftColumn()+j)->text();
+                qDebug()<<"adding to clipbard: "<<AlbumInfo->item(range.topRow() +i, range.leftColumn()+j)->text();
             }
         }
     }
@@ -1170,11 +1170,11 @@ void SearchDialog::copyCells(){
 
 void SearchDialog::removeRow(){
 
-    int ind = albumInfo->currentRow();
+    int ind = AlbumInfo->currentRow();
     if(ind==-1){
         return;
     }
-    albumInfo->removeRow(ind);
+    AlbumInfo->removeRow(ind);
     nFiles=nFiles-1;
 
     resize(size().height()-1,size().width());
@@ -1183,13 +1183,13 @@ void SearchDialog::removeRow(){
 
 void SearchDialog::insertBlankItem(){
 
-    int ind = albumInfo->currentRow();
+    int ind = AlbumInfo->currentRow();
     if(ind==-1){
         return;
     }
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
-    int n = albumInfo->rowCount();
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
+    int n = AlbumInfo->rowCount();
     //QList<int> inds;inds<<0<<1<<2<<5;
     QAction *action = qobject_cast<QAction *>(sender());
     itemCol t = (itemCol)action->data().toInt();
@@ -1206,49 +1206,49 @@ void SearchDialog::insertBlankItem(){
         int col = inds[i];
         QList<TableWidgetItem*> tmp;
         for(int row=ind;row<n;row++){
-            tmp << (TableWidgetItem*)albumInfo->takeItem( row, col );
+            tmp << (TableWidgetItem*)AlbumInfo->takeItem( row, col );
         }
         int row = ind+1;
         for(int j=0;j<tmp.size();j++){
-            if(row>=albumInfo->rowCount()){
-                albumInfo->setRowCount(row+1);
+            if(row>=AlbumInfo->rowCount()){
+                AlbumInfo->setRowCount(row+1);
                 setNonEditable( row+1, row+1 );
             }
-            albumInfo->setItem( row, col, tmp.at(j) );
+            AlbumInfo->setItem( row, col, tmp.at(j) );
             qDebug()<<i<<j;
             row++;
         }
         //blank item
         TableWidgetItem *newItem = new TableWidgetItem;
         newItem->setFlags( newItem->flags() ^ Qt::ItemIsEditable );
-        albumInfo->setItem( ind, col, newItem );
+        AlbumInfo->setItem( ind, col, newItem );
     }
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
     nFiles=nFiles+1;
 
-    for(int i=0;i<albumInfo->rowCount();i++){
-        albumInfo->item(i,CURRENTTITLE)->setFlags( albumInfo->item(i,CURRENTTITLE)->flags() ^ Qt::ItemIsEditable );
-        albumInfo->item(i,CURRENTTITLE)->setFlags( albumInfo->item(i,CURRENTTITLE)->flags() ^ Qt::ItemIsEditable );
+    for(int i=0;i<AlbumInfo->rowCount();i++){
+        AlbumInfo->item(i,CURRENTTITLE)->setFlags( AlbumInfo->item(i,CURRENTTITLE)->flags() ^ Qt::ItemIsEditable );
+        AlbumInfo->item(i,CURRENTTITLE)->setFlags( AlbumInfo->item(i,CURRENTTITLE)->flags() ^ Qt::ItemIsEditable );
     }
 
 }
 
 void SearchDialog::deleteCells(){
 
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
-    QModelIndexList indexes = albumInfo->selectionModel()->selectedIndexes();
+    bool enabled = AlbumInfo->isSortingEnabled();
+    AlbumInfo->setSortingEnabled(false);
+    QModelIndexList indexes = AlbumInfo->selectionModel()->selectedIndexes();
     for(int i=0;i<indexes.size();i++){
         int row = indexes[i].row();
         int column = indexes[i].column();
-        if( albumInfo->item(row,column) && !originCols.contains(column) ){
-            delete albumInfo->takeItem(row,column);
+        if( AlbumInfo->item(row,column) && !originCols.contains(column) ){
+            delete AlbumInfo->takeItem(row,column);
             TableWidgetItem *newItem = new TableWidgetItem;
             newItem->setFlags( newItem->flags() ^ Qt::ItemIsEditable );
-            albumInfo->setItem( row, column, newItem );
+            AlbumInfo->setItem( row, column, newItem );
         }
     }
-    albumInfo->setSortingEnabled(enabled);
+    AlbumInfo->setSortingEnabled(enabled);
     resize(size().height()+1,size().width());
 }
 
@@ -1299,8 +1299,8 @@ void SearchDialog::updateCell( int row, int col ){
         currentCol=col;
         col = currentCol+2;
     }
-    TableWidgetItem *item  = (TableWidgetItem*)albumInfo->item(row,currentCol);
-    TableWidgetItem *item2 = (TableWidgetItem*)albumInfo->item(row,col);
+    TableWidgetItem *item  = (TableWidgetItem*)AlbumInfo->item(row,currentCol);
+    TableWidgetItem *item2 = (TableWidgetItem*)AlbumInfo->item(row,col);
     if( !item2 || !item || item2->text().isEmpty() ){
         return;
     }
@@ -1325,13 +1325,13 @@ void SearchDialog::resizeHeader( QHeaderView *header, bool state ){
     header->setResizeMode( mode );
 }
 void SearchDialog::resizeColumns(bool state){
-    resizeHeader( albumInfo->horizontalHeader(), state );
+    resizeHeader( AlbumInfo->horizontalHeader(), state );
     autoResizeColumns = state;
     //settings->setValue( "discogs/autoResizeColumns", state );
     //settings->sync();
 }
 void SearchDialog::resizeRows(bool state){
-    resizeHeader( albumInfo->verticalHeader(), state );
+    resizeHeader( AlbumInfo->verticalHeader(), state );
     autoResizeRows = state;
     //settings->setValue( "discogs/autoResizeRows", state );
     //settings->sync();
