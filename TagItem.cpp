@@ -1,7 +1,7 @@
 #include "TagItem.h"
 
 
-TagItem::TagItem( const QString &fullfile, int type, QTreeWidget *parent ) : QTreeWidgetItem( parent, type)    {
+TagItem::TagItem( const QString &fullfile, QTreeWidget *parent, int type ) : QTreeWidgetItem( parent, type)    {
 
     artist_="";
     title_="";

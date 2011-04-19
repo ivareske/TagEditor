@@ -24,7 +24,7 @@ void Discogs::handleResults( QNetworkReply* reply ){
     QXmlStreamReader xml(response);
     while (!xml.atEnd()) {
         xml.readNext();
-        //qDebug()<<xml.name();
+        qDebug()<<xml.name();
 
         if (xml.tokenType() == QXmlStreamReader::StartElement){
             if (xml.name() == "resp") {
@@ -40,8 +40,8 @@ void Discogs::handleResults( QNetworkReply* reply ){
                         }
                     }
                 }else if( xml.attributes().hasAttribute("requests") ){
-                    //nSearches = xml.attributes().value("requests").toString().toInt(&ok, 10);
-                    //qDebug()<<nSearches;
+                    int nSearches = xml.attributes().value("requests").toString().toInt();
+                    qDebug()<<nSearches;
                     //info->setText(QString::number(nSearches)+" searches performed within the last 24 hours");
                 }else{
                     xml.skipCurrentElement();
@@ -91,12 +91,12 @@ void Discogs::handleResults( QNetworkReply* reply ){
 
     reply->deleteLater();
 
-    if( !downloadImmediately() ){
+    if( !downloadImmediately() ){        
         emit resultsDownloaded( albums_ );
     }else{
-        if( albums_.size()==0 ){
-            emit albumsDownloaded( albums_ );
-        }else{
+        if( albums_.size()==0 ){            
+            emit albumsDownloaded( albums_ );            
+        }else{            
             downloadAllAlbums( albums_ );
         }
     }

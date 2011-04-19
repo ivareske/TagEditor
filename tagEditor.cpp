@@ -281,7 +281,7 @@ void TagEditor::saveSettings(){
     guiSettings->endGroup();
     guiSettings->setValue("style", style );
     guiSettings->setValue("startupFolder", startupFolder );	
-    guiSettings->setValue("api_key", api_key );
+    //guiSettings->setValue("api_key", api_key );
     guiSettings->setValue("showSaveTagWarning", showSaveTagWarning );
     guiSettings->setValue("subfolders", subfolders );
     guiSettings->setValue("artistChecked", ArtistCheckbox->isChecked() );
@@ -331,7 +331,7 @@ void TagEditor::readSettings(){
     TreeView->setRootIndex(model->index(startupFolder));
     treeViewLabel->setText(startupFolder);
 
-    api_key = guiSettings->value("api_key","").toString();
+    //api_key = guiSettings->value("api_key","").toString();
     showSaveTagWarning = guiSettings->value("showSaveTagWarning",true).toBool();
     subfolders = guiSettings->value("subfolders",true).toBool();
     ArtistCheckbox->setChecked( guiSettings->value("artistChecked",true).toBool() );
@@ -378,7 +378,7 @@ void TagEditor::chooseDir(){
     if( dialog.exec() ){
         QStringList d = dialog.selectedFiles();
         dir = d[0];
-        QFileSystemModel *m = (QFileSystemModel *)TreeView->model();
+        QFileSystemModel *m =static_cast<QFileSystemModel*>(TreeView->model());
         TreeView->setRootIndex(m->index(dir));
         treeViewLabel->setText(dir);
         startupFolder = dir;
@@ -386,11 +386,12 @@ void TagEditor::chooseDir(){
 }
 
 void TagEditor::showSettings(){
+
     SettingsDialog s;
     if( s.exec()==QDialog::Accepted ){
         //obtain newly saved data from settingsdialog
         extensions = guiSettings->value("extensions","").toStringList();
-        api_key = guiSettings->value("api_key","").toString();
+        //api_key = guiSettings->value("api_key","").toString();
         subfolders = guiSettings->value("subfolders",true).toBool();
     }
 
@@ -888,6 +889,7 @@ void TagEditor::searchOnline(){
 
     QString query;
     QList<QFileInfo> info;
+    QList<TagItem*> items;
     if(isdir){
         //folder/album
         QString folder = m->filePath(index);
@@ -904,8 +906,12 @@ void TagEditor::searchOnline(){
         return;
     }
 
-    SearchDialog d( this, api_key, &info );
-    d.setModal(false);
+    for(int i=0;i<info.size();i++){
+        items.append(new TagItem(info[i].absoluteFilePath()));
+    }
+
+    SearchDialog d( items, this );
+    //d.setModal(false);
     d.exec();
     /*
 	if( d.exec()>=0 ){

@@ -71,7 +71,7 @@ private:
     QSettings *guiSettings;
     QString startupFolder;
     QStringList extensions;
-    QString api_key;
+    //QString api_key;
     bool subfolders;
 /*
     bool artistChecked;

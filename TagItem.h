@@ -12,7 +12,7 @@ class TagItem : public QTreeWidgetItem{
 
 public:
 
-    TagItem(const QString &fullfile="", int type = QTreeWidgetItem::Type, QTreeWidget *parent = 0);
+    TagItem(const QString &fullfile="", QTreeWidget *parent = 0, int type = QTreeWidgetItem::Type);
     TagItem( const TagItem &other );
     void clearTags();
     void readTags();    
