@@ -195,11 +195,15 @@ void SearchDialog::gotAlbums( const QHash<QString,Album> &albums ){
 void SearchDialog::showAlbumAndCover( const Album &album ){
 
     if(album.images().size()==0){
-        cover->setText("No cover found...");
+        if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt()==SearchDialog::MUSICBRAINZ ){
+            cover->setText("Covers are not available from MusicBrainz");
+        }else{
+            cover->setText("No cover found...");
+        }
         coverLabel->setText("");
     }else{
         showCover( 0 );
-    }    
+    }
     showAlbumInfo( album );
 
 }
@@ -470,27 +474,27 @@ void SearchDialog::save(){
         if( albumInfo->item(i,TableWidget::COMMENT) && !clearPreviousComentsCheckBox->isChecked() ){
             comments = albumInfo->item(i,TableWidget::COMMENT)->text();
         }
-        QString tmp="formatLineEdit: "+formatLineEdit->text();
+        QString tmp="Format: "+formatLineEdit->text();
         if(formatLabel->isVisible() && formatLabel->isChecked() && !comments.contains(tmp) && !formatLineEdit->text().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
-        tmp="countryLineEdit: "+countryLineEdit->text();
+        tmp="Country: "+countryLineEdit->text();
         if(countryLabel->isVisible() && countryLabel->isChecked() && !comments.contains(tmp) && !countryLineEdit->text().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
-        tmp="labelLineEdit: "+labelLineEdit->text();
+        tmp="Label: "+labelLineEdit->text();
         if(labelLabel->isVisible() && labelLabel->isChecked() && !comments.contains(tmp) && !labelLineEdit->text().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
-        tmp="rolesTextEdit: "+rolesTextEdit->toPlainText();
+        tmp="Roles: "+rolesTextEdit->toPlainText();
         if(rolesLabel->isVisible() && rolesLabel->isChecked() && !comments.contains(tmp) && !rolesTextEdit->toPlainText().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
         }
-        tmp="notesTextEdit: "+notesTextEdit->toPlainText();
+        tmp="Notes: "+notesTextEdit->toPlainText();
         if(notesLabel->isVisible() && notesLabel->isChecked() && !comments.contains(tmp) && !notesTextEdit->toPlainText().isEmpty() ){
             if(!comments.isEmpty()){ comments.append("\n"); }
             comments.append(tmp);
@@ -527,67 +531,7 @@ void SearchDialog::save(){
 
     //at last, update saved data in table and labels
     setItems();
-    /*
-    bool enabled = albumInfo->isSortingEnabled();
-    albumInfo->setSortingEnabled(false);
-    for(int i=0;i<albumInfo->rowCount();i++){
-        if( !albumInfo->item(i,TableWidget::FILE_NAME) ){
-            continue;
-        }
-        if( albumInfo->item(i,TableWidget::FILE_NAME)->text().isEmpty() ){
-            continue;
-        }
-        if(albumInfo->item(i,TableWidget::FILE_NAME)->checkState()!=Qt::Checked){
-            continue;
-        }
-        //title
-        TableWidgetItem *newItem1 = new TableWidgetItem;
-        QFont font = newItem1->font();font.setBold(true);
-        newItem1->setFont(font);
-        if(albumInfo->item(i,TableWidget::TITLE)){
-            newItem1->setText( albumInfo->item(i,TableWidget::TITLE)->text() );
-        }else{
-            newItem1->setText( albumInfo->item(i,TableWidget::CURRENT_TITLE)->text() );
-        }
-        //newItem1->setFont(font);
-        newItem1->setFlags( newItem1->flags() ^ Qt::ItemIsEditable );
-        albumInfo->setItem(i, TableWidget::CURRENT_TITLE, newItem1);
-	
-        //track
-        if(trackOk){
-            TableWidgetItem *newItem2 = new TableWidgetItem;
-            newItem2->setFont(font);
-            if(albumInfo->item(i,TableWidget::TRACK)){
-                newItem2->setText( albumInfo->item(i,TableWidget::TRACK)->text() );
-            }else{
-                newItem2->setText( albumInfo->item(i,TableWidget::CURRENT_TRACK)->text() );
-            }
-            //newItem2->setFont(font);
-            newItem2->setFlags( newItem2->flags() ^ Qt::ItemIsEditable );
-            albumInfo->setItem(i, TableWidget::CURRENT_TRACK, newItem2);
-        }
-        //comments
-        TableWidgetItem *newItem3 = new TableWidgetItem;
-        //newItem3->setFont(font);
-        newItem3->setText( commentsList[albumInfo->item(i,TableWidget::FILE_NAME)->data(Qt::UserRole).toString()] );
-        //newItem3->setFont(font);
-        //newItem3->setFlags( newItem3->flags() ^ Qt::ItemIsEditable );
-        albumInfo->setItem(i, TableWidget::COMMENT, newItem3);
 
-    }
-    if(artistLabel->isChecked()){
-        artistLabel->setText("artistLineEdit (current: "+artistLineEdit->text()+" ): ");
-    }
-    if(albumLabel->isChecked()){
-        albumLabel->setText("albumLineEdit (current: "+albumLineEdit->text()+" ): ");
-    }
-    if(genreLabel->isChecked()){
-        genreLabel->setText("Genre (current: "+genreLineEdit->text()+" ): ");
-    }
-    if(yearLabel->isChecked() && yearOk){
-        yearLabel->setText("yearLineEdit (current: "+yearLineEdit->text()+" ): ");
-    }
-    */
     //save covers at last, in case tags are used to name covers
     if( saveCoverCheckBox->isChecked() && !saveAllCoversCheckBox->isChecked() ){
         if( currentCoverInd>=0 && currentCoverInd<album.images().size() ){

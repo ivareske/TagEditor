@@ -28,6 +28,7 @@ public slots:
     void showAlbumInfo( const Album &a );
 
 private slots:
+    void resetTable();
     void contextMenu(const QPoint &p, bool init=false );
     void verticalContextMenu(const QPoint &p, bool init=false );
     void moveRow( int from, int to, ColumnType t );
@@ -38,7 +39,7 @@ private slots:
     int matchResult( const QVariant &toMatch, int matchCol );
     void deleteCells();
     void insertBlankRow();
-    void removeCurrentRow();
+    void removeRows();
     void copyCells();
     void cut();
     void insertCutRows();
@@ -64,6 +65,7 @@ private:
     QAction* matchByFileNameAction;
 
 
+    QList<TagItem*> items_;
     QSettings *settings;
     QList< QList<TableWidgetItem*> > cutRows_;
 

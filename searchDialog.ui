@@ -168,6 +168,9 @@ If checked, artist, album, year and format are available and  will be shown.</st
               <property name="text">
                <string/>
               </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item row="0" column="0">

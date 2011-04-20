@@ -99,14 +99,13 @@ int TableWidget::matchResult( const QVariant &toMatch, int matchCol ){
 }
 
 
-void TableWidget::removeCurrentRow(){
+void TableWidget::removeRows(){
 
-    int ind = currentRow();
-    if(ind==-1){
-        return;
+    QModelIndexList indexes = this->selectedIndexes();
+    qSort(indexes.begin(), indexes.end());
+    for(int i=indexes.size()-1;i>=0;i--){
+        removeRow(indexes[i].row());
     }
-    removeRow(ind);
-    //nFiles=nFiles-1;
 
 }
 
@@ -192,8 +191,9 @@ TableWidget::~TableWidget(){
     delete settings;
 }
 
-void TableWidget::setItems( const QList<TagItem*> &items_ ){
+void TableWidget::setItems( const QList<TagItem*> &items ){
 
+    items_ = items;
 
     //nFiles = infos->size();
     this->setRowCount(items_.size());
@@ -414,33 +414,32 @@ void TableWidget::contextMenu(const QPoint &p, bool init ){
 
     //move up/down actions for this
     QAction* moveResultUpAction = new QAction("Move result up", this);
-    moveResultUpAction->setData(RESULT);
+    moveResultUpAction->setData(RESULT); moveResultUpAction->setShortcut(tr("Ctrl+U"));
     connect(moveResultUpAction, SIGNAL(triggered()), this, SLOT(moveRowUp()));
     QAction* moveResultDownAction = new QAction("Move result down", this);
-    moveResultDownAction->setData(RESULT);
+    moveResultDownAction->setData(RESULT); moveResultDownAction->setShortcut(tr("Ctrl+D"));
     connect(moveResultDownAction, SIGNAL(triggered()), this, SLOT(moveRowDown()));
     QAction* moveResultToAction = new QAction("Move result to...", this);
-    moveResultToAction->setData(RESULT);
+    moveResultToAction->setData(RESULT); moveResultToAction->setShortcut(tr("Ctrl+T"));
     connect(moveResultToAction, SIGNAL(triggered()), this, SLOT(moveRowTo()));
 
     QAction* moveOriginUpAction = new QAction("Move file up", this);
-    moveOriginUpAction->setData(ORIGIN);
+    moveOriginUpAction->setData(ORIGIN); moveOriginUpAction->setShortcut(tr("Ctrl+Alt+U"));
     connect(moveOriginUpAction, SIGNAL(triggered()), this, SLOT(moveRowUp()));
     QAction* moveOriginDownAction = new QAction("Move file down", this);
-    moveOriginDownAction->setData(ORIGIN);
+    moveOriginDownAction->setData(ORIGIN); moveOriginDownAction->setShortcut(tr("Ctrl+Alt+D"));
     connect(moveOriginDownAction, SIGNAL(triggered()), this, SLOT(moveRowDown()));
     QAction* moveOriginToAction = new QAction("Move file to...", this);
-    moveOriginToAction->setData(ORIGIN);
+    moveOriginToAction->setData(ORIGIN); moveOriginToAction->setShortcut(tr("Ctrl+Alt+T"));
     connect(moveOriginToAction, SIGNAL(triggered()), this, SLOT(moveRowTo()));
 
     QAction* sortEnabledAction = new QAction(tr("Sorting enabled"), this);
     sortEnabledAction->setCheckable(true); sortEnabledAction->setChecked( this->isSortingEnabled() );
     connect(sortEnabledAction, SIGNAL(toggled(bool)), this, SLOT(enableSorting(bool)));
 
-    resizeColumnAction->setShortcut(tr("Ctrl+C"));
+    resizeColumnAction->setShortcut(tr("Ctrl+R"));
     connect(resizeColumnAction, SIGNAL(toggled(bool)), this, SLOT(resizeColumns(bool)));
 
-    resizeRowAction->setShortcut(tr("Ctrl+R"));
     connect(resizeRowAction, SIGNAL(toggled(bool)), this, SLOT(resizeRows(bool)));
     QAction* deleteAction = new QAction(tr("Delete selected cells"), this);
     deleteAction->setShortcut(tr("Ctrl+Del"));
@@ -453,13 +452,16 @@ void TableWidget::contextMenu(const QPoint &p, bool init ){
     insertBlankResultAction->setData(RESULT);
     connect(insertBlankResultAction, SIGNAL(triggered()), this, SLOT(insertBlankRow()));
 
-    QAction* removeRowAction = new QAction(tr("Remove entire row"), this);
-    connect(removeRowAction, SIGNAL(triggered()), this, SLOT(removeCurrentRow()));
     QAction* copyAction = new QAction(tr("Copy"), this);
+    copyAction->setShortcut(tr("Ctrl+C"));
     connect(copyAction, SIGNAL(triggered()), this, SLOT(copyCells()));
 
     QAction* pasteAction = new QAction(tr("Paste"), this);
+    pasteAction->setShortcut(tr("Ctrl+V"));
     connect(pasteAction, SIGNAL(triggered()), this, SLOT(paste()));
+
+    QAction* resetAction = new QAction(tr("Reset"), this);
+    connect(resetAction, SIGNAL(triggered()), this, SLOT(resetTable()));
 
     QMenu* matchByMenu = new QMenu(tr("Match results by..."), this);
     connect(matchByTrackAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
@@ -499,8 +501,9 @@ void TableWidget::contextMenu(const QPoint &p, bool init ){
     c->addAction(deleteAction);
     c->addSeparator();
     c->addAction(insertBlankFileAction);
-    c->addAction(insertBlankResultAction);
-    c->addAction(removeRowAction);
+    c->addAction(insertBlankResultAction);    
+    c->addSeparator();
+    c->addAction(resetAction);
 
 
     QPoint globalPos = this->mapToGlobal(p);
@@ -535,22 +538,37 @@ void TableWidget::contextMenu(const QPoint &p, bool init ){
 
         this->addAction(insertBlankFileAction);
         this->addAction(insertBlankResultAction);
-        this->addAction(removeRowAction);
+
     }
+}
+
+void TableWidget::resetTable(){
+    clear();
+    setItems(items_);
 }
 
 void TableWidget::verticalContextMenu(const QPoint &p, bool init ){
 
     QMenu *c = new QMenu(this);
 
+    //cut
     QAction* cutAction = new QAction(tr("Cut selected rows"), this);
+    cutAction->setShortcut(tr("Ctrl+C"));
     connect(cutAction, SIGNAL(triggered()), this, SLOT(cut()));
 
+    //insert
     QAction* insertCutRowsAction = new QAction("Insert cut rows", this);
+    insertCutRowsAction->setShortcut(tr("Ctrl+I"));
     connect(insertCutRowsAction, SIGNAL(triggered()), this, SLOT(insertCutRows()));
+
+    //delete
+    QAction* removeRowAction = new QAction(tr("Delete rows"), this);
+    removeRowAction->setShortcut(tr("Ctrl+D"));
+    connect(removeRowAction, SIGNAL(triggered()), this, SLOT(removeRows()));
 
     c->addAction(cutAction);
     c->addAction(insertCutRowsAction);
+    c->addAction(removeRowAction);
 
     QPoint globalPos = this->mapToGlobal(p);
     //menu->exec( globalPos );
@@ -559,6 +577,7 @@ void TableWidget::verticalContextMenu(const QPoint &p, bool init ){
     }else{
         this->verticalHeader()->addAction( cutAction );
         this->verticalHeader()->addAction( insertCutRowsAction );
+        this->verticalHeader()->addAction( removeRowAction );
     }
 }
 
@@ -600,6 +619,7 @@ void TableWidget::moveRow( int from, int to, ColumnType t ){
         qDebug()<<"moving result columns";
         inds = resultCols_;
     }
+    QTableWidgetItem* currItem = this->currentItem();
     bool enabled = isSortingEnabled();
     setSortingEnabled(false);
     for(int i=0;i<inds.size();i++){
@@ -615,6 +635,10 @@ void TableWidget::moveRow( int from, int to, ColumnType t ){
         }
     }
     setSortingEnabled(enabled);
+    if(enabled){
+        QMessageBox::warning(this,"Move row","Sorting is enabled, so moving a row might not have any effect");
+    }
+    this->setCurrentItem(currItem);
 }
 
 void TableWidget::moveRowUp(){
@@ -788,15 +812,16 @@ void TableWidget::deleteCells(){
     for(int i=0;i<indexes.size();i++){
         int row = indexes[i].row();
         int column = indexes[i].column();
-        if( item(row,column) && !originCols_.contains(column) ){
-            delete takeItem(row,column);
-            TableWidgetItem *newItem = new TableWidgetItem;
-            newItem->setFlags( newItem->flags() &= ~Qt::ItemIsEditable );
-            setItem( row, column, newItem );
+        //if( item(row,column) && !originCols_.contains(column) ){
+        if( item(row,column)->flags().testFlag(Qt::ItemIsEditable) ){
+            item(row,column)->setText("");
+            //delete takeItem(row,column);
+            //TableWidgetItem *newItem = new TableWidgetItem;
+            //newItem->setFlags( newItem->flags() &= ~Qt::ItemIsEditable );
+            //setItem( row, column, newItem );
         }
     }
-    setSortingEnabled(enabled);
-    resize(size().height()+1,size().width());
+    setSortingEnabled(enabled);    
 }
 
 void TableWidget::matchBy(bool state){
