@@ -26,6 +26,12 @@ TagItem::TagItem( const QString &fullfile, QTreeWidget *parent, int type ) : QTr
 
 }
 
+bool TagItem::operator<(const QTreeWidgetItem &other) const{
+    int column = treeWidget()->sortColumn();
+    const QVariant v1 = data(column, Qt::DisplayRole);
+    const QVariant v2 = other.data(column, Qt::DisplayRole);
+    return Global::naturalCompare(v1.toString(),v2.toString(),Qt::CaseInsensitive) < 0;
+}
 
 TagItem::TagItem( const TagItem &other ){
 

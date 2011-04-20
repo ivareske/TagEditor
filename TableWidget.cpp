@@ -5,6 +5,15 @@ TableWidget::TableWidget(QWidget *parent) : QTableWidget(parent){
     originCols_ <<0<<1<<2<<5;
     resultCols_ <<3<<4;
 
+    resizeColumnAction = new QAction(tr("Auto resize columns"), this); resizeColumnAction->setCheckable(true);
+    resizeRowAction = new QAction(tr("Auto resize rows"), this); resizeRowAction->setCheckable(true);
+    matchByTrackAction = new QAction(tr("Match by track"), this); matchByTrackAction->setData( MATCH_BY_TRACK ); matchByTrackAction->setCheckable(true);
+    matchByTitleAction = new QAction(tr("Match by title"), this); matchByTitleAction->setData( MATCH_BY_TITLE ); matchByTitleAction->setCheckable(true);
+    dontMatchAction = new QAction(tr("Do not match"), this); dontMatchAction->setData( DONT_MATCH ); dontMatchAction->setCheckable(true);
+    matchByTrackTitleAction = new QAction(tr("Match by track, then title, then title to filename"), this); matchByTrackTitleAction->setData( MATCH_BY_TRACK_TITLE ); matchByTrackTitleAction->setCheckable(true);
+    matchByTitleTrackAction = new QAction(tr("Match by title, then track, then title to filename"), this); matchByTitleTrackAction->setData( MATCH_BY_TITLE_TRACK ); matchByTitleTrackAction->setCheckable(true);
+    matchByFileNameAction = new QAction(tr("Match title to filename"), this); matchByFileNameAction->setData( MATCH_BY_FILE_NAME ); matchByFileNameAction->setCheckable(true);
+
     //context menu
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenu(const QPoint &)));
@@ -18,10 +27,11 @@ TableWidget::TableWidget(QWidget *parent) : QTableWidget(parent){
     connect( this, SIGNAL( cellChanged( int, int )  ), this, SLOT( updateCell(int, int) ) );
 
     settings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
-    autoResizeColumns = settings->value("SearchDialog/autoResizeColumns",true).toBool();
-    resizeColumns(autoResizeColumns);
-    autoResizeRows = settings->value("SearchDialog/autoResizeRows",false).toBool();
-    resizeRows(autoResizeRows);
+
+    resizeColumns( settings->value("SearchDialog/autoResizeColumns",true).toBool() );
+    resizeColumnAction->setChecked( settings->value("SearchDialog/autoResizeColumns",true).toBool() );
+    resizeRows( settings->value("SearchDialog/autoResizeRows",false).toBool() );
+    resizeRowAction->setChecked( settings->value("SearchDialog/autoResizeRows",false).toBool() );
     setSortingEnabled( settings->value("SearchDialog/sortingEnabled",true).toBool() );
     if( isSortingEnabled() ){
         int sortColumn = settings->value("SearchDialog/sortColumn",CURRENT_TRACK).toInt();
@@ -31,12 +41,12 @@ TableWidget::TableWidget(QWidget *parent) : QTableWidget(parent){
         horizontalHeader()->setSortIndicatorShown(true);
         horizontalHeader()->setClickable(true);
     }
-    matchByTrackChecked = settings->value("SearchDialog/matchByTrack",false).toBool();
-    matchByTitleChecked = settings->value("SearchDialog/matchByTitle",false).toBool();
-    dontMatchChecked = settings->value("SearchDialog/dontMacth",true).toBool();
-    matchByTrackTitleChecked = settings->value("SearchDialog/matchByTrackTitle",false).toBool();
-    matchByTitleTrackChecked = settings->value("SearchDialog/matchByTitleTrack",false).toBool();
-    matchByFileNameChecked = settings->value("SearchDialog/matchByFileName",false).toBool();
+    matchByTrackAction->setChecked( settings->value("SearchDialog/matchByTrack",false).toBool() );
+    matchByTitleAction->setChecked( settings->value("SearchDialog/matchByTitle",false).toBool() );
+    dontMatchAction->setChecked( settings->value("SearchDialog/dontMacth",true).toBool() );
+    matchByTrackTitleAction->setChecked( settings->value("SearchDialog/matchByTrackTitle",true).toBool() );
+    matchByTitleTrackAction->setChecked( settings->value("SearchDialog/matchByTitleTrack",false).toBool() );
+    matchByFileNameAction->setChecked( settings->value("SearchDialog/matchByFileName",false).toBool() );
 
     this->horizontalHeader()->setStretchLastSection(true);
     this->verticalHeader()->setStretchLastSection(true);
@@ -53,7 +63,7 @@ int TableWidget::matchResult( const QVariant &toMatch, int matchCol ){
     int res=-1;
     for(int i=0;i<rowCount();i++){
         if( item(i,TITLE) || item(i,TRACK) || !item(i,matchCol) ){
-            //if an item already set there, or item to compare to doesn`t exist, continue
+            //if an item already set there (already matched), or item to compare to doesn`t exist, continue
             continue;
         }
         if( matchCol==CURRENT_TRACK ){
@@ -74,7 +84,9 @@ int TableWidget::matchResult( const QVariant &toMatch, int matchCol ){
             }
         }else{
             //compare title or filename by contains
-            if(item(i,matchCol)->text().contains( toMatch.toString() ) || toMatch.toString().contains( item(i,matchCol)->text() ) ){
+            QString match1 = item(i,matchCol)->text();
+            QString match2 = toMatch.toString();
+            if( match1.contains( match2, Qt::CaseInsensitive ) || match2.contains( match1, Qt::CaseInsensitive ) ){
                 //qDebug()<<"string "<<item(i,matchCol)->text()<<"contains"<<toMatch.toString();
                 res = i;
                 break;
@@ -82,7 +94,7 @@ int TableWidget::matchResult( const QVariant &toMatch, int matchCol ){
         }
 
     }
-    //qDebug()<<"matched "<<toMatch.toString()<<" to row "<<res;
+    qDebug()<<"matched "<<toMatch.toString()<<" to row "<<res;
     return res;
 }
 
@@ -100,12 +112,12 @@ void TableWidget::removeCurrentRow(){
 
 void TableWidget::unCheckMatchActions(){
 
-    matchByTrackChecked = false;
-    matchByTitleChecked = false;
-    dontMatchChecked = false;
-    matchByTitleTrackChecked = false;
-    matchByTrackTitleChecked = false;
-    matchByFileNameChecked = false;
+    matchByTrackAction->setChecked( false );
+    matchByTitleAction->setChecked( false );
+    dontMatchAction->setChecked( false );
+    matchByTitleTrackAction->setChecked( false );
+    matchByTrackTitleAction->setChecked( false );
+    matchByFileNameAction->setChecked( false );
 }
 
 void TableWidget::insertBlankRow(){
@@ -165,20 +177,23 @@ void TableWidget::insertBlankRow(){
 
 TableWidget::~TableWidget(){
 
-    settings->setValue( "matchByTrack", matchByTrackChecked );
-    settings->setValue( "matchByTitle", matchByTitleChecked );
-    settings->setValue( "dontMacth", dontMatchChecked );
-    settings->setValue( "matchByTrackTitle", matchByTrackTitleChecked );
-    settings->setValue( "matchByTitleTrack", matchByTitleTrackChecked );
-    settings->setValue( "matchByFileName", matchByFileNameChecked );
-    settings->setValue( "autoResizeColumns", autoResizeColumns );
-    settings->setValue( "autoResizeRows", autoResizeRows );
+    settings->beginGroup("SearchDialog");
+    settings->setValue( "matchByTrack", matchByTrackAction->isChecked() );
+    settings->setValue( "matchByTitle", matchByTitleAction->isChecked() );
+    settings->setValue( "dontMacth", dontMatchAction->isChecked() );
+    settings->setValue( "matchByTrackTitle", matchByTrackTitleAction->isChecked() );
+    settings->setValue( "matchByTitleTrack", matchByTitleTrackAction->isChecked() );
+    settings->setValue( "matchByFileName", matchByFileNameAction->isChecked() );
+    settings->setValue( "autoResizeColumns", resizeColumnAction->isChecked() );
+    settings->setValue( "autoResizeRows", resizeRowAction->isChecked() );
+    settings->endGroup();
     settings->sync();
 
     delete settings;
 }
 
 void TableWidget::setItems( const QList<TagItem*> &items_ ){
+
 
     //nFiles = infos->size();
     this->setRowCount(items_.size());
@@ -198,7 +213,10 @@ void TableWidget::setItems( const QList<TagItem*> &items_ ){
 
         QString fullfile = items_[i]->fileInfo().filePath();
 
-        TableWidgetItem *newItem = new TableWidgetItem;
+        TableWidgetItem *newItem = static_cast<TableWidgetItem*>(takeItem(i,FILE_NAME));
+        if(!newItem){
+            newItem = new TableWidgetItem;
+        }
         newItem->setText( items_[i]->fileInfo().fileName() );
         newItem->setData( Qt::UserRole, QVariant(fullfile) );
         QFont font = newItem->font();font.setBold(true);
@@ -231,26 +249,43 @@ void TableWidget::setItems( const QList<TagItem*> &items_ ){
 
         }
 
-        TableWidgetItem *newItem1 = new TableWidgetItem;
+        TableWidgetItem *newItem1 = static_cast<TableWidgetItem*>(takeItem(i,CURRENT_TITLE));
+        if(!newItem1){
+            newItem1 = new TableWidgetItem;
+        }
         newItem1->setText( tagTitle );
         newItem1->setFont(font);
         newItem1->setFlags( newItem1->flags() &= ~Qt::ItemIsEditable );
         this->setItem(i, CURRENT_TITLE, newItem1);
 
-        TableWidgetItem *newItem2 = new TableWidgetItem;
+        TableWidgetItem *newItem2 = static_cast<TableWidgetItem*>(takeItem(i,CURRENT_TRACK));
+        if(!newItem2){
+            newItem2 = new TableWidgetItem;
+        }
         newItem2->setText( tagTrack );
         newItem2->setFont(font);
         newItem2->setFlags( newItem2->flags() &= ~Qt::ItemIsEditable );
         this->setItem(i, CURRENT_TRACK, newItem2);
 
-        TableWidgetItem *newItem3 = new TableWidgetItem;
+        TableWidgetItem *newItem3 = static_cast<TableWidgetItem*>(takeItem(i,COMMENT));
+        if(!newItem3){
+            newItem3 = new TableWidgetItem;
+        }
         newItem3->setText( tagComment );
         this->setItem(i, COMMENT, newItem3);
 
-        TableWidgetItem *newItem4 = new TableWidgetItem;
+        TableWidgetItem *newItem4 = static_cast<TableWidgetItem*>(takeItem(i,TITLE));
+        if(!newItem4){
+            newItem4 = new TableWidgetItem;
+        }
         this->setItem(i, TITLE, newItem4);
-        TableWidgetItem *newItem5 = new TableWidgetItem;
+
+        TableWidgetItem *newItem5 = static_cast<TableWidgetItem*>(takeItem(i,TRACK));
+        if(!newItem5){
+            newItem5 = new TableWidgetItem;
+        }
         this->setItem(i, TRACK, newItem5);
+
     }
     this->setSortingEnabled(enabled);
 
@@ -277,11 +312,11 @@ void TableWidget::showAlbumInfo( const Album &a ){
     while( songs.size()>0 ){
         int row;
         //qDebug()<<a.songs[0].title;
-        if(matchByTrackChecked){
+        if(matchByTrackAction->isChecked()){
             row = matchResult( songs[0].track(), CURRENT_TRACK );
-        }else if(matchByTitleChecked){
+        }else if(matchByTitleAction->isChecked()){
             row = matchResult( songs[0].title(), CURRENT_TITLE );
-        }else if(matchByTitleTrackChecked){
+        }else if(matchByTitleTrackAction->isChecked()){
             row = matchResult( songs[0].title(), CURRENT_TITLE );
             if(row==-1){
                 row = matchResult( songs[0].track(), CURRENT_TRACK );
@@ -289,7 +324,7 @@ void TableWidget::showAlbumInfo( const Album &a ){
             if(row==-1){
                 row = matchResult( songs[0].title(), FILE_NAME );
             }
-        }else if(matchByTrackTitleChecked){
+        }else if(matchByTrackTitleAction->isChecked()){
             row = matchResult( songs[0].track(), CURRENT_TRACK );
             if(row==-1){
                 row = matchResult( songs[0].title(), CURRENT_TITLE );
@@ -297,9 +332,9 @@ void TableWidget::showAlbumInfo( const Album &a ){
             if(row==-1){
                 row = matchResult( songs[0].title(), FILE_NAME );
             }
-        }else if(matchByFileNameChecked){
+        }else if(matchByFileNameAction->isChecked()){
             row = matchResult( songs[0].title(), FILE_NAME );
-        }else if(dontMatchChecked){;
+        }else if(dontMatchAction->isChecked()){;
             row = k;
             k++;
         }else{
@@ -334,7 +369,7 @@ void TableWidget::showAlbumInfo( const Album &a ){
                 break;
             }
         }
-        //qDebug()<<leftOverSongs[i].title<<" leftover, put in row "<<row;
+        qDebug()<<leftOverSongs[i].title()<<" leftover, put in row "<<row;
         TableWidgetItem *newItem = new TableWidgetItem;
         newItem->setText(leftOverSongs[i].title());
         QFont f = newItem->font();f.setPointSize(10);
@@ -365,6 +400,8 @@ void TableWidget::contextMenu(const QPoint &p, bool init ){
         t = RESULT;
     }
     */
+
+
     QMenu *c = new QMenu(this);
 
 
@@ -400,12 +437,9 @@ void TableWidget::contextMenu(const QPoint &p, bool init ){
     sortEnabledAction->setCheckable(true); sortEnabledAction->setChecked( this->isSortingEnabled() );
     connect(sortEnabledAction, SIGNAL(toggled(bool)), this, SLOT(enableSorting(bool)));
 
-    QAction* resizeColumnAction = new QAction(tr("Auto resize columns"), this);
-    resizeColumnAction->setCheckable(true);
     resizeColumnAction->setShortcut(tr("Ctrl+C"));
     connect(resizeColumnAction, SIGNAL(toggled(bool)), this, SLOT(resizeColumns(bool)));
-    QAction* resizeRowAction = new QAction(tr("Auto resize rows"), this);
-    resizeRowAction->setCheckable(true);
+
     resizeRowAction->setShortcut(tr("Ctrl+R"));
     connect(resizeRowAction, SIGNAL(toggled(bool)), this, SLOT(resizeRows(bool)));
     QAction* deleteAction = new QAction(tr("Delete selected cells"), this);
@@ -428,18 +462,12 @@ void TableWidget::contextMenu(const QPoint &p, bool init ){
     connect(pasteAction, SIGNAL(triggered()), this, SLOT(paste()));
 
     QMenu* matchByMenu = new QMenu(tr("Match results by..."), this);
-    QAction* matchByTrackAction = new QAction(tr("Match by track"), this); matchByTrackAction->setData( MATCH_BY_TRACK );
-    matchByTrackAction->setCheckable(true); connect(matchByTrackAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* matchByTitleAction = new QAction(tr("Match by title"), this); matchByTitleAction->setData( MATCH_BY_TITLE );
-    matchByTitleAction->setCheckable(true); connect(matchByTitleAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* dontMatchAction = new QAction(tr("Do not match"), this); dontMatchAction->setData( DONT_MATCH );
-    dontMatchAction->setCheckable(true); connect(dontMatchAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* matchByTrackTitleAction = new QAction(tr("Match by track, then title, then title to filename"), this); matchByTrackTitleAction->setData( MATCH_BY_TRACK_TITLE );
-    matchByTrackTitleAction->setCheckable(true); connect(matchByTrackTitleAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* matchByTitleTrackAction = new QAction(tr("Match by title, then track, then title to filename"), this); matchByTitleTrackAction->setData( MATCH_BY_TITLE_TRACK );
-    matchByTitleTrackAction->setCheckable(true); connect(matchByTitleTrackAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
-    QAction* matchByFileNameAction = new QAction(tr("Match title to filename"), this); matchByFileNameAction->setData( MATCH_BY_FILE_NAME );
-    matchByFileNameAction->setCheckable(true); connect(matchByFileNameAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
+    connect(matchByTrackAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
+    connect(matchByTitleAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
+    connect(dontMatchAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
+    connect(matchByTrackTitleAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
+    connect(matchByTitleTrackAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
+    connect(matchByFileNameAction, SIGNAL(triggered(bool)), this, SLOT(matchBy(bool)));
 
     matchByMenu->addAction( dontMatchAction );
     matchByMenu->addAction( matchByTitleAction );
@@ -473,16 +501,6 @@ void TableWidget::contextMenu(const QPoint &p, bool init ){
     c->addAction(insertBlankFileAction);
     c->addAction(insertBlankResultAction);
     c->addAction(removeRowAction);
-
-    dontMatchAction->setChecked( dontMatchChecked );
-    matchByTitleAction->setChecked( matchByTitleChecked );
-    matchByTrackAction->setChecked( matchByTrackChecked );
-    matchByTrackTitleAction->setChecked( matchByTrackTitleChecked );
-    matchByTitleTrackAction->setChecked( matchByTitleTrackChecked );
-    matchByFileNameAction->setChecked( matchByFileNameChecked );
-    resizeRowAction->setChecked(autoResizeRows);
-    resizeColumnAction->setChecked(autoResizeColumns);
-
 
 
     QPoint globalPos = this->mapToGlobal(p);
@@ -784,26 +802,9 @@ void TableWidget::deleteCells(){
 void TableWidget::matchBy(bool state){
 
     QAction *action = qobject_cast<QAction*>(sender());
-    if(state==false){
-        action->setChecked(true);
-        return;
-    }
-    MatchByFlag f = (MatchByFlag)action->data().toInt();
+
     unCheckMatchActions();
     action->setChecked(true);
-    if(f==MATCH_BY_TRACK){
-        matchByTrackChecked = true;
-    }else if(f==MATCH_BY_TITLE){
-        matchByTitleChecked = true;
-    }else if(f==DONT_MATCH){
-        dontMatchChecked = true;
-    }else if(f==MATCH_BY_TITLE_TRACK){
-        matchByTitleTrackChecked = true;
-    }else if(f==MATCH_BY_TRACK_TITLE){
-        matchByTrackTitleChecked = true;
-    }else if(f==MATCH_BY_FILE_NAME){
-        matchByFileNameChecked = true;
-    }
 
 }
 
@@ -847,14 +848,8 @@ void TableWidget::resizeHeader( QHeaderView *header, bool state ){
 
 void TableWidget::resizeColumns(bool state){
     resizeHeader( horizontalHeader(), state );
-    autoResizeColumns = state;
-    //settings->setValue( "discogs/autoResizeColumns", state );
-    //settings->sync();
 }
 
 void TableWidget::resizeRows(bool state){
     resizeHeader( verticalHeader(), state );
-    autoResizeRows = state;
-    //settings->setValue( "discogs/autoResizeRows", state );
-    //settings->sync();
 }

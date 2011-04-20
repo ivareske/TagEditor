@@ -54,14 +54,14 @@ private slots:
 private:
     QList<int> originCols_;
     QList<int> resultCols_;
-    bool matchByTrackChecked;
-    bool matchByTitleChecked;
-    bool matchByTitleTrackChecked;
-    bool matchByTrackTitleChecked;
-    bool matchByFileNameChecked;
-    bool dontMatchChecked;
-    bool autoResizeColumns;
-    bool autoResizeRows;
+    QAction* resizeColumnAction;
+    QAction* resizeRowAction;
+    QAction* matchByTrackAction;
+    QAction* matchByTitleAction;
+    QAction* dontMatchAction;
+    QAction* matchByTrackTitleAction;
+    QAction* matchByTitleTrackAction;
+    QAction* matchByFileNameAction;
 
 
     QSettings *settings;

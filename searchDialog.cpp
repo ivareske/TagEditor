@@ -416,14 +416,14 @@ void SearchDialog::save(){
     QString log;
     int aind = searchResults->currentRow();
     if(aind==-1){
-        QMessageBox::critical(this, "Save",
-                              "Please select a serach result first", QMessageBox::Ok, QMessageBox::Ok);
+        QMessageBox::critical(this, "Save", "Please select a serach result first", QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
     Album album = albums_[searchResults->currentItem()->data(Qt::UserRole).toString()];
     //save tags
     bool trackOk;bool yearOk; QHash<QString,QString> commentsList;
     for(int i=0;i<albumInfo->rowCount();i++){
+        qDebug()<<i;
         if( !albumInfo->item(i,TableWidget::FILE_NAME) ){
             continue;
         }
@@ -434,22 +434,35 @@ void SearchDialog::save(){
             continue;
         }
         QString fullfile = albumInfo->item(i,TableWidget::FILE_NAME)->data(Qt::UserRole).toString();
-        TagLib::FileRef f( fullfile.toStdString().c_str() );
-        if( f.isNull() || !f.tag() ){
+        TagItem* tagItem = 0;
+        for(int j=0;j<items_.size();j++){
+            qDebug()<<items_[j]->fileInfo().filePath().toLower()<<fullfile;
+            if(items_[j]->fileInfo().filePath().toLower()==fullfile.toLower()){
+                tagItem = items_[j];
+                break;
+            }
+        }
+        if(tagItem==0){
+            qDebug()<<"BUG!!!!! COULD NOT FIND "+fullfile;
+            continue;
+        }
+
+        if( !tagItem->tagOk() ){
             log.append("\nCould not read tag for "+fullfile);
             continue;
         }
+
         qDebug()<<"saving "<<fullfile;
         //title
         if(albumInfo->item(i,TableWidget::TITLE)){
-            f.tag()->setTitle( albumInfo->item(i,TableWidget::TITLE)->text().toStdString().c_str() );
+            tagItem->setTitle( albumInfo->item(i,TableWidget::TITLE)->text() );
         }
 
         //track
         if(albumInfo->item(i,TableWidget::TRACK)){
             int tmp = albumInfo->item(i,TableWidget::TRACK)->text().toInt(&trackOk,10);
             if(trackOk){
-                f.tag()->setTrack( tmp );
+                tagItem->setTrack( tmp );
             }
         }
         //add extra info to comments if checked
@@ -485,35 +498,36 @@ void SearchDialog::save(){
         commentsList.insert(fullfile,comments);
         //comments
         if(albumInfo->item(i,TableWidget::COMMENT)){
-            f.tag()->setComment( comments.toStdString().c_str() );
+            tagItem->setComment( comments );
         }
         //album
         if(albumLabel->isChecked()){
-            f.tag()->setAlbum( albumLineEdit->text().toStdString().c_str() );
+            tagItem->setAlbum( albumLineEdit->text() );
         }
         //artist
         if(artistLabel->isChecked()){
-            f.tag()->setArtist( artistLineEdit->text().toStdString().c_str() );
+            tagItem->setArtist( artistLineEdit->text() );
         }
         //genre
         if(genreLabel->isVisible() && genreLabel->isChecked()){
-            f.tag()->setGenre( genreLineEdit->text().toStdString().c_str() );
+            tagItem->setGenre( genreLineEdit->text() );
         }
         //year
         if(yearLabel->isChecked()){
             int tmp = yearLineEdit->text().toInt(&yearOk,10);
             if(yearOk){                
-                f.tag()->setYear( tmp );
+                tagItem->setYear( tmp );
             }            
         }
-        bool saveOk = f.save();
+        bool saveOk = tagItem->saveTag();
         if(!saveOk){
             log.append("\nCould not save tag for "+fullfile);
         }
     }
 
     //at last, update saved data in table and labels
-    //so far not done by reading tags again, to speed things up
+    setItems();
+    /*
     bool enabled = albumInfo->isSortingEnabled();
     albumInfo->setSortingEnabled(false);
     for(int i=0;i<albumInfo->rowCount();i++){
@@ -573,6 +587,7 @@ void SearchDialog::save(){
     if(yearLabel->isChecked() && yearOk){
         yearLabel->setText("yearLineEdit (current: "+yearLineEdit->text()+" ): ");
     }
+    */
     //save covers at last, in case tags are used to name covers
     if( saveCoverCheckBox->isChecked() && !saveAllCoversCheckBox->isChecked() ){
         if( currentCoverInd>=0 && currentCoverInd<album.images().size() ){
@@ -592,7 +607,7 @@ void SearchDialog::save(){
         t.exec();
     }
     info->setText("Tags saved");
-    albumInfo->setSortingEnabled(enabled);
+    //albumInfo->setSortingEnabled(enabled);
 }
 
 

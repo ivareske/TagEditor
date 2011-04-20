@@ -14,6 +14,8 @@ public:
 
     TagItem(const QString &fullfile="", QTreeWidget *parent = 0, int type = QTreeWidgetItem::Type);
     TagItem( const TagItem &other );
+    bool operator<(const QTreeWidgetItem &other) const;
+
     void clearTags();
     void readTags();    
     bool saveTag();
