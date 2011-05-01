@@ -42,8 +42,8 @@ SearchDialog::SearchDialog( const QList<TagItem*> &items, QWidget *parent ) : QD
     connect(&saveCoverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(saveCoverFromReply(QNetworkReply*)));
     connect( searchResults, SIGNAL( itemClicked( QListWidgetItem * )  ), this, SLOT( showResult(QListWidgetItem *) ) );
     connect( databaseComboBox, SIGNAL( currentIndexChanged( int )  ), this, SLOT( databaseChanged(int) ) );
-    databaseComboBox->addItem("Discogs",SearchDialog::DISCOGS);
-    databaseComboBox->addItem("MusicBrainz",SearchDialog::MUSICBRAINZ);
+    databaseComboBox->addItem("Discogs");
+    databaseComboBox->addItem("MusicBrainz");
 
     //save cover now action
     QAction* saveCoverAction = new QAction(tr("Save current cover now"), this);
@@ -124,7 +124,8 @@ void SearchDialog::search(){
         return;
     }
     QString url;
-    if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::DISCOGS ){
+    //if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::DISCOGS ){
+    if( database_->type()==MusicDatabase::DISCOGS ){
         url = "http://www.discogs.com/search?type=all&q="+searchStr->text()+"+"+searchTitle->text()+"&f=xml&api_key="+api_key_;
     }else{
         url = "http://musicbrainz.org/ws/1/release/?type=xml&artist="+searchStr->text()+"&title="+searchTitle->text();
@@ -147,9 +148,10 @@ void SearchDialog::getResults( const QHash<QString,Album> &results ){
         QList<Album> tmpresults = results_.values();
         std::sort( tmpresults.begin(), tmpresults.end(), Global::compareAlbum );
         for(int i=0;i<tmpresults.size();i++){
-            if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::DISCOGS ){
+            //if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::DISCOGS ){
+            if( database_->type()==MusicDatabase::DISCOGS ){
                 setResultItem( tmpresults[i].title(), tmpresults[i].key() );
-            }else if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::MUSICBRAINZ ){
+            }else{ // if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::MUSICBRAINZ ){
                 setResultItem( tmpresults[i].displayArtist()+" - "+tmpresults[i].title() +"("+tmpresults[i].format()+","+QString::number(tmpresults[i].year())+")", tmpresults[i].key() );
             }
         }
@@ -195,7 +197,8 @@ void SearchDialog::gotAlbums( const QHash<QString,Album> &albums ){
 void SearchDialog::showAlbumAndCover( const Album &album ){
 
     if(album.images().size()==0){
-        if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt()==SearchDialog::MUSICBRAINZ ){
+        //if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt()==SearchDialog::MUSICBRAINZ ){
+        if( database_->type()==MusicDatabase::MUSICBRAINZ ){
             cover->setText("Covers are not available from MusicBrainz");
         }else{
             cover->setText("No cover found...");
@@ -220,7 +223,8 @@ void SearchDialog::showAlbumInfo( const Album &a ){
     formatLineEdit->setText( a.format() );
     countryLineEdit->setText( a.country() );
     labelLineEdit->setText( a.label() );
-    if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::DISCOGS ){
+    //if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::DISCOGS ){
+    if( database_->type()==MusicDatabase::DISCOGS ){
         rolesTextEdit->setText( a.roles().join(". ") );
         notesTextEdit->setText( a.notes() );
     }
@@ -317,6 +321,38 @@ void SearchDialog::saveCover( const QUrl &url ){
     saveCoverManager.get(QNetworkRequest(url));
 }
 
+/*
+void SearchDialog::downloadCover( const Album &album, const QUrl &url ){
+
+    QNetworkRequest coverRequest(url);
+    coverRequest.setAttribute(QNetworkRequest::User,album.key());
+    QNetworkAccessManager *coverManager = new QNetworkAccessManager;
+    connect(coverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getCoverFromReply(QNetworkReply*)));
+    coverManager->get(coverRequest);
+
+}
+
+void SearchDialog::getCoverFromReply(QNetworkReply* reply){
+
+    QByteArray data = reply->readAll();
+    QString key = reply->request().attribute(QNetworkRequest::User).toString();
+    Album album = albums_[key];
+    QImage p;
+    p.loadFromData(data);
+    p.convertToFormat(QImage::Format_RGB32);
+    QList<QPixMap> covers = album.covers();
+    if( !covers.contains(p) ){
+        covers.append(p);
+        album.setCovers(covers);
+    }
+
+    albums_[key] = album;
+
+    reply->deleteLater();
+
+}
+*/
+
 void SearchDialog::saveCoverFromReply(QNetworkReply* reply){
     //image to be saved must exist in albumLineEdit.images
 
@@ -326,11 +362,13 @@ void SearchDialog::saveCoverFromReply(QNetworkReply* reply){
     p.convertToFormat(QImage::Format_RGB32);
     reply->deleteLater();
 
+
     int aind = searchResults->currentRow();
     if(aind==-1){
         return;
-    }
+    }    
     Album album = albums_[searchResults->currentItem()->data(Qt::UserRole).toString()];
+
     QList<QUrl> images = album.images();
     QString url = reply->url().toString();
     int cInd=-1;
@@ -558,9 +596,9 @@ void SearchDialog::save(){
 
 void SearchDialog::databaseChanged( int ind ){
 
-    //delete database_;
+    delete database_;
 
-    if(databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::DISCOGS){
+    if(databaseComboBox->currentText()=="Discogs"){
         database_ = new Discogs( api_key_ );
         rolesTextEdit->show();
         notesTextEdit->show();
@@ -568,7 +606,7 @@ void SearchDialog::databaseChanged( int ind ){
         rolesLabel->show();
         notesLabel->show();
         genreLabel->show();
-    }else if(databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::MUSICBRAINZ){
+    }else if(databaseComboBox->currentText()=="MusicBrainz" ){
         database_ = new MusicBrainz();
         rolesTextEdit->hide();
         notesTextEdit->hide();

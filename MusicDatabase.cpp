@@ -29,13 +29,24 @@ void MusicDatabase::handleCover( QNetworkReply* reply ){
 
 }
 
-
+MusicDatabase::DataBaseType MusicDatabase::type() const{
+    return type_;
+}
 
 void MusicDatabase::downloadAllAlbums( QHash<QString,Album> results ){
 
     //Albums.clear();
     nDownloaded_=0;
     QList<Album> tmpresults = results.values();
+
+    qDebug()<<tmpresults.size()<<" ALBUMS FOUND!!!!!!!!!!";
+    /*
+    QStringList keys;
+    for(int i=0;i<tmpresults.size();i++){
+        keys.append(tmpresults[i].key());
+    }
+    qDebug()<<"NUMBER OF UNIQUE KEYS: "<<keys.toSet().toList().size();
+    */
     for(int i=0;i<tmpresults.size();i++){
         qDebug()<<"downloading album "<<tmpresults[i].title();
         downloadAlbum( tmpresults[i] );

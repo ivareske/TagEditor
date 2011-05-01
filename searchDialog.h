@@ -5,12 +5,8 @@
 #include <QtNetwork>
 #include "TextViewer.h"
 #include "Album.h"
-//#include <tag.h>
-//#include <taglib.h>
-//#include <fileref.h>
 #include "TableWidget.h"
 #include "TagItem.h"
-//#include "TableWidgetItem.h"
 #include "MusicDatabase.h"
 #include "MusicBrainz.h"
 #include "Discogs.h"
@@ -26,7 +22,6 @@ public:
 
 
 private:
-    enum DataBaseType{ DISCOGS, MUSICBRAINZ };
 
     void closeEvent( QCloseEvent *event );
     void readSettings();
@@ -38,7 +33,6 @@ private:
     QByteArray coverData;
     QSettings *settings;
 
-    //int nFiles;
 
     QHash<QString,Album> albums_;
     QHash<QString,Album> results_;
@@ -48,6 +42,12 @@ private:
     TableWidget *albumInfo;
 
 private slots:
+
+    fix cover downloading. keep downloaded covers
+    /*
+    void getCoverFromReply(QNetworkReply* reply);
+    void downloadCover( const Album &album, const QUrl &url );
+    */
 
     void setItems();
     void search();

@@ -15,7 +15,7 @@ public:
 	public slots:
     void handleResults( QNetworkReply* reply );
     void handleRelease( QNetworkReply* reply );
-    void handleCover(QNetworkReply* reply);
+    //void handleCover(QNetworkReply* reply);
 
 
 

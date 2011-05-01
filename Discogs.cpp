@@ -5,6 +5,7 @@ Discogs::Discogs( QString key ){
 
     api_key = key;
 
+    type_ = MusicDatabase::DISCOGS;
 
 }
 
@@ -342,31 +343,38 @@ void Discogs::handleRelease( QNetworkReply* reply ){
     albums_.insert(album.key(),album);
     reply->deleteLater();
 
+    /*
     if(images.size()>0){
-        qDebug()<<"starting image downloading for album "+album.title();
-        QNetworkRequest coverRequest(images[0]);
-        coverRequest.setAttribute(static_cast<QNetworkRequest::Attribute>(1010),album.key());
+        //qDebug()<<"starting image downloading for album "+album.title()<<", images: "<<images;
+        QNetworkRequest coverRequest(images[0]);        
+        coverRequest.setAttribute(QNetworkRequest::User,album.key());
         QNetworkAccessManager *coverManager = new QNetworkAccessManager;
         connect(coverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleCover(QNetworkReply*)));
         coverManager->get(coverRequest);
     }else {
+        */
+        nDownloaded_++;
+        qDebug()<<"downloaded album "<<album.title();
         if( downloadImmediately_ && nDownloaded_==albums_.size() ){
             emit albumsDownloaded( albums_ );
         }
         if(!downloadImmediately_){
             emit albumDownloaded( album );
         }
-    }
+    //}
 
 
 }
+
+/*
+  //too slow downloading all images at once
 void Discogs::handleCover(QNetworkReply* reply){
 
     QByteArray data = reply->readAll();
     QPixmap p;
     p.loadFromData(data);
-    QString key = reply->attribute(static_cast<QNetworkRequest::Attribute>(1010)).toString();
-    qDebug()<<key;
+    QString key = reply->request().attribute(QNetworkRequest::User).toString();
+    //qDebug()<<key;
     Album album = albums_[key];
     QList<QPixmap> covers = album.covers();
     covers.append(p);
@@ -381,17 +389,15 @@ void Discogs::handleCover(QNetworkReply* reply){
         }
     }
 
-    key er "", setattribute funker ikke?
-                last ned første album, så alle covere for dette album, så start med neste album
-
-    qDebug()<<"downloaded "<<reply->url().toString()<<" for album "<<album.title()<<", "<<album.covers().size()<<" of "<<album.images().size()<<" finished ";
+    //qDebug()<<"downloaded "<<reply->url().toString()<<" for album "<<album.title()<<", "<<album.covers().size()<<" of "<<album.images().size()<<" finished ";
+    //qDebug()<<album.title()<<": "<<album.covers().size()<<" of "<<album.images().size()<<" covers finished "<<reply->url().toString();
 
     reply->deleteLater();
 
     if(ind!=-1 && ind<images.size()){
         //download next cover in line
         QNetworkRequest coverRequest(images[ind]);
-        coverRequest.setAttribute(static_cast<QNetworkRequest::Attribute>(1010),album.key());
+        coverRequest.setAttribute(QNetworkRequest::User,album.key());
         QNetworkAccessManager *coverManager = new QNetworkAccessManager;
         connect(coverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleCover(QNetworkReply*)));
         coverManager->get(coverRequest);
@@ -400,7 +406,7 @@ void Discogs::handleCover(QNetworkReply* reply){
         if(album.covers().size()==album.images().size()){
             //all covers for this album downloaded
             nDownloaded_++;
-
+            qDebug()<<"downloaded all covers for album "<<album.title();
             //qDebug()<<downloadImmediately_<<nDownloaded_<<albums_.size();
             if( downloadImmediately_ && nDownloaded_==albums_.size() ){
                 emit albumsDownloaded( albums_ );
@@ -411,7 +417,5 @@ void Discogs::handleCover(QNetworkReply* reply){
         }
     }
 
-
-
-
 }
+*/

@@ -3,6 +3,7 @@
 
 MusicBrainz::MusicBrainz(){
 
+    type_ = MusicDatabase::MUSICBRAINZ;
 
 }
 

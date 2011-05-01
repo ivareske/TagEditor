@@ -2,10 +2,12 @@
 
 
 Album::Album(){
-    
+
 
 }
 
+
+/*
 Album& Album::operator=(const Album &other){
 
     covers_ = other.covers();
@@ -54,7 +56,7 @@ Album::Album( const Album &other ){
     release_ = other.release();
 
 }
-
+*/
 void Album::setCovers( const QList<QPixmap> covers ){
     covers_ = covers;
 }
@@ -204,11 +206,12 @@ QString Album::displayArtist() const{
 
     QString res="Unknown";
     if(artists_.size()>1){
-        res = "Various";
+        //res = "Various";
+        artists_.join(", ");
     }else if(artists_.size()==1){
         res = artists_[0];
     }
-    qDebug()<<res;
+    //qDebug()<<res;
     return res;
 
 }
