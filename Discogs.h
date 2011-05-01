@@ -11,10 +11,11 @@ class Discogs : public MusicDatabase{
 
 public:
     Discogs( QString key = "" );
-    ~Discogs();
+
 	public slots:
     void handleResults( QNetworkReply* reply );
     void handleRelease( QNetworkReply* reply );
+    void handleCover(QNetworkReply* reply);
 
 
 

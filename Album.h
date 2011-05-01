@@ -9,9 +9,12 @@ class Album{
 
 public:
 	Album();
+        Album( const Album &other );
+        Album &operator= (const Album &other);
         QString key() const;
         QString displayArtist() const;
         void disp() const;
+        QList<QPixmap> covers() const;
         QList<QUrl> images() const;
         QStringList artists() const;
         QStringList roles() const;
@@ -32,6 +35,7 @@ public:
         QString release() const;
         QHash<QString,QPixmap> downloadedImages() const;
 
+        void setCovers( const QList<QPixmap> covers );
         void setImages( QList<QUrl> images );
         void setArtists( QStringList artists );
         void setRoles( QStringList roles );
@@ -50,11 +54,11 @@ public:
         void setSongs( QList<Song> songs );
         void setNotes( QString notes );
         void setRelease( QString release );
-        void setDownloadedImages( QHash<QString,QPixmap> dImages );
 
 private:
         QList<QUrl> images_;
-        QHash<QString,QPixmap> downloadedImages_;
+        QList<QPixmap> covers_;
+        //QHash<QString,QPixmap> downloadedImages_;
         QStringList artists_;
         QStringList roles_;
         QString type_;

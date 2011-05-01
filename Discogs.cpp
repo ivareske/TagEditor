@@ -8,13 +8,9 @@ Discogs::Discogs( QString key ){
 
 }
 
-Discogs::~Discogs(){
-
-}
-
 
 void Discogs::handleResults( QNetworkReply* reply ){
-
+    //a serach result, not the same as a release. Contains less info
     qDebug()<<"Discogs handleResults";
     QString err="";
     //QList<SearchResult> Results;
@@ -24,7 +20,7 @@ void Discogs::handleResults( QNetworkReply* reply ){
     QXmlStreamReader xml(response);
     while (!xml.atEnd()) {
         xml.readNext();
-        qDebug()<<xml.name();
+        //qDebug()<<xml.name();
 
         if (xml.tokenType() == QXmlStreamReader::StartElement){
             if (xml.name() == "resp") {
@@ -40,8 +36,8 @@ void Discogs::handleResults( QNetworkReply* reply ){
                         }
                     }
                 }else if( xml.attributes().hasAttribute("requests") ){
-                    int nSearches = xml.attributes().value("requests").toString().toInt();
-                    qDebug()<<nSearches;
+                    //int nSearches = xml.attributes().value("requests").toString().toInt();
+                    //qDebug()<<nSearches;
                     //info->setText(QString::number(nSearches)+" searches performed within the last 24 hours");
                 }else{
                     xml.skipCurrentElement();
@@ -91,12 +87,12 @@ void Discogs::handleResults( QNetworkReply* reply ){
 
     reply->deleteLater();
 
-    if( !downloadImmediately() ){        
+    if( !downloadImmediately() ){
         emit resultsDownloaded( albums_ );
     }else{
-        if( albums_.size()==0 ){            
-            emit albumsDownloaded( albums_ );            
-        }else{            
+        if( albums_.size()==0 ){
+            emit albumsDownloaded( albums_ );
+        }else{
             downloadAllAlbums( albums_ );
         }
     }
@@ -343,18 +339,79 @@ void Discogs::handleRelease( QNetworkReply* reply ){
     album.setImages(images);
     album.setSongs(songs);
 
+    albums_.insert(album.key(),album);
+    reply->deleteLater();
+
+    if(images.size()>0){
+        qDebug()<<"starting image downloading for album "+album.title();
+        QNetworkRequest coverRequest(images[0]);
+        coverRequest.setAttribute(static_cast<QNetworkRequest::Attribute>(1010),album.key());
+        QNetworkAccessManager *coverManager = new QNetworkAccessManager;
+        connect(coverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleCover(QNetworkReply*)));
+        coverManager->get(coverRequest);
+    }else {
+        if( downloadImmediately_ && nDownloaded_==albums_.size() ){
+            emit albumsDownloaded( albums_ );
+        }
+        if(!downloadImmediately_){
+            emit albumDownloaded( album );
+        }
+    }
+
+
+}
+void Discogs::handleCover(QNetworkReply* reply){
+
+    QByteArray data = reply->readAll();
+    QPixmap p;
+    p.loadFromData(data);
+    QString key = reply->attribute(static_cast<QNetworkRequest::Attribute>(1010)).toString();
+    qDebug()<<key;
+    Album album = albums_[key];
+    QList<QPixmap> covers = album.covers();
+    covers.append(p);
+    album.setCovers(covers);
+    albums_[key] = album;
+    QList<QUrl> images = album.images();
+    int ind = -1;
+    for(int i=0;i<images.size();i++){
+        if(images[i]==reply->url()){
+            ind = i+1;
+            break;
+        }
+    }
+
+    key er "", setattribute funker ikke?
+                last ned første album, så alle covere for dette album, så start med neste album
+
+    qDebug()<<"downloaded "<<reply->url().toString()<<" for album "<<album.title()<<", "<<album.covers().size()<<" of "<<album.images().size()<<" finished ";
 
     reply->deleteLater();
-    albums_.insert(album.key(),album);
-    nDownloaded_++;
 
-    //qDebug()<<downloadImmediately_<<nDownloaded_<<albums_.size();
-    if( downloadImmediately_ && nDownloaded_==albums_.size() ){
-        emit albumsDownloaded( albums_ );
+    if(ind!=-1 && ind<images.size()){
+        //download next cover in line
+        QNetworkRequest coverRequest(images[ind]);
+        coverRequest.setAttribute(static_cast<QNetworkRequest::Attribute>(1010),album.key());
+        QNetworkAccessManager *coverManager = new QNetworkAccessManager;
+        connect(coverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleCover(QNetworkReply*)));
+        coverManager->get(coverRequest);
+    }else{
+
+        if(album.covers().size()==album.images().size()){
+            //all covers for this album downloaded
+            nDownloaded_++;
+
+            //qDebug()<<downloadImmediately_<<nDownloaded_<<albums_.size();
+            if( downloadImmediately_ && nDownloaded_==albums_.size() ){
+                emit albumsDownloaded( albums_ );
+            }
+            if(!downloadImmediately_){
+                emit albumDownloaded( album );
+            }
+        }
     }
-    if(!downloadImmediately_){
-        emit albumDownloaded( album );
-    }
+
+
 
 
 }

@@ -16,9 +16,10 @@ class MusicDatabase : public QObject{
                 //QHash<QString,SearchResult> Results;
                 void search( QString query, bool downloadNow );
                 virtual void downloadAlbum( Album result );
-                void downloadAllAlbums( QHash<QString,Album> results );
+                void downloadAllAlbums( QHash<QString,Album> results );                
 		
         protected slots:
+                void handleCover( QNetworkReply* reply );
 		virtual void handleResults( QNetworkReply* reply );
 		virtual void handleRelease( QNetworkReply* reply );				                
                 void setAlbums( QHash<QString,Album> albums );
@@ -38,6 +39,7 @@ class MusicDatabase : public QObject{
 		QNetworkAccessManager *searchManager;
 		QNetworkAccessManager *releaseManager;
 		QNetworkAccessManager *downloadAllManager;
+                //QNetworkAccessManager *coverManager;
 		
 
 };

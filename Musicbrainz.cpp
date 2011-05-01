@@ -6,9 +6,6 @@ MusicBrainz::MusicBrainz(){
 
 }
 
-MusicBrainz::~MusicBrainz(){
-
-}
 
 void MusicBrainz::handleResults( QNetworkReply* reply ){
 
