@@ -1,6 +1,7 @@
 #ifndef RENAMEIALOG_H
 #define RENAMEIALOG_H
 
+
 #include <QtGui>
 #include "TextViewer.h"
 #include "TagItem.h"
