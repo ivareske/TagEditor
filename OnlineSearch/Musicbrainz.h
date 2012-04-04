@@ -1,25 +1,23 @@
-#ifndef DISCOGS_H
-#define DISCOGS_H
+#ifndef MUSICBRAINZ_H
+#define MUSICBRAINZ_H
 
 #include <QtGui>
 #include "MusicDatabase.h"
+#include "ReleaseEvent.h"
 #include "Artist.h"
 
 
-class Discogs : public MusicDatabase{
- Q_OBJECT
-
+class MusicBrainz : public MusicDatabase{
+    Q_OBJECT
 public:
-    Discogs( QString key = "" );
-    ~Discogs();
-	public slots:
+    MusicBrainz();
+
+public slots:
     void handleResults( QNetworkReply* reply );
     void handleRelease( QNetworkReply* reply );
 
-
-
 private:
-    QString api_key;
+
 };
 
 

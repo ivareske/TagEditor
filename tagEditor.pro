@@ -25,34 +25,54 @@
 #stream operators, cleanup/move files
 #legg til taglib kompilerings instruksjoner + debuglogger
 #prøve å kompilere taglib med qt? pro file ligge ved
+#rename klasser til å starte med stor bokstav
 
 TEMPLATE = app
 TARGET = TagEditor
 
-CONFIG += qt release warn_on
-CONFIG += console
+# The application version
+VERSION = 1.0
+
+
 QT += network webkit
 QT += xml
 #QTPLUGIN += qjpeg
 
+INCLUDEPATH  += ./OnlineSearch
+DEPENDPATH  += ./OnlineSearch
+win32{
+    INCLUDEPATH  += ./taglib ./
+    LIBS += ./libtag.dll
+}
+unix{
+    INCLUDEPATH += /usr/include/taglib/
+    LIBS += -L/usr/lib/ -ltag
+}
 
-#INCLUDEPATH  += $$quote(C:/Program Files/taglib/include/taglib/)
-INCLUDEPATH  += ./taglib/include/taglib
-INCLUDEPATH  += $$PWD
-#LIBS += $$quote(C:/Program Files/taglib/bin/libtag.dll)
-LIBS += ./taglib/bin/libtag.dll
 
-
-HEADERS  = TagEditor.h ReleaseEvent.h Song.h Artist.h Album.h MusicDatabase.h Discogs.h MusicBrainz.h TextViewer.h globalFunctions.h TableWidgetItem.h SettingsDialog.h SettingsClass.h SearchDialog.h TagItem.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
-             TreeWidget.h SetColumnsDialog.h
+HEADERS  = TagEditor.h SettingsDialog.h SettingsClass.h SearchDialog.h Album.h TextViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
+    ReleaseEvent.h \
+    Song.h \
+    Artist.h \
+    TreeWidget.h SetColumnsDialog.h \
+    TableWidget.h
 
 FORMS     = TagEditor.ui SettingsDialog.ui SearchDialog.ui TextViewer.ui ReplaceDialog.ui RenameDialog.ui SearchForTagsDialog.ui SetColumnsDialog.ui
 
-SOURCES = main.cpp TagEditor.cpp ReleaseEvent.cpp Song.cpp Artist.cpp Album.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp TextViewer.cpp globalFunctions.cpp TableWidgetItem.cpp SettingsDialog.cpp SettingsClass.cpp SearchDialog.cpp TagItem.cpp ReplaceDialog.cpp RenameDialog.cpp SearchForTagsDialog.cpp \
-     TreeWidget.cpp SetColumnsDialog.cpp
+SOURCES = main.cpp TagEditor.cpp SettingsDialog.cpp SettingsClass.cpp SearchDialog.cpp Album.cpp TextViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp ReplaceDialog.cpp RenameDialog.cpp SearchForTagsDialog.cpp \
+    ReleaseEvent.cpp \
+    Song.cpp \
+    Artist.cpp \
+    TreeWidget.cpp SetColumnsDialog.cpp \
+    TableWidget.cpp
 
 RC_FILE = TagEditor.rc
 RESOURCES += TagEditor.qrc
+
+
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+DEFINES += APP_NAME=\\\"$$TARGET\\\"
+
 
 
 #fant ikke:

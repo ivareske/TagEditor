@@ -105,18 +105,7 @@ If checked, artist, album, year and format are available and  will be shown.</st
           </widget>
          </item>
          <item row="0" column="6">
-          <widget class="QComboBox" name="DatabaseComboBox">
-           <item>
-            <property name="text">
-             <string>Discogs</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>MusicBrainz</string>
-            </property>
-           </item>
-          </widget>
+          <widget class="QComboBox" name="databaseComboBox"/>
          </item>
          <item row="0" column="3">
           <widget class="QLineEdit" name="searchTitle">
@@ -178,6 +167,9 @@ If checked, artist, album, year and format are available and  will be shown.</st
               </property>
               <property name="text">
                <string/>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -418,7 +410,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QLineEdit" name="Artist">
+             <widget class="QLineEdit" name="artistLineEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -444,7 +436,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLineEdit" name="AlbumField">
+             <widget class="QLineEdit" name="albumLineEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -470,7 +462,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QLineEdit" name="Genre">
+             <widget class="QLineEdit" name="genreLineEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -496,7 +488,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="4" column="1">
-             <widget class="QLineEdit" name="Year">
+             <widget class="QLineEdit" name="yearLineEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -599,7 +591,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="4" column="1">
-             <widget class="QLineEdit" name="Format">
+             <widget class="QLineEdit" name="formatLineEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -631,7 +623,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="5" column="1">
-             <widget class="QLineEdit" name="Country">
+             <widget class="QLineEdit" name="countryLineEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -663,7 +655,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="6" column="1">
-             <widget class="QLineEdit" name="Label">
+             <widget class="QLineEdit" name="labelLineEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -695,7 +687,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="9" column="1">
-             <widget class="QTextEdit" name="Notes">
+             <widget class="QTextEdit" name="notesTextEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -714,7 +706,7 @@ If not checked, the name of the cover from discogs is used</string>
              </widget>
             </item>
             <item row="8" column="1">
-             <widget class="QTextEdit" name="Roles">
+             <widget class="QTextEdit" name="rolesTextEdit">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
@@ -865,34 +857,6 @@ If not checked, the name of the cover from discogs is used</string>
       <property name="margin">
        <number>0</number>
       </property>
-      <item row="0" column="1">
-       <widget class="QTableWidget" name="albumInfo">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>4</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="dragDropOverwriteMode">
-         <bool>true</bool>
-        </property>
-        <property name="dragDropMode">
-         <enum>QAbstractItemView::NoDragDrop</enum>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::ContiguousSelection</enum>
-        </property>
-        <property name="sortingEnabled">
-         <bool>true</bool>
-        </property>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="verticalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QListWidget" name="searchResults">
         <property name="sizePolicy">
@@ -906,6 +870,22 @@ If not checked, the name of the cover from discogs is used</string>
         </property>
         <property name="tabKeyNavigation">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QFrame" name="albumInfoFrame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>4</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
        </widget>
       </item>

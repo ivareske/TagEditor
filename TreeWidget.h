@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include "TagItem.h"
+#include "SetColumnsDialog.h"
 #include "globalFunctions.h"
 //#include "SetColumnsDialog.h"
 
@@ -21,6 +22,12 @@ public:
     void updateItems( QList<TagItem*> items );
     bool showTagInfo() const;
     void setShowTagInfo( bool show );
+    TagItem* tagItem( int index );
+    void setColumnData( TagItem* item );
+    QList<Global::TagField> columns() const;
+    void setColumnsList( const QList<Global::TagField> &columns );
+    void clearTags();
+
 signals:
 
 public slots:
@@ -31,12 +38,15 @@ private slots:
     void treeWidgetContextMenu(const QPoint &p);
     void updateFileNames( bool enable );    
     void updateShowTagInfo( bool enable );
-    void editColumns();
+
     void setColumns();
+    void editColumns();
 private:
     bool showFullFileName_;
     bool showTagInfo_;
-    QList<int> columns_;
+    QList<Global::TagField> columns_;
+    QList<Global::TagField> defaultColumns_;
+
 
 };
 

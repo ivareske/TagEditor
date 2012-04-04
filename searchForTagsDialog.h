@@ -6,7 +6,6 @@
 #include "TagItem.h"
 #include "ui_SearchForTagsDialog.h"
 
-
 class SearchForTagsDialog : public QDialog, private Ui::SearchForTagsDialog{
     Q_OBJECT
 

@@ -2,32 +2,27 @@
 
 #include "TagEditor.h"
 
-
-
 TagEditor::TagEditor(QWidget *parent) : QMainWindow(parent){
     setupUi(this); // this sets up GUI
 
-    /*
-    qDebug()<<"TagEditor1";
 
-    treeWidget = new TreeWidget(this);
-    qDebug()<<"TagEditor2";
-    ListWidgetFrame->layout()->addWidget(treeWidget);
+    TreeWidget_ = new TreeWidget(this);
+    ListWidgetFrame->layout()->addWidget(TreeWidget_);
+
     createActions();
 
     QFileSystemModel *model = new QFileSystemModel;
-    treeView->setModel(model);
+    TreeView->setModel(model);
 
     guiSettings = new QSettings(Global::settingsFile,QSettings::IniFormat,this);
     readSettings();
     setSettings();
-    setGUIStyle( style );
-*/
 
+    setGUIStyle( style );
 
 }
 
-/*
+
 void TagEditor::openStyleSheet(){
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open style sheet file"),
@@ -129,7 +124,7 @@ void TagEditor::setGUIStyle( const QString &s ){
 
 void TagEditor::renameFiles(){
 
-    QModelIndexList indexes = treeWidget->selectionModel()->selectedRows();
+    QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows();
     if(indexes.size()==0){
         QMessageBox msgBox;
         msgBox.setText("No files selected...");
@@ -137,25 +132,24 @@ void TagEditor::renameFiles(){
         return;
     }
 
-    QList<TagItem*> *items = new QList<TagItem*>;
+    QList<TagItem*> items; // = new QList<TagItem*>;
     for(int i=0;i<indexes.size();i++){
-        TagItem *item = ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ));
-        items->append(item);
+        TagItem *item = TreeWidget_->tagItem(indexes[i].row());
+        items.append(item);
     }
 
-    RenameDialog r(this,items,&renameFormat);
-    r.setModal(false);
-    r.exec();
 
-    treeWidget->updateItems(*items);
-    delete items;
-
-
-    statusBar()->showMessage("Finished renaming files", 8000);
+    RenameDialog r(items,this);
+    if(r.exec()==QDialog::Accepted){
+        TreeWidget_->updateItems(items);
+        statusBar()->showMessage("Finished renaming files", 8000);
+    }
 }
 
+
 void TagEditor::removeFrames(){
-    QModelIndexList indexes = treeWidget->selectionModel()->selectedRows();
+    QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows();
+
     if(indexes.size()==0){
         QMessageBox msgBox;
         msgBox.setText("No files selected...");
@@ -177,17 +171,9 @@ void TagEditor::removeFrames(){
     p.setWindowModality(Qt::WindowModal);
     QString log;
     for(int i=0;i<indexes.size();i++){
-        QString fullfile = ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ))->fileInfo().absoluteFilePath();
+        QString fullfile = ((TagItem*)TreeWidget_->topLevelItem( indexes[i].row() ))->fileInfo().absoluteFilePath();
         TagLib::MPEG::File f( fullfile.toStdString().c_str() );
-        //TagLib::FileRef f = TagLib::FileRef( fullfile.toStdString().c_str() );
-        ////if( !f.tag() ){
-   //log.append("\nCould not read tag for "+fullfile);
-   //continue;
-  //}
 
-        qDebug()<<1;
-        //TagLib::ID3v2::Tag *id3v2tag = f.ID3v2Tag();
-        qDebug()<<1.1;
         if(f.ID3v2Tag()){
             TagLib::ID3v2::FrameList::ConstIterator it = f.ID3v2Tag()->frameList().begin();
             qDebug()<<1.2;
@@ -198,14 +184,6 @@ void TagEditor::removeFrames(){
                 f.ID3v2Tag()->removeFrame(frame, true );
             }
 
-   //for(; it != id3v2tag->frameList().end(); it++){
-    //qDebug()<<"removing frame";
-    //id3v2tag->removeFrame( (*it), true );
-    //qDebug()<<"removed frame";
-   // k++;
-   //}
-
-            qDebug()<<1.3;
             if(k>0){
                 log.append("Removed "+QString::number(k)+" frames from ID3v2 tag for "+fullfile);
             }
@@ -249,7 +227,8 @@ void TagEditor::removeFrames(){
 
 void TagEditor::rewriteTag(){
 
-    QModelIndexList indexes = treeWidget->selectionModel()->selectedRows();
+    QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows();
+
     if(indexes.size()==0){
         QMessageBox msgBox;
         msgBox.setText("No files selected...");
@@ -259,15 +238,16 @@ void TagEditor::rewriteTag(){
 
     QProgressDialog p("Rewriting tags...", "Cancel", 0, indexes.size(), this);
     p.setWindowModality(Qt::WindowModal);
-    QString log;
+    QString log; QList<TagItem*> items;
     for(int i=0;i<indexes.size();i++){
-        QString fullfile = ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ))->fileInfo().absoluteFilePath();
-        TagLib::FileRef f = TagLib::FileRef( fullfile.toStdString().c_str() );
-        if( f.isNull() || !f.tag() ){
+        TagItem* item = TreeWidget_->tagItem(indexes[i].row());
+        QString fullfile = item->fileInfo().absoluteFilePath();
+        item->readTags();
+        if( !item->tagOk() ){
             log.append("\nCould not read tag for "+fullfile);
             continue;
         }
-        bool ok = f.save();
+        bool ok = item->saveTag();
         if(!ok){
             log.append("\nCould not save tag for "+fullfile);
         }
@@ -277,7 +257,9 @@ void TagEditor::rewriteTag(){
             log.append("\n\nCanceled by user at "+fullfile);
             break;
         }
+        items.append(item);
     }
+    TreeWidget_->updateItems(items);
     p.setValue(indexes.size());
     statusBar()->showMessage("Finished rewriting tags", 8000);
     if(!log.isEmpty()){
@@ -297,30 +279,32 @@ void TagEditor::saveSettings(){
     guiSettings->endGroup();
     guiSettings->setValue("style", style );
     guiSettings->setValue("startupFolder", startupFolder );	
-    guiSettings->setValue("api_key", api_key );
+    //guiSettings->setValue("api_key", api_key );
     guiSettings->setValue("showSaveTagWarning", showSaveTagWarning );
     guiSettings->setValue("subfolders", subfolders );
-    guiSettings->setValue("artistChecked", artistChecked );
-    guiSettings->setValue("titleChecked", titleChecked );
-    guiSettings->setValue("albumChecked", albumChecked );
-    guiSettings->setValue("yearChecked", yearChecked );
-    guiSettings->setValue("trackChecked", trackChecked );
-    guiSettings->setValue("genreChecked", genreChecked );
-    guiSettings->setValue("commentChecked", commentChecked );
-    guiSettings->setValue("renameFormat", renameFormat );
+    guiSettings->setValue("artistChecked", ArtistCheckbox->isChecked() );
+    guiSettings->setValue("titleChecked", TitleCheckbox->isChecked() );
+    guiSettings->setValue("albumChecked", AlbumCheckbox->isChecked() );
+    guiSettings->setValue("yearChecked", YearCheckbox->isChecked() );
+    guiSettings->setValue("trackChecked", TrackCheckbox->isChecked() );
+    guiSettings->setValue("genreChecked", GenreCheckbox->isChecked() );
+    guiSettings->setValue("commentChecked", CommentCheckbox->isChecked() );
     guiSettings->setValue("textViewerSize", textViewerSize );
     guiSettings->setValue("lastStyleSheetFolder", lastStyleSheetFolder );
 
-    guiSettings->setValue("showFullFileName", treeWidget->showFullFileName() );    
-    guiSettings->setValue("sortingEnabled", treeWidget->isSortingEnabled() );
-    guiSettings->setValue("showTagInfo", treeWidget->showTagInfo() );
-    guiSettings->setValue("sortColumn", treeWidget->sortColumn() );
-    guiSettings->setValue("sortOrder", treeWidget->header()->sortIndicatorOrder() );
+    guiSettings->setValue("showFullFileName", TreeWidget_->showFullFileName() );
+    guiSettings->setValue("sortingEnabled", TreeWidget_->isSortingEnabled() );
+    guiSettings->setValue("showTagInfo", TreeWidget_->showTagInfo() );
+    guiSettings->setValue("sortColumn", TreeWidget_->sortColumn() );
+    guiSettings->setValue("sortOrder", TreeWidget_->header()->sortIndicatorOrder() );
     guiSettings->setValue("windowState", saveState() );    
     guiSettings->setValue("geometry", saveGeometry());
-    //guiSettings->setValue("splittersizes", QVariant::fromValue< QList<int> >(splitter->sizes()) );
-
-
+    QList<Global::TagField> cols = TreeWidget_->columns();
+    QVariantList colslist;
+    for(int i=0;i<cols.size();i++){
+        colslist.append(cols[i]);
+    }    
+    guiSettings->setValue("columns", colslist );    
 
     guiSettings->sync();
 }
@@ -337,28 +321,49 @@ void TagEditor::readSettings(){
     startupFolder = guiSettings->value("startupFolder","").toString();
     QString defaultExt = "*.mp3;*.wma;*.wav;*.ogg;*.aac;*.ac3;*.m4a";
     extensions = guiSettings->value("extensions",defaultExt.split(";")).toStringList();
-    api_key = guiSettings->value("api_key","").toString();
+
+    QFileSystemModel *model = static_cast<QFileSystemModel*>(TreeView->model());
+    model->setRootPath(startupFolder);
+    model->setNameFilters(extensions);
+    model->setNameFilterDisables(false);
+    TreeView->setRootIndex(model->index(startupFolder));
+    treeViewLabel->setText(startupFolder);
+
+    //api_key = guiSettings->value("api_key","").toString();
     showSaveTagWarning = guiSettings->value("showSaveTagWarning",true).toBool();
     subfolders = guiSettings->value("subfolders",true).toBool();
-    artistChecked = guiSettings->value("artistChecked",true).toBool();
-    titleChecked = guiSettings->value("titleChecked",true).toBool();
-    albumChecked = guiSettings->value("albumChecked",true).toBool();
-    yearChecked = guiSettings->value("yearChecked",true).toBool();
-    trackChecked = guiSettings->value("trackChecked",true).toBool();
-    genreChecked = guiSettings->value("genreChecked",true).toBool();
-    commentChecked = guiSettings->value("commentChecked",true).toBool();
-    renameFormat = guiSettings->value("renameFormat","%artist% - %title%").toString();
+    ArtistCheckbox->setChecked( guiSettings->value("artistChecked",true).toBool() );
+    TitleCheckbox->setChecked( guiSettings->value("titleChecked",true).toBool() );
+    AlbumCheckbox->setChecked( guiSettings->value("albumChecked",true).toBool() );
+    YearCheckbox->setChecked( guiSettings->value("yearChecked",true).toBool() );
+    TrackCheckbox->setChecked( guiSettings->value("trackChecked",true).toBool() );
+    GenreCheckbox->setChecked( guiSettings->value("genreChecked",true).toBool() );
+    CommentCheckbox->setChecked( guiSettings->value("commentChecked",true).toBool() );
     textViewerSize = guiSettings->value("textViewerSize", QSize(750, 350)).toSize();
     lastStyleSheetFolder = guiSettings->value("lastStyleSheetFolder","").toString();
-    treeWidget->setShowFullFileName( guiSettings->value("showFullFileName",false).toBool() );
-    treeWidget->setShowTagInfo( guiSettings->value("showTagInfo",false).toBool() );
-    treeWidget->setSortingEnabled( guiSettings->value("sortingEnabled",true).toBool() );
-    treeWidget->header()->setSortIndicator( guiSettings->value("sortColumn",0).toInt(), static_cast<Qt::SortOrder>(guiSettings->value("sortOrder",0).toInt()) );
+    TreeWidget_->setShowFullFileName( guiSettings->value("showFullFileName",false).toBool() );
+    TreeWidget_->setShowTagInfo( guiSettings->value("showTagInfo",false).toBool() );
+    TreeWidget_->setSortingEnabled( guiSettings->value("sortingEnabled",true).toBool() );
+    if(TreeWidget_->isSortingEnabled()){
+        TreeWidget_->header()->setSortIndicator( guiSettings->value("sortColumn",0).toInt(), static_cast<Qt::SortOrder>(guiSettings->value("sortOrder",0).toInt()) );
+        TreeWidget_->header()->setSortIndicatorShown(true);
+    }    
+    QVariantList colstmp = guiSettings->value("columns").toList();
+    QList<Global::TagField> cols;
+    for(int i=0;i<colstmp.size();i++){
+        qDebug()<<"colstmp[i] "<<colstmp[i];
+        cols.append(static_cast<Global::TagField>(colstmp[i].toInt()));
+    }
+    TreeWidget_->setColumnsList(cols);
+
     restoreState(guiSettings->value("windowState").toByteArray());
     restoreGeometry(guiSettings->value("geometry").toByteArray());
+
     //splitter->setSizes(guiSettings->value("splittersizes").value< QList<int> >() );
 
 }
+
+
 
 void TagEditor::setSettings(){
 
@@ -380,6 +385,7 @@ void TagEditor::setSettings(){
 
 }
 
+
 void TagEditor::chooseDir(){
 
     static QString dir;
@@ -392,19 +398,20 @@ void TagEditor::chooseDir(){
     if( dialog.exec() ){
         QStringList d = dialog.selectedFiles();
         dir = d[0];
-        QFileSystemModel *m = (QFileSystemModel *)treeView->model();
-        treeView->setRootIndex(m->index(dir));
+        QFileSystemModel *m =static_cast<QFileSystemModel*>(TreeView->model());
+        TreeView->setRootIndex(m->index(dir));
         treeViewLabel->setText(dir);
         startupFolder = dir;
     }
 }
 
 void TagEditor::showSettings(){
+
     SettingsDialog s;
     if( s.exec()==QDialog::Accepted ){
         //obtain newly saved data from settingsdialog
         extensions = guiSettings->value("extensions","").toStringList();
-        api_key = guiSettings->value("api_key","").toString();
+        //api_key = guiSettings->value("api_key","").toString();
         subfolders = guiSettings->value("subfolders",true).toBool();
     }
 
@@ -412,7 +419,7 @@ void TagEditor::showSettings(){
 
 void TagEditor::serialize(){
 
-    QModelIndexList indexes = treeWidget->selectionModel()->selectedRows();
+    QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows();
     qDebug()<<indexes.size();
     if(indexes.size()==0){
         QMessageBox msgBox;
@@ -422,8 +429,7 @@ void TagEditor::serialize(){
     }
 
     bool ok;
-    uint track = QInputDialog::getInt(this, "",
-                                      tr("Starting index:"), 1, 0, 99999, 1, &ok);
+    uint track = QInputDialog::getInt(this, "",tr("Starting index:"), 1, 0, 99999, 1, &ok);
 
     qDebug()<<ok;
     if(!ok){
@@ -434,18 +440,25 @@ void TagEditor::serialize(){
     QString log;
     TagLib::FileRef f;
     for(int i=0;i<indexes.size();i++){
-        TagItem *item = ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ));
+        TagItem *item = TreeWidget_->tagItem(indexes[i].row()); // ((TagItem*)TreeWidget_->topLevelItem( indexes[i].row() ));
         QString fullfile = item->fileInfo().absoluteFilePath();
+        /*
         f = TagLib::FileRef( fullfile.toStdString().c_str() );
         if( f.tag() ){
             f.tag()->setTrack( track );
-            item->setTag( TagItem::Track, track );
+            item->setTag( Global::Track, track );
             bool ok = f.save();
             if(!ok){
                 log.append("\nCould not save tag for "+fullfile);
             }
         }else{
             log.append("\nCould not read tag for "+fullfile);
+        }
+        */
+        item->setTrack(track);
+        bool ok = item->saveTag();
+        if(!ok){
+            log.append("\nCould not save tag for "+fullfile);
         }
         track++;
     }
@@ -461,8 +474,8 @@ void TagEditor::serialize(){
 
 void TagEditor::saveTag(){
 
-    //QModelIndexList indexes = treeWidget->selectionModel()->selectedRows();
-    QModelIndexList indexes = treeWidget->selectionModel()->selectedRows(0);
+    //QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows();
+    QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows(0);
     qDebug()<<indexes.size();
 
     if( indexes.size()>1 && showSaveTagWarning ){
@@ -502,28 +515,32 @@ void TagEditor::saveTag(){
         }
 	
         int row = indexes[i].row();
-        TagItem *item = (TagItem*)treeWidget->topLevelItem( row );
+        //TagItem *item = (TagItem*)TreeWidget_->topLevelItem( row );
+        TagItem *item = TreeWidget_->tagItem(row);
         QString fullfile = item->fileInfo().absoluteFilePath();
         qDebug()<<fullfile;
-        TagLib::FileRef f( fullfile.toStdString().c_str() );
-        if( !f.tag() ){
+        //TagLib::FileRef f( fullfile.toStdString().c_str() );
+        if( !item->tagOk() ){
             log.append("\nCould not read tag for "+fullfile);
             continue;
         }
 
-        if(artistCheckbox->isChecked()){
-            f.tag()->setArtist( Artist->text().toStdString().c_str() );
-            item->setTag( TagItem::Artist, Artist->text() );
+        if(ArtistCheckbox->isChecked()){
+            //f.tag()->setArtist( Artist->text().toStdString().c_str() );
+            //item->setTag( Global::Artist, Artist->text() );
+            item->setArtist(Artist->text());
         }
-        if(titleCheckbox->isChecked()){
-            f.tag()->setTitle( Title->text().toStdString().c_str() );
-            item->setTag( TagItem::Title, Title->text() );
+        if(TitleCheckbox->isChecked()){
+            //f.tag()->setTitle( Title->text().toStdString().c_str() );
+            //item->setTag( Global::Title, Title->text() );
+            item->setTitle(Title->text());
         }
-        if(albumCheckbox->isChecked()){
-            f.tag()->setAlbum( Album->text().toStdString().c_str() );
-            item->setTag( TagItem::Album, Album->text() );
+        if(AlbumCheckbox->isChecked()){
+            //f.tag()->setAlbum( Album->text().toStdString().c_str() );
+            //item->setTag( Global::AlbumField, Album->text() );
+            item->setAlbum(Album->text());
         }
-        if(yearCheckbox->isChecked()){
+        if(YearCheckbox->isChecked()){
             bool ok;
             uint year = Year->text().toUInt(&ok);
             qDebug()<<"converted to uint: "<<ok<<year;
@@ -533,13 +550,14 @@ void TagEditor::saveTag(){
                                       fullfile+":\nYear has to be an positive integer value!",
                                       QMessageBox::Ok, QMessageBox::Ok);
                 //Year->setText( item->getTag("year").toString() );
-                Year->setText( QString::number(item->getTag(TagItem::Year).toInt()) );
+                Year->setText( QString::number(item->year()) );
             }else{
-                f.tag()->setYear( year );
-                item->setTag( TagItem::Year, year );
+                //f.tag()->setYear( year );
+                //item->setTag( Global::Year, year );
+                item->setYear(year);
             }
         }
-        if(trackCheckbox->isChecked()){
+        if(TrackCheckbox->isChecked()){
             bool ok;
             uint track = Track->text().toUInt(&ok);
             if(!ok){
@@ -547,22 +565,25 @@ void TagEditor::saveTag(){
                 QMessageBox::critical(this, "",
                                       fullfile+":\nTrack has to be an positive integer value!",
                                       QMessageBox::Ok, QMessageBox::Ok);
-                Track->setText( QString::number(item->getTag(TagItem::Track).toInt()) );
+                Track->setText( QString::number(item->track()) );
             }else{
-                f.tag()->setTrack( track );
-                item->setTag( TagItem::Track, track );
+                //f.tag()->setTrack( track );
+                //item->setTag( Global::Track, track );
+                item->setTrack(track);
             }
         }
-        if(genreCheckbox->isChecked()){
-            f.tag()->setGenre( Genre->text().toStdString().c_str() );
-            item->setTag( TagItem::Genre, Genre->text() );
+        if(GenreCheckbox->isChecked()){
+            //f.tag()->setGenre( Genre->text().toStdString().c_str() );
+            //item->setTag( Global::Genre, Genre->text() );
+            item->setGenre(Genre->text());
         }
-        if(commentCheckbox->isChecked()){
-            f.tag()->setComment( Comment->toPlainText().toStdString().c_str() );
-            item->setTag( TagItem::Comment, Comment->toPlainText() );
+        if(CommentCheckbox->isChecked()){
+            //f.tag()->setComment( Comment->toPlainText().toStdString().c_str() );
+            //item->setTag( Global::Comment, Comment->toPlainText() );
+            item->setComment(Comment->toPlainText());
         }
 
-        bool ok = f.save();
+        bool ok = item->saveTag();//f.save();
         if(!ok){
             log.append("\nCould not save tag for "+fullfile);
         }
@@ -591,108 +612,109 @@ void TagEditor::clearTextFields(){
     Track->setText( "" );
     Genre->setText( "" );
     Comment->setText( "" );
-    //fileLabel->setText( "" );
+    //FileLabel->setText( "" );
 }
 
 void TagEditor::showTagInfo(){
 
-    //QModelIndexList indexes = treeWidget->selectionModel()->selectedRows();
-    QModelIndexList indexes = treeWidget->selectionModel()->selectedRows(0);
-    //const QModelIndexList qml = treeWidget->selectedIndexes();
+    //QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows();
+    QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows(0);
+    //const QModelIndexList qml = TreeWidget_->selectedIndexes();
 
     if( indexes.size()==0 ){
         return;
     }
-    qDebug()<<indexes[0].row()<<treeWidget->topLevelItemCount();
-    if( indexes.size()==1 && indexes[0].row()>=treeWidget->topLevelItemCount() ){
-        return;
-    }
-    if( treeWidget->currentItem()==0 ){
+    qDebug()<<indexes[0].row()<<TreeWidget_->topLevelItemCount();
+    if( indexes.size()==1 && indexes[0].row()>=TreeWidget_->topLevelItemCount() ){
         return;
     }
 
-    qDebug()<<"indexes.size(): "<<indexes.size()<<" currentRow: "<<treeWidget->currentIndex().row();
-    //for(int i=0;i<indexes.size();i++){
-     //   qDebug()<<indexes[i].row();
-    //}
+    if( TreeWidget_->currentItem()==0 ){
+        return;
+    }
+
+    //qDebug()<<"indexes.size(): "<<indexes.size()<<" currentRow: "<<TreeWidget_->currentRow();
+    for(int i=0;i<indexes.size();i++){
+        qDebug()<<indexes[i].row();
+    }
 
     if(indexes.size()>1){
         qDebug()<<"multiple rows selected!";
-        fileLabel->setText("Pressing the save button when more than one file is selected will store the checked fields for all the selected files! ("+QString::number(indexes.size())+") ");
+        FileLabel->setText("Pressing the save button when more than one file is selected will store the checked fields for all the selected files! ("+QString::number(indexes.size())+") ");
         return;
     }
     if(indexes.size()==0){
         qDebug()<<"no row selected!";
-        fileLabel->setText("");
+        FileLabel->setText("");
         clearTextFields();
         return;
     }
     //int row = indexes[0].row();
 
-    TagItem *item = static_cast<TagItem*>(treeWidget->currentItem());
 
-    //if(indexes.size()==1 && treeWidget->isSortingEnabled()){
-      //  treeWidget->sortItems(treeWidget->header()->sortIndicatorSection(),treeWidget->header()->sortIndicatorOrder());
-     //   treeWidget->setCurrentItem(item);
-    //}
+    //tag
+    TagItem *item = static_cast<TagItem*>(TreeWidget_->currentItem());
+    FileLabel->setText( item->fileInfo().absoluteFilePath() );
 
-
-    //tag    
-    fileLabel->setText( item->fileInfo().absoluteFilePath() );
     if( !item->tagIsRead() ){
         item->readTags();
     }
+    TreeWidget_->setColumnData(item);
 
     if( item->tagOk() ){
-        Artist->setText( item->getTag( TagItem::Artist ).toString() );
-        Title->setText( item->getTag( TagItem::Title ).toString() );
-        Album->setText( item->getTag( TagItem::Album ).toString() );
-        Year->setText( QString::number( item->getTag( TagItem::Year ).toInt() ) );
-        Track->setText( QString::number( item->getTag( TagItem::Track ).toInt() ) );
-        Genre->setText( item->getTag( TagItem::Genre ).toString() );
-        Comment->setText( item->getTag( TagItem::Comment ).toString() );
+        Artist->setText( item->artist() );
+        Title->setText( item->title() );
+        Album->setText( item->album() );
+        Year->setText( QString::number( item->year() ) );
+        Track->setText( QString::number( item->track() ) );
+        Genre->setText( item->genre() );
+        Comment->setText( item->comment() );
     }else{
         clearTextFields();
     }
     //audioproperties
     if( item->audioPropertiesOk() ){
-        fileLabel->setText( fileLabel->text() + "\n(Bitrate: "+QString::number(item->getTag( TagItem::BitRate ).toInt())+" kb/s, samplerate: "+QString::number(item->getTag( TagItem::SampleRate ).toInt())+" Hz, length: "+QString::number(item->getTag( TagItem::Length ).toInt())+" s, chanels: "+QString::number(item->getTag( TagItem::Channels ).toInt())+")" );
+        FileLabel->setText( FileLabel->text() + "\n(Bitrate: "+QString::number(item->bitRate())+" kb/s, samplerate: "+
+                           QString::number(item->sampleRate())+" Hz, length: "+QString::number(item->length())+
+                           " s, chanels: "+QString::number(item->channels())+")" );
     }else{
-        fileLabel->setText( fileLabel->text() + "\n(Could not read tag...)");
+        FileLabel->setText( FileLabel->text() + "\n(Could not read tag...)");
     }
 
 }
 
 void TagEditor::resizeColumn(){
     
-    treeView->resizeColumnToContents(0);
+    TreeView->resizeColumnToContents(0);
 
 }
 
 void TagEditor::removeAllFiles(){
-    treeWidget->clear();
-    fileLabel->setText( "" );
+
+    TreeWidget_->clear();
+    FileLabel->setText( "" );
+
     clearTextFields();
 }
 
 void TagEditor::removeFiles(){
 
-    QModelIndexList indexes = treeWidget->selectionModel()->selectedRows();
-    if(indexes.size()==treeWidget->topLevelItemCount()){
+    QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows();
+    if(indexes.size()==TreeWidget_->topLevelItemCount()){
         removeAllFiles();
         return;
     }
     for(int i=indexes.size()-1;i>=0;i--){
-        delete treeWidget->takeTopLevelItem(indexes[i].row());
+        delete TreeWidget_->takeTopLevelItem(indexes[i].row());
     }
-    fileLabel->setText( "" );
+    FileLabel->setText( "" );
     clearTextFields();
 }
 
 void TagEditor::searchAndAddFiles(){
 
-    QModelIndexList indexes = treeView->selectionModel()->selectedRows(0);
-    QFileSystemModel *m = (QFileSystemModel *)treeView->model();
+    QModelIndexList indexes = TreeView->selectionModel()->selectedRows(0);
+    QFileSystemModel *m = (QFileSystemModel *)TreeView->model();
 
     QList<QFileInfo> infos;
     for(int i=0;i<indexes.size();i++){
@@ -710,11 +732,13 @@ void TagEditor::searchAndAddFiles(){
 
     SearchForTagsDialog r(infos,this);
     if( r.exec()==QDialog::Accepted){
-        QList<QFileInfo> files = r.files();        
-        addFiles(files);
+
+        QList<QFileInfo> files = r.files();
+        for(int j=0;j<files.size();j++){
+            TagItem *newItem = new TagItem( files[j].filePath() );
+            TreeWidget_->addItem( newItem );
+        }
     }
-
-
 }
 
 void TagEditor::addFiles( const QList<QFileInfo> &infos ){
@@ -732,12 +756,12 @@ void TagEditor::addFiles( const QList<QFileInfo> &infos ){
 
 }
 
-void TagEditor::getFiles(){
+void TagEditor::addFiles(){
 
-    QModelIndexList indexes = treeView->selectionModel()->selectedRows(0);
-    QFileSystemModel *m = (QFileSystemModel *)treeView->model();
+    QModelIndexList indexes = TreeView->selectionModel()->selectedRows(0);
+    QFileSystemModel *m = (QFileSystemModel *)TreeView->model();
 
-    QList<QFileInfo> infos;
+
     for(int i=0;i<indexes.size();i++){
 
         QModelIndex index = indexes[i];
@@ -747,16 +771,22 @@ void TagEditor::getFiles(){
 
         if(isdir){
             QString folder = m->filePath(index);
-            infos += getDirContent( folder );
+
+            QList<QFileInfo> info = getDirContent( folder );
+            for(int j=0;j<info.size();j++){                
+                TagItem *newItem = new TagItem( info[j].filePath() );
+                TreeWidget_->addItem( newItem );
+            }
+
         }else{
             QFileInfo f(m->filePath(index));
-            infos.append(f);
+            TagItem *newItem = new TagItem( f.filePath() );
+            TreeWidget_->addItem( newItem );
         }
     }
 
-    addFiles(infos);
-
 }
+
 
 QList<QFileInfo> TagEditor::getDirContent( const QString& aPath ){
 
@@ -787,20 +817,12 @@ QList<QFileInfo> TagEditor::getDirContent( const QString& aPath ){
 
 void TagEditor::closeEvent( QCloseEvent *event ){
 
-    artistChecked = artistCheckbox->isChecked();
-    titleChecked = titleCheckbox->isChecked();
-    albumChecked = albumCheckbox->isChecked();
-    yearChecked = yearCheckbox->isChecked();
-    trackChecked = trackCheckbox->isChecked();
-    genreChecked = genreCheckbox->isChecked();
-    commentChecked = commentCheckbox->isChecked();
-
     saveSettings();
 }
 
 void TagEditor::replaceTags(){
 
-    QModelIndexList indexes = treeWidget->selectionModel()->selectedRows();
+    QModelIndexList indexes = TreeWidget_->selectionModel()->selectedRows();
     if(indexes.size()==0){
         QMessageBox msgBox;
         msgBox.setText("No files selected...");
@@ -810,22 +832,22 @@ void TagEditor::replaceTags(){
     //QList<QFileInfo> *fileInfos = new QList<QFileInfo>;
     QList<TagItem*> items;
     for(int i=0;i<indexes.size();i++){
-        TagItem *item = ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ));
+        TagItem *item = ((TagItem*)TreeWidget_->topLevelItem( indexes[i].row() ));
         //fileInfos->append(item->fileInfo());
         items.append(item);
     }
     ReplaceDialog r(items,this);
     if(r.exec()==QDialog::Accepted){
-        treeWidget->updateItems(items);
+        TreeWidget_->updateItems(items);
     }
     //delete fileInfos;
 
-    //for(int i=0;i<indexes.size();i++){
-      //  TagItem *item = ((TagItem*)treeWidget->topLevelItem( indexes[i].row() ));
-     //   item->clearTags();
-    //}
-
-
+    /*
+    for(int i=0;i<indexes.size();i++){
+        TagItem *item = ((TagItem*)TreeWidget_->topLevelItem( indexes[i].row() ));
+        item->clearTags();
+    }
+    */
 }
 
 
@@ -838,21 +860,19 @@ void TagEditor::createActions(){
     //searchForFilesAction->setShortcut(tr("Ctrl+S"));
     connect(searchForFilesAction, SIGNAL(triggered()), this, SLOT(searchAndAddFiles()));
 
-    treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
-    treeView->addAction(searchOnlineAction);
-    treeView->addAction(searchForFilesAction);   
+    TreeView->setContextMenuPolicy(Qt::ActionsContextMenu);
+    TreeView->addAction(searchOnlineAction);
+    TreeView->addAction(searchForFilesAction);
 
-
-    connect( treeView, SIGNAL( expanded( const QModelIndex & )  ), this, SLOT( resizeColumn() ) );
-    connect( treeView, SIGNAL( collapsed( const QModelIndex & )  ), this, SLOT( resizeColumn() ) );
-    //connect( treeWidget, SIGNAL( currentRowChanged( int )  ), this, SLOT( showTagInfo(int) ) );
-    //connect( treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT( TagItemClicked(QTreeWidgetItem*,int) ) );
-    connect( treeWidget, SIGNAL( itemSelectionChanged() ), this, SLOT( showTagInfo() ) );
-    connect( addButton, SIGNAL( clicked()  ), this, SLOT(getFiles() ) );
-    connect( removeButton, SIGNAL( clicked()  ), this, SLOT(removeFiles() ) );
-    connect( clearButton, SIGNAL( clicked()  ), this, SLOT(removeAllFiles() ) );
-    connect( saveButton, SIGNAL( clicked()  ), this, SLOT(saveTag() ) );
-    connect( chooseDirButton, SIGNAL( clicked()  ), this, SLOT(chooseDir() ) );
+    connect( TreeView, SIGNAL( expanded( const QModelIndex & )  ), this, SLOT( resizeColumn() ) );
+    connect( TreeView, SIGNAL( collapsed( const QModelIndex & )  ), this, SLOT( resizeColumn() ) );
+    //connect( TreeWidget_, SIGNAL( currentRowChanged( int )  ), this, SLOT( showTagInfo(int) ) );
+    connect( TreeWidget_, SIGNAL( itemSelectionChanged() ), this, SLOT( showTagInfo() ) );
+    connect( AddButton, SIGNAL( clicked()  ), this, SLOT(addFiles() ) );
+    connect( RemoveButton, SIGNAL( clicked()  ), this, SLOT(removeFiles() ) );
+    connect( ClearButton, SIGNAL( clicked()  ), this, SLOT(removeAllFiles() ) );
+    connect( SaveButton, SIGNAL( clicked()  ), this, SLOT(saveTag() ) );
+    connect( ChooseDirButton, SIGNAL( clicked()  ), this, SLOT(chooseDir() ) );
 
     connect( actionSettings, SIGNAL( triggered() ), this, SLOT( showSettings() ) );
     connect( actionRewriteTag, SIGNAL( triggered() ), this, SLOT( rewriteTag() ) );
@@ -885,10 +905,7 @@ void TagEditor::createActions(){
 
 void TagEditor::clearTags(){
 
-    for(int i=0;i<treeWidget->topLevelItemCount();i++){
-        TagItem *item = (TagItem*)treeWidget->topLevelItem(i);
-        item->clearTags();
-    }
+    TreeWidget_->clearTags();
     statusBar()->showMessage("Tags cleared", 8000);
 
 }
@@ -897,7 +914,7 @@ void TagEditor::clearTags(){
 
 void TagEditor::searchOnline(){
 
-    QModelIndexList indexes = treeView->selectionModel()->selectedRows(0);
+    QModelIndexList indexes = TreeView->selectionModel()->selectedRows(0);
 
     if(indexes.size()==0){
         QMessageBox msgBox;
@@ -907,11 +924,12 @@ void TagEditor::searchOnline(){
     }
 
     QModelIndex index = indexes[0];
-    QFileSystemModel *m = (QFileSystemModel *)treeView->model();
+    QFileSystemModel *m = (QFileSystemModel *)TreeView->model();
     bool isdir = m->isDir(index);
 
     QString query;
     QList<QFileInfo> info;
+    QList<TagItem*> items;
     if(isdir){
         //folder/album
         QString folder = m->filePath(index);
@@ -928,17 +946,22 @@ void TagEditor::searchOnline(){
         return;
     }
 
-    SearchDialog d( this, api_key, &info );
-    d.setModal(false);
+
+    for(int i=0;i<info.size();i++){
+        items.append(new TagItem(info[i].absoluteFilePath()));
+    }
+
+    SearchDialog d( items, this );
+    //d.setModal(false);
     d.exec();
 
 
-    //delete tag data from these files if they exist in treeWidget, since the tag data now might get changed
-    for(int i=0;i<treeWidget->topLevelItemCount();i++){
+    //delete tag data from these files if they exist in TreeWidget_, since the tag data now might get changed
+    for(int i=0;i<TreeWidget_->topLevelItemCount();i++){
         if( info.size()==0 ){
             break;
         }
-        TagItem *item = (TagItem*)treeWidget->topLevelItem(i);
+        TagItem *item = (TagItem*)TreeWidget_->topLevelItem(i);
         for(int j=0;j<info.size();j++){
             if( item->data(0,TreeWidget::FULLFILE)==info.at(j).absoluteFilePath() ){
                 item->clearTags();
@@ -950,18 +973,6 @@ void TagEditor::searchOnline(){
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-*/
 
 
 

@@ -3,7 +3,6 @@
 
 
 #include <QtGui>
-//#include "structs.h"
 
 class ReleaseEvent{
 

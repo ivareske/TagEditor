@@ -3,8 +3,7 @@
  
 #include <QtGui>
 #include "SettingsClass.h"
-#include "globalFunctions.h"
-#include "ui_SettingsDialog.h"
+#include "ui_settingsDialog.h"
  
  
 class SettingsDialog : public QDialog, private Ui::SettingsDialog{

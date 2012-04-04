@@ -2,11 +2,68 @@
 
 
 Album::Album(){
-    
+
 
 }
 
 
+/*
+Album& Album::operator=(const Album &other){
+
+    covers_ = other.covers();
+    images_ = other.images();
+    artists_ = other.artists();
+    roles_ = other.roles();
+    type_ = other.type();
+    title_ = other.title();
+    year_ = other.year();
+    nDiscs_ = other.nDiscs();
+    nTracks_ = other.nTracks();
+    url_ = other.url();
+    label_ = other.label();
+    catalog_ = other.catalog();
+    format_ = other.format();
+    country_ = other.country();
+    genre_ = other.genre();
+    style_ = other.style();
+    songs_ = other.songs();
+    notes_ = other.notes();
+    release_ = other.release();
+
+    return *this;
+}
+
+Album::Album( const Album &other ){
+
+    covers_ = other.covers();
+    images_ = other.images();
+    artists_ = other.artists();
+    roles_ = other.roles();
+    type_ = other.type();
+    title_ = other.title();
+    year_ = other.year();
+    nDiscs_ = other.nDiscs();
+    nTracks_ = other.nTracks();
+    url_ = other.url();
+    label_ = other.label();
+    catalog_ = other.catalog();
+    format_ = other.format();
+    country_ = other.country();
+    genre_ = other.genre();
+    style_ = other.style();
+    songs_ = other.songs();
+    notes_ = other.notes();
+    release_ = other.release();
+
+}
+*/
+void Album::setCovers( const QList<QPixmap> covers ){
+    covers_ = covers;
+}
+
+QList<QPixmap> Album::covers() const{
+    return covers_;
+}
 QList<QUrl> Album::images() const{
     return images_;
 }
@@ -62,9 +119,6 @@ QString Album::release() const{
     return release_;
 }
 
-QHash<QString,QPixmap> Album::downloadedImages() const{
-    return downloadedImages_;
-}
 
 void Album::setImages( QList<QUrl> images ){
     images_ = images;
@@ -138,15 +192,12 @@ void Album::setRelease( QString release ){
     release_ = release;
 }
 
-void Album::setDownloadedImages( QHash<QString,QPixmap> dImages ){
-    downloadedImages_ = dImages;
-}
 
 QString Album::key() const{
 
     //QString key_ = release_+format_+country_+QString::number(year_);
     QString key_ = release_;//+artists_.join(",")+title_;
-    qDebug()<< key_;
+    //qDebug()<< key_;
     return key_;
 
 }
@@ -155,11 +206,12 @@ QString Album::displayArtist() const{
 
     QString res="Unknown";
     if(artists_.size()>1){
-        res = "Various";
+        //res = "Various";
+        artists_.join(", ");
     }else if(artists_.size()==1){
         res = artists_[0];
     }
-    qDebug()<<res;
+    //qDebug()<<res;
     return res;
 
 }
@@ -196,4 +248,14 @@ void Album::disp() const{
     qDebug()<<release;
     qDebug()<<"-----------------------------";
     */
+}
+
+bool compareAlbum( const Album &a1, const Album &a2 ){
+    int res = Global::naturalCompare( a1.format(), a2.format(), Qt::CaseInsensitive );
+    if(res==0){
+        return a1.year() < a2.year();
+    }else{
+        return res<0;
+    }
+
 }

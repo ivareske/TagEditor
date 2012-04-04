@@ -6,7 +6,7 @@ ReplaceDialog::ReplaceDialog( const QList<TagItem*> &items, QWidget *parent ) : 
     connect( ReplaceButton, SIGNAL( clicked()  ), this, SLOT(replace() ) );
     items_ = items;
     QStringList list; list<<"Artist"<<"Album"<<"Title"<<"Year"<<"Track"<<"Genre"<<"Comment";
-    tagComboBox->addItems(list);
+    TagComboBox->addItems(list);
 
     settings = new QSettings(Global::settingsFile,QSettings::IniFormat,0);
     CaseSensitive->setChecked( settings->value("ReplaceDialog/CaseSensitive",false).toBool() );
@@ -39,7 +39,7 @@ void ReplaceDialog::replace(){
 
         f = TagLib::FileRef( items_[i]->fileInfo().absoluteFilePath().toStdString().c_str() );
         if( f.tag() ){
-            QString field = tagComboBox->currentText().toLower();
+            QString field = TagComboBox->currentText().toLower();
             QString tagtxt;
             if( field=="artist" ){
                 tagtxt = f.tag()->artist().toCString(); before=tagtxt;

@@ -3,12 +3,10 @@
 
 MusicBrainz::MusicBrainz(){
 
+    type_ = MusicDatabase::MUSICBRAINZ;
 
 }
 
-MusicBrainz::~MusicBrainz(){
-
-}
 
 void MusicBrainz::handleResults( QNetworkReply* reply ){
 

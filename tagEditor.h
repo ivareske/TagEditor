@@ -26,8 +26,6 @@
 #include "TreeWidget.h"
 
 
-//Q_IMPORT_PLUGIN(qjpeg)
-
 class TagEditor : public QMainWindow, private Ui::TagEditor{
     Q_OBJECT
 
@@ -36,12 +34,11 @@ public:
     TagEditor(QWidget *parent = 0);    
 
 private slots:
-/*
-    QList<QFileInfo> getDirContent( const QString& aPath );
-    void addFiles( const QList<QFileInfo> &infos );
-    void getFiles();
-    void clearTextFields();
-    //bool compareListWidgetItems( const QListWidgetItem &s1, const QListWidgetItem &s2, QString string );
+
+    QList<QFileInfo> getDirContent( QString& aPath );
+    void addFiles();
+    void clearTextFields();    
+
     void resizeColumn();
     void removeFiles();
     void removeAllFiles();
@@ -56,17 +53,16 @@ private slots:
     void saveTag();
     void serialize();
     void showSettings();
-    void chooseDir();
-    void setSettings();
+    void chooseDir();    
     void createActions();
     void searchOnline();
     void readSettings();
     void saveSettings();
     void clearTags();
-    void removeFrames();
+    //void removeFrames();
     void replaceTags();
     void searchAndAddFiles();
-*/
+
     //protected:
 private:
     //void closeEvent( QCloseEvent *event );
@@ -74,22 +70,16 @@ private:
     QSettings *guiSettings;
     QString startupFolder;
     QStringList extensions;
-    QString api_key;
+    //QString api_key;
     bool subfolders;
-    bool artistChecked;
-    bool titleChecked;
-    bool albumChecked;
-    bool yearChecked;
-    bool trackChecked;
-    bool genreChecked;
-    bool commentChecked;
-    QString renameFormat;
+
     QString lastStyleSheetFolder;
     QString style;
     //QVector<tag> tags;
     bool showSaveTagWarning;
     QSize textViewerSize;
-   // TreeWidget *treeWidget;
+
+    TreeWidget *TreeWidget_;
 
 };
 

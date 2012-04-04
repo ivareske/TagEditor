@@ -1,28 +1,29 @@
 #include "TagItem.h"
 
 
-TagItem::TagItem( const QString &fullfile, int type, QTreeWidget *parent ) : QTreeWidgetItem( parent, type)    {
+TagItem::TagItem( const QString &fullfile, QTreeWidget *parent, int type ) : QTreeWidgetItem( parent, type)    {
 
     artist_="";
     title_="";
     album_="";
     comment_="";
     genre_="";
-    year_=-1;
-    track_=-1;
-    fileInfo_ = QFileInfo( fullfile );
-    tagIsRead_=false;
+
+    year_=0;
+    track_=0;
     tagOk_=false;
     audioPropertiesOk_=false;
+    length_=0;
+    bitRate_=0;
+    sampleRate_=0;
+    channels_=0;
+    unSavedChanges_=false;
 
-    length_=-1;
-    bitRate_=-1;
-    sampleRate_=-1;
-    channels_=-1;
+    fileInfo_ = QFileInfo( fullfile );
+    tagIsRead_=false;    
 
     setToolTip( 0, fullfile );
     //setColumnData();
-
 
 
 }
@@ -36,51 +37,59 @@ void TagItem::setColumnData( const QList<int> &columns ){
             setData( k, Qt::DisplayRole, str ); k++;
         }
     }
-    /*
-    setData( Global::ArtistColumn, Qt::DisplayRole, artist_ );
-    setData( Global::TitleColumn, Qt::DisplayRole, title_ );
-    setData( Global::AlbumColumn, Qt::DisplayRole, album_ );
-    //setData( Global::CommentColumn, Qt::DisplayRole, comment_ );
-    setData( Global::GenreColumn, Qt::DisplayRole, genre_ );
-    if( track_==-1 ){
-        setData( Global::TrackColumn, Qt::DisplayRole, "" );
-    }else{
-        setData( Global::TrackColumn, Qt::DisplayRole, track_ );
-    }
-    if( year_==-1 ){
-        setData( Global::YearColumn, Qt::DisplayRole, "" );
-    }else{
-        setData( Global::YearColumn, Qt::DisplayRole, year_ );
-    }
-    if( length_==-1 ){
-        setData( Global::LengthColumn, Qt::DisplayRole, "" );
-    }else{
-        setData( Global::LengthColumn, Qt::DisplayRole, length_ );
-    }
-    if( bitRate_==-1 ){
-        setData( Global::BitRateColumn, Qt::DisplayRole, "" );
-    }else{
-        setData( Global::BitRateColumn, Qt::DisplayRole, bitRate_ );
-    }
-    if( sampleRate_==-1 ){
-        setData( Global::SampleRateColumn, Qt::DisplayRole, "" );
-    }else{
-        setData( Global::SampleRateColumn, Qt::DisplayRole, sampleRate_ );
-    }
-    if( bitRate_==-1 ){
-        setData( Global::ChannelsColumn, Qt::DisplayRole, "" );
-    }else{
-        setData( Global::ChannelsColumn, Qt::DisplayRole, channels_ );
-    }
-    */
 
-    /*
-    QString filename = fileInfo_.fileName();
-    if( showFullFileName ){
-        filename = fileInfo_.absoluteFilePath();
+}
+
+bool TagItem::operator<(const QTreeWidgetItem &other) const{
+    int column = treeWidget()->sortColumn();
+    const QVariant v1 = data(column, Qt::DisplayRole);
+    const QVariant v2 = other.data(column, Qt::DisplayRole);
+    return Global::naturalCompare(v1.toString(),v2.toString(),Qt::CaseInsensitive) < 0;
+}
+
+TagItem::TagItem( const TagItem &other ){
+
+    artist_ = other.artist();
+    title_ = other.title();
+    album_ = other.album();
+    comment_ = other.comment();
+    genre_ = other.genre();
+    year_ = other.year();
+    track_ = other.track();
+
+    length_ = other.length();
+    bitRate_ = other.bitRate();
+    sampleRate_ = other.sampleRate();
+    channels_ = other.channels();
+
+    tagIsRead_ = other.tagIsRead();
+    fileInfo_ = other.fileInfo();
+    tagOk_ = other.tagOk();
+    audioPropertiesOk_ = other.audioPropertiesOk();
+    unSavedChanges_ = other.unSavedChanges();
+
+    setToolTip( 0, fileInfo_.absoluteFilePath() );
+    //setColumnData();
+
+}
+
+void TagItem::setColumnData( const QList<Global::TagField> &columns, bool showFullFileName, bool readTags_ ){
+
+    if(readTags_){
+        readTags();
     }
-    setData( Global::FileNameColumn, Qt::DisplayRole, filename );
-*/
+
+    int k=0;
+    for(int i=0;i<columns.size();i++){
+
+        QString str = getTag( columns[i] ).toString();
+        if(columns[i]==Global::FileName && showFullFileName){
+            str = fileInfo_.absoluteFilePath();
+        }
+        setData( k, Qt::DisplayRole, str );
+        k++;
+    }
+
 }
 
 QString TagItem::artist() const{
@@ -103,53 +112,65 @@ QString TagItem::genre() const{
     return genre_;
 }
 
-int TagItem::year() const{
+uint TagItem::year() const{
     return year_;
 }
 
-int TagItem::track() const{
+uint TagItem::track() const{
     return track_;
 }
 
-int TagItem::length() const{
+uint TagItem::length() const{
     return length_;
 }
-int TagItem::bitRate() const{
+uint TagItem::bitRate() const{
     return bitRate_;
 }
-int TagItem::sampleRate() const{
+uint TagItem::sampleRate() const{
     return sampleRate_;
 }
-int TagItem::channels() const{
+uint TagItem::channels() const{
     return channels_;
 }
 
-
-TagItem::TagItem( const TagItem &other ){
-
-    artist_ = other.artist();
-    title_ = other.title();
-    album_ = other.album();
-    comment_ = other.comment();
-    genre_ = other.genre();
-    year_ = other.year();
-    track_ = other.track();
-
-    length_ = other.length();
-    bitRate_ = other.bitRate();
-    sampleRate_ = other.sampleRate();
-    channels_ = other.channels();
-
-    tagIsRead_ = other.tagIsRead();
-    fileInfo_ = other.fileInfo();
-    tagOk_ = other.tagOk();
-    audioPropertiesOk_ = other.audioPropertiesOk();
-
-    setToolTip( 0, fileInfo_.absoluteFilePath() );
-    //setColumnData();
-
+void TagItem::setArtist( const QString &artist ){
+    unSavedChanges_ = artist!=artist_;
+    artist_ = artist;
 }
 
+void TagItem::setAlbum( const QString &album ){
+    unSavedChanges_ = album!=album_;
+    album_ = album;
+}
+
+void TagItem::setTitle( const QString &title ){
+    unSavedChanges_ = title!=title_;
+    title_ = title;
+}
+
+void TagItem::setGenre( const QString &genre ){
+    unSavedChanges_ = genre!=genre_;
+    genre_ = genre;
+}
+
+void TagItem::setComment( const QString &comment ){
+    unSavedChanges_ = comment!=comment_;
+    comment_ = comment;
+}
+
+void TagItem::setTrack( uint track ){
+    unSavedChanges_ = track!=track_;
+    track_ = track;
+}
+
+void TagItem::setYear( uint year ){
+    unSavedChanges_ = year!=year_;
+    year_ = year;
+}
+
+bool TagItem::unSavedChanges() const{
+    return unSavedChanges_;
+}
 
 bool TagItem::tagOk() const{
     return tagOk_;
@@ -167,35 +188,40 @@ QFileInfo TagItem::fileInfo() const{
     return fileInfo_;
 }
 
-QVariant TagItem::getTag( TagItem::TagField field ){
 
-    if(!tagIsRead_){
+QVariant TagItem::getTag( Global::TagField field, bool read ){
+
+
+    if(!tagIsRead_ && read){
         readTags();
     }
 
+
     QVariant result;
-    if(field==Artist){
+    if(field==Global::Artist){
         result = QVariant(artist_);
-    }else if(field==Album){
+    }else if(field==Global::AlbumField){
         result = QVariant(album_);
-    }else if(field==Title){
+    }else if(field==Global::Title){
         result = QVariant(title_);
-    }else if(field==Genre){
+    }else if(field==Global::Genre){
         result = QVariant(genre_);
-    }else if(field==Comment){
+    }else if(field==Global::Comment){
         result = QVariant(artist_);
-    }else if(field==Year){
+    }else if(field==Global::Year){
         result = QVariant(year_);
-    }else if(field==Track){
+    }else if(field==Global::Track){
         result = QVariant(track_);
-    }else if(field==Length){
+    }else if(field==Global::Length){
         result = QVariant(length_);
-    }else if(field==BitRate){
+    }else if(field==Global::BitRate){
         result = QVariant(bitRate_);
-    }else if(field==SampleRate){
+    }else if(field==Global::SampleRate){
         result = QVariant(sampleRate_);
-    }else if(field==Channels){
+    }else if(field==Global::Channels){
         result = QVariant(channels_);
+    }else if(field==Global::FileName){
+        result = QVariant(fileInfo_.fileName());
     }
     return result;
 }
@@ -203,14 +229,14 @@ QVariant TagItem::getTag( TagItem::TagField field ){
 void TagItem::changeName( const QString &newFullFileName ){
 
     fileInfo_ = QFileInfo( newFullFileName );
-    //setText( 0, fileInfo_.fileName() );
-    //setColumnData();
+    setToolTip( 0, fileInfo_.absoluteFilePath() );
 
 }
 
 void TagItem::readTags(){
 
     tagIsRead_=true;
+
     TagLib::FileRef f( fileInfo_.absoluteFilePath().toStdString().c_str() );
     if( !f.isNull() || f.tag()  ){
         artist_ = f.tag()->artist().toCString();
@@ -229,6 +255,7 @@ void TagItem::readTags(){
         channels_ = f.audioProperties()->channels();
         audioPropertiesOk_=true;
     }
+
     //setColumnData();
 
 }
@@ -258,20 +285,38 @@ void TagItem::setTag( TagItem::TagField field, const QVariant &tag ){
         ok = tag.canConvert(QVariant::UInt);
         track_ = tag.toInt();
     }
-    //return ok;
-    //setColumnData();
+    unSavedChanges_ = false;
+
 }
 
 
-void TagItem::clearTags(){
+bool TagItem::saveTag(){
 
+    TagLib::FileRef f( fileInfo_.absoluteFilePath().toStdString().c_str() );
+    bool ok = false;
+    if( !f.isNull() || f.tag()  ){
+        f.tag()->setTrack(track_);
+        f.tag()->setYear(year_);
+        f.tag()->setAlbum(album_.toStdString().c_str());
+        f.tag()->setArtist(artist_.toStdString().c_str());
+        f.tag()->setTitle(title_.toStdString().c_str());
+        f.tag()->setGenre(genre_.toStdString().c_str());
+        f.tag()->setComment(comment_.toStdString().c_str());
+        ok = f.save();
+        unSavedChanges_ = !ok;
+    }
+    return ok;
+}
+
+void TagItem::clearTags(){
     artist_="";
     title_="";
     album_="";
     comment_="";
     genre_="";
-    //year=0;
-    //track=0;
+    year_=0;
+    track_=0;
+
     tagIsRead_=false;
     audioPropertiesOk_=false;
     tagOk_=false;
@@ -280,5 +325,7 @@ void TagItem::clearTags(){
     sampleRate_=-1;
     channels_=-1;
 
-    //setColumnData();
+    unSavedChanges_=false;
+
+
 }

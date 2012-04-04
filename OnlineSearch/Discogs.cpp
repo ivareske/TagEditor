@@ -5,16 +5,13 @@ Discogs::Discogs( QString key ){
 
     api_key = key;
 
-
-}
-
-Discogs::~Discogs(){
+    type_ = MusicDatabase::DISCOGS;
 
 }
 
 
 void Discogs::handleResults( QNetworkReply* reply ){
-
+    //a serach result, not the same as a release. Contains less info
     qDebug()<<"Discogs handleResults";
     QString err="";
     //QList<SearchResult> Results;
@@ -40,7 +37,7 @@ void Discogs::handleResults( QNetworkReply* reply ){
                         }
                     }
                 }else if( xml.attributes().hasAttribute("requests") ){
-                    //nSearches = xml.attributes().value("requests").toString().toInt(&ok, 10);
+                    //int nSearches = xml.attributes().value("requests").toString().toInt();
                     //qDebug()<<nSearches;
                     //info->setText(QString::number(nSearches)+" searches performed within the last 24 hours");
                 }else{
@@ -343,18 +340,82 @@ void Discogs::handleRelease( QNetworkReply* reply ){
     album.setImages(images);
     album.setSongs(songs);
 
-
-    reply->deleteLater();
     albums_.insert(album.key(),album);
-    nDownloaded_++;
+    reply->deleteLater();
 
-    //qDebug()<<downloadImmediately_<<nDownloaded_<<albums_.size();
-    if( downloadImmediately_ && nDownloaded_==albums_.size() ){
-        emit albumsDownloaded( albums_ );
-    }
-    if(!downloadImmediately_){
-        emit albumDownloaded( album );
-    }
+    /*
+    if(images.size()>0){
+        //qDebug()<<"starting image downloading for album "+album.title()<<", images: "<<images;
+        QNetworkRequest coverRequest(images[0]);        
+        coverRequest.setAttribute(QNetworkRequest::User,album.key());
+        QNetworkAccessManager *coverManager = new QNetworkAccessManager;
+        connect(coverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleCover(QNetworkReply*)));
+        coverManager->get(coverRequest);
+    }else {
+        */
+        nDownloaded_++;
+        qDebug()<<"downloaded album "<<album.title();
+        if( downloadImmediately_ && nDownloaded_==albums_.size() ){
+            emit albumsDownloaded( albums_ );
+        }
+        if(!downloadImmediately_){
+            emit albumDownloaded( album );
+        }
+    //}
 
 
 }
+
+/*
+  //too slow downloading all images at once
+void Discogs::handleCover(QNetworkReply* reply){
+
+    QByteArray data = reply->readAll();
+    QPixmap p;
+    p.loadFromData(data);
+    QString key = reply->request().attribute(QNetworkRequest::User).toString();
+    //qDebug()<<key;
+    Album album = albums_[key];
+    QList<QPixmap> covers = album.covers();
+    covers.append(p);
+    album.setCovers(covers);
+    albums_[key] = album;
+    QList<QUrl> images = album.images();
+    int ind = -1;
+    for(int i=0;i<images.size();i++){
+        if(images[i]==reply->url()){
+            ind = i+1;
+            break;
+        }
+    }
+
+    //qDebug()<<"downloaded "<<reply->url().toString()<<" for album "<<album.title()<<", "<<album.covers().size()<<" of "<<album.images().size()<<" finished ";
+    //qDebug()<<album.title()<<": "<<album.covers().size()<<" of "<<album.images().size()<<" covers finished "<<reply->url().toString();
+
+    reply->deleteLater();
+
+    if(ind!=-1 && ind<images.size()){
+        //download next cover in line
+        QNetworkRequest coverRequest(images[ind]);
+        coverRequest.setAttribute(QNetworkRequest::User,album.key());
+        QNetworkAccessManager *coverManager = new QNetworkAccessManager;
+        connect(coverManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleCover(QNetworkReply*)));
+        coverManager->get(coverRequest);
+    }else{
+
+        if(album.covers().size()==album.images().size()){
+            //all covers for this album downloaded
+            nDownloaded_++;
+            qDebug()<<"downloaded all covers for album "<<album.title();
+            //qDebug()<<downloadImmediately_<<nDownloaded_<<albums_.size();
+            if( downloadImmediately_ && nDownloaded_==albums_.size() ){
+                emit albumsDownloaded( albums_ );
+            }
+            if(!downloadImmediately_){
+                emit albumDownloaded( album );
+            }
+        }
+    }
+
+}
+*/
