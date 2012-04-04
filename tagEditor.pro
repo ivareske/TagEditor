@@ -38,6 +38,8 @@ QT += network webkit
 QT += xml
 #QTPLUGIN += qjpeg
 
+INCLUDEPATH  += ./OnlineSearch
+DEPENDPATH  += ./OnlineSearch
 win32{
     INCLUDEPATH  += ./taglib ./
     LIBS += ./libtag.dll
