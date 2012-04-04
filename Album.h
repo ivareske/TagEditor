@@ -4,6 +4,7 @@
 
 #include <QtGui>
 #include "Song.h"
+#include "globalFunctions.h"
 
 class Album {
 
@@ -78,6 +79,8 @@ private:
 
 };
 
+
+bool compareAlbum( const Album &a1, const Album &a2 );
 
 
 #endif

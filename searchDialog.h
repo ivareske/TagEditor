@@ -43,7 +43,7 @@ private:
 
 private slots:
 
-    fix cover downloading. keep downloaded covers
+    //fix cover downloading. keep downloaded covers
     /*
     void getCoverFromReply(QNetworkReply* reply);
     void downloadCover( const Album &album, const QUrl &url );

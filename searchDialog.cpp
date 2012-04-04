@@ -146,7 +146,7 @@ void SearchDialog::getResults( const QHash<QString,Album> &results ){
         //gotAlbums is then called, albums are sorted and result items created
     }else{
         QList<Album> tmpresults = results_.values();
-        std::sort( tmpresults.begin(), tmpresults.end(), Global::compareAlbum );
+        std::sort( tmpresults.begin(), tmpresults.end(), compareAlbum );
         for(int i=0;i<tmpresults.size();i++){
             //if( databaseComboBox->itemData(databaseComboBox->currentIndex()).toInt() == SearchDialog::DISCOGS ){
             if( database_->type()==MusicDatabase::DISCOGS ){
@@ -185,7 +185,7 @@ void SearchDialog::gotAlbums( const QHash<QString,Album> &albums ){
 
     albums_ = albums;
     QList<Album> tmpalbums = albums_.values();
-    std::sort( tmpalbums.begin(), tmpalbums.end(), Global::compareAlbum );
+    std::sort( tmpalbums.begin(), tmpalbums.end(), compareAlbum );
     searchResults->clear();
     for(int i=0;i<tmpalbums.size();i++){
         setResultItem( tmpalbums[i].displayArtist()+" - "+tmpalbums[i].title()+" ("+tmpalbums[i].format()+","+QString::number(tmpalbums[i].year())+")", tmpalbums[i].key() );

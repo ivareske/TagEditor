@@ -249,3 +249,13 @@ void Album::disp() const{
     qDebug()<<"-----------------------------";
     */
 }
+
+bool compareAlbum( const Album &a1, const Album &a2 ){
+    int res = Global::naturalCompare( a1.format(), a2.format(), Qt::CaseInsensitive );
+    if(res==0){
+        return a1.year() < a2.year();
+    }else{
+        return res<0;
+    }
+
+}

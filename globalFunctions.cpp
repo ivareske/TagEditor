@@ -23,15 +23,6 @@ QString columnText( Global::TagField t ){
     }
 }
 
-bool compareAlbum( const Album &a1, const Album &a2 ){
-    int res = naturalCompare( a1.format(), a2.format(), Qt::CaseInsensitive );
-    if(res==0){
-        return a1.year() < a2.year();
-    }else{
-        return res<0;
-    }
-
-}
 
 int naturalCompare( const QString &_a, const QString &_b, Qt::CaseSensitivity caseSensitivity ){
     // This method chops the input a and b into pieces of
