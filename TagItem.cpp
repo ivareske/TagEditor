@@ -1,7 +1,7 @@
 #include "TagItem.h"
 
 
-TagItem::TagItem( const QString &fullfile, QTreeWidget *parent, int type ) : QTreeWidgetItem( parent, type)    {
+TagItem::TagItem( const QString &fullfile, QTreeWidget *parent, int type ) : QObject(parent),QTreeWidgetItem( parent, type) {
 
     artist_="";
     title_="";
@@ -32,7 +32,7 @@ bool TagItem::operator<(const QTreeWidgetItem &other) const{
     const QVariant v2 = other.data(column, Qt::DisplayRole);
     return Global::naturalCompare(v1.toString(),v2.toString(),Qt::CaseInsensitive) < 0;
 }
-
+/*
 TagItem::TagItem( const TagItem &other ){
 
     artist_ = other.artist();
@@ -58,7 +58,7 @@ TagItem::TagItem( const TagItem &other ){
     //setColumnData();
 
 }
-
+*/
 void TagItem::setColumnData( const QList<Global::TagField> &columns, bool showFullFileName, bool readTags_ ){
 
     if(readTags_){
@@ -244,50 +244,7 @@ void TagItem::readTags(){
     unSavedChanges_ = false;
 }
 
-/*
-bool TagItem::setTag( Global::TagField field, const QVariant &tag ){
 
-    bool ok=false;
-    if(field==Global::Artist){
-        ok = tag.canConvert(QVariant::String);
-        if(ok){
-            setArtist(tag.toString());
-        }
-    }else if(field==Global::AlbumField){
-        ok = tag.canConvert(QVariant::String);
-        if(ok){
-            setAlbum(tag.toString());
-        }
-    }else if(field==Global::Title){
-        ok = tag.canConvert(QVariant::String);
-        if(ok){
-            setTitle(tag.toString());
-        }
-    }else if(field==Global::Genre){
-        ok = tag.canConvert(QVariant::String);
-        if(ok){
-            setGenre(tag.toString());
-        }
-    }else if(field==Global::Comment){
-        ok = tag.canConvert(QVariant::String);
-        if(ok){
-            setComment(tag.toString());
-        }
-    }else if(field==Global::Year){
-        ok = tag.canConvert(QVariant::UInt);
-        if(ok){
-            setYear(tag.toUInt());
-        }
-    }else if(field==Global::Track){
-        ok = tag.canConvert(QVariant::UInt);
-        if(ok){
-            setTrack(tag.toUInt());
-        }
-    }
-    return ok;
-
-}
-*/
 bool TagItem::saveTag(){
 
     TagLib::FileRef f( fileInfo_.absoluteFilePath().toStdString().c_str() );

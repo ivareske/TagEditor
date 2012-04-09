@@ -1,6 +1,5 @@
 #include "SettingsDialog.h"
 
-//SettingsClass globalSettings;
 
 SettingsDialog::SettingsDialog(QWidget *parent){
     setupUi(this); // this sets up GUI

@@ -1,3 +1,4 @@
+#change font in treewidget when there are unsaved changes. warn when exit if unsaved changed
 #find lyrics?
 #build qt static: configure -static -no-exceptions; make sub-src
 #http://www.techsupportalert.com/best-free-mp3-tag-editor.htm
@@ -49,7 +50,7 @@ unix{
     LIBS += -L/usr/lib/ -ltag
 }
 
-HEADERS  = TagEditor.h SettingsDialog.h SettingsClass.h SearchDialog.h Album.h TextViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
+HEADERS  = TagEditor.h SettingsDialog.h SearchDialog.h Album.h TextViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
     ReleaseEvent.h \
     Song.h \
     Artist.h \
@@ -58,7 +59,7 @@ HEADERS  = TagEditor.h SettingsDialog.h SettingsClass.h SearchDialog.h Album.h T
 
 FORMS     = TagEditor.ui SettingsDialog.ui SearchDialog.ui TextViewer.ui ReplaceDialog.ui RenameDialog.ui SearchForTagsDialog.ui SetColumnsDialog.ui
 
-SOURCES = main.cpp TagEditor.cpp SettingsDialog.cpp SettingsClass.cpp SearchDialog.cpp Album.cpp TextViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp ReplaceDialog.cpp RenameDialog.cpp SearchForTagsDialog.cpp \
+SOURCES = main.cpp TagEditor.cpp SettingsDialog.cpp SearchDialog.cpp Album.cpp TextViewer.cpp globalFunctions.cpp TagItem.cpp TableWidgetItem.cpp MusicDatabase.cpp Discogs.cpp MusicBrainz.cpp ReplaceDialog.cpp RenameDialog.cpp SearchForTagsDialog.cpp \
     ReleaseEvent.cpp \
     Song.cpp \
     Artist.cpp \

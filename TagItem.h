@@ -7,13 +7,13 @@
 #include <fileref.h>
 #include "globalFunctions.h"
 
-class TagItem : public QTreeWidgetItem{
-    //Q_OBJECT
+class TagItem : public QObject, public QTreeWidgetItem{
+    Q_OBJECT
 
 public:
 
     TagItem(const QString &fullfile="", QTreeWidget *parent = 0, int type = QTreeWidgetItem::Type);
-    TagItem( const TagItem &other );
+    //TagItem( const TagItem &other );
     bool operator<(const QTreeWidgetItem &other) const;
 
     void clearTags();
