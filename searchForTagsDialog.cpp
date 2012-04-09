@@ -7,8 +7,7 @@ SearchForTagsDialog::SearchForTagsDialog( QList<QFileInfo> files, QWidget *paren
     connect( SearchButton, SIGNAL( clicked()  ), this, SLOT(search() ) );
     fileInfos = files;
 
-    QSettings settings(Global::settingsFile,QSettings::IniFormat,0);
-
+    QSettings settings("TagEditor.ini",QSettings::IniFormat,0);
     CaseSensitive->setChecked( settings.value("SearchForTagsDialog/CaseSensitive",false).toBool() );
     artistCheckbox->setChecked( settings.value("SearchForTagsDialog/artistChecked",true).toBool());
     titleCheckbox->setChecked( settings.value("SearchForTagsDialog/titleChecked",true).toBool());
@@ -35,9 +34,7 @@ QList<QFileInfo> SearchForTagsDialog::files(){
 
 
 void SearchForTagsDialog::finito( int result ){
-
-    QSettings settings(Global::settingsFile,QSettings::IniFormat,0);
-
+    QSettings settings("TagEditor.ini",QSettings::IniFormat,0);
     settings.setValue( "SearchForTagsDialog/CaseSensitive", CaseSensitive->isChecked() );
     settings.setValue("SearchForTagsDialog/artistChecked", artistCheckbox->isChecked() );
     settings.setValue("SearchForTagsDialog/titleChecked", titleCheckbox->isChecked() );

@@ -45,11 +45,9 @@ public:
     QFileInfo fileInfo() const;
     bool tagIsRead() const;
     bool tagOk() const;
-
     bool audioPropertiesOk() const;    
     QVariant getTag( Global::TagField field, bool read = false );
     void setColumnData( const QList<Global::TagField> &columns, bool showFullFileName, bool readTags_ );
-
 public slots:
 
 

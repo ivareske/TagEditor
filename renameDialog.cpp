@@ -3,9 +3,7 @@
 RenameDialog::RenameDialog( QList<TagItem*> tagitems, QWidget *parent ) : QDialog(parent){
     setupUi(this); // this sets up GUI
 
-    //settings = new QSettings("TagEditor.ini",QSettings::IniFormat,0);
-    settings = new QSettings(Global::settingsFile,QSettings::IniFormat,0);
-
+    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,0);
     connect( RenameButton, SIGNAL( clicked()  ), this, SLOT(rename() ) );
     tagItems = tagitems;
 
@@ -57,12 +55,6 @@ void RenameDialog::updateReplaceFormat( QTableWidgetItem* item ){
     replaceFormat[ind] = item->text();
 }
 
-
-void RenameDialog::updateFormat(  const QString &format ){
-    *renameFormat = format;
-}
-
-
 void RenameDialog::finito( int result ){
 
     settings->setValue( "RenameDialog/replaceFormat", replaceFormat );
@@ -72,6 +64,7 @@ void RenameDialog::finito( int result ){
 }
 
 void RenameDialog::setDefaultFormat(){
+
     int k=0;
     for(int i=0;i<replaceFormat.size();i=i+2){
         QTableWidgetItem *item1 = new QTableWidgetItem;

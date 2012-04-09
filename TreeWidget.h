@@ -5,9 +5,7 @@
 #include "TagItem.h"
 #include "SetColumnsDialog.h"
 #include "globalFunctions.h"
-//#include "SetColumnsDialog.h"
 
-class TagItem;
 
 class TreeWidget : public QTreeWidget{
     Q_OBJECT
@@ -18,7 +16,6 @@ public:
     bool showFullFileName() const;
     void setShowFullFileName( bool show );
     void addItem( QTreeWidgetItem *item );
-    void addTopLevelItems( const QList<QTreeWidgetItem*> &items );
     void updateItems( QList<TagItem*> items );
     bool showTagInfo() const;
     void setShowTagInfo( bool show );
@@ -38,7 +35,6 @@ private slots:
     void treeWidgetContextMenu(const QPoint &p);
     void updateFileNames( bool enable );    
     void updateShowTagInfo( bool enable );
-
     void setColumns();
     void editColumns();
 private:
@@ -46,7 +42,6 @@ private:
     bool showTagInfo_;
     QList<Global::TagField> columns_;
     QList<Global::TagField> defaultColumns_;
-
 
 };
 

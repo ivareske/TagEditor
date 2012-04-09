@@ -1,12 +1,12 @@
 #include "SettingsDialog.h"
 
+//SettingsClass globalSettings;
+
 SettingsDialog::SettingsDialog(QWidget *parent){
     setupUi(this); // this sets up GUI
 
-    //settings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
-    settings = new QSettings(Global::settingsFile,QSettings::IniFormat,this);
+    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
     api_key->setText( settings->value("SearchDialog/api_key","").toString() );
-
     QString defaultExt = "*.mp3;*.wma;*.wav;*.ogg;*.aac;*.ac3;*.m4a";
     extensions->setText( settings->value( "extensions", defaultExt.split(";") ).toStringList().join(";") );
     subfolders->setChecked( settings->value("subfolders",true).toBool() );

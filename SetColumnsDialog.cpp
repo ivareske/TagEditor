@@ -1,6 +1,5 @@
 #include "SetColumnsDialog.h"
 
-
 SetColumnsDialog::SetColumnsDialog(const QList<Global::TagField> &columns,QWidget *parent) : QDialog(parent){
 
     setupUi(this);
@@ -16,13 +15,11 @@ SetColumnsDialog::SetColumnsDialog(const QList<Global::TagField> &columns,QWidge
     }
 
     for(int i=0;i<Global::NTagFields;i++){
-
         QLayout *l = Frame->layout();
         if(l==0){
             l = new QVBoxLayout;
             Frame->setLayout(l);
         }
-
         QComboBox *b = new QComboBox;        
         b->addItems(columnStrs);
         comboboxes.append(b);
@@ -38,7 +35,6 @@ SetColumnsDialog::SetColumnsDialog(const QList<Global::TagField> &columns,QWidge
 
 
 }
-
 
 void SetColumnsDialog::save(){
 

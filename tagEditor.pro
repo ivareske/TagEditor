@@ -29,11 +29,11 @@
 
 TEMPLATE = app
 TARGET = TagEditor
-
 # The application version
 VERSION = 1.0
 
-
+#CONFIG += qt release warn_on
+#CONFIG += console silent
 QT += network webkit
 QT += xml
 #QTPLUGIN += qjpeg
@@ -48,7 +48,6 @@ unix{
     INCLUDEPATH += /usr/include/taglib/
     LIBS += -L/usr/lib/ -ltag
 }
-
 
 HEADERS  = TagEditor.h SettingsDialog.h SettingsClass.h SearchDialog.h Album.h TextViewer.h globalFunctions.h TagItem.h TableWidgetItem.h MusicDatabase.h Discogs.h MusicBrainz.h ReplaceDialog.h RenameDialog.h SearchForTagsDialog.h \
     ReleaseEvent.h \
@@ -72,7 +71,6 @@ RESOURCES += TagEditor.qrc
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += APP_NAME=\\\"$$TARGET\\\"
-
 
 
 #fant ikke:

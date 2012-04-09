@@ -5,7 +5,7 @@
 #include <QtGui>
 #include "TextViewer.h"
 #include "TagItem.h"
-#include "ui_RenameDialog.h"
+#include "ui_renameDialog.h"
 
 
 class RenameDialog : public QDialog, private Ui::RenameDialog
@@ -15,7 +15,6 @@ class RenameDialog : public QDialog, private Ui::RenameDialog
 public:
 
     RenameDialog( QList<TagItem*> tagitems, QWidget *parent = 0 );
-
 
 public slots:
     void rename();

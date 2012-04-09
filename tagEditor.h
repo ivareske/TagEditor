@@ -20,9 +20,8 @@
 #include <taglib.h>
 #include <fileref.h>
 #include <QtPlugin>
-
-#include "ListWidget.h"
-#include "ui_TagEditor.h"
+//#include "ListWidget.h"
+#include "ui_tagEditor.h"
 #include "TreeWidget.h"
 
 
@@ -38,7 +37,6 @@ private slots:
     QList<QFileInfo> getDirContent( QString& aPath );
     void addFiles();
     void clearTextFields();    
-
     void resizeColumn();
     void removeFiles();
     void removeAllFiles();
@@ -48,8 +46,8 @@ private slots:
     void openStyleSheet();
     void setGUIStyle( const QString &s );
     void uncheckStyleActions();
-    void checkStyleAction( const QString &actionText, bool state );
-    bool loadStyleSheet( const QString &file );
+    void checkStyleAction( QString actionText, bool state );
+    bool loadStyleSheet( QString file );
     void saveTag();
     void serialize();
     void showSettings();
@@ -65,20 +63,27 @@ private slots:
 
     //protected:
 private:
-    //void closeEvent( QCloseEvent *event );
+    void closeEvent( QCloseEvent *event );
 
     QSettings *guiSettings;
     QString startupFolder;
     QStringList extensions;
     //QString api_key;
     bool subfolders;
-
+/*
+    bool artistChecked;
+    bool titleChecked;
+    bool albumChecked;
+    bool yearChecked;
+    bool trackChecked;
+    bool genreChecked;
+    bool commentChecked;
+*/
     QString lastStyleSheetFolder;
     QString style;
     //QVector<tag> tags;
     bool showSaveTagWarning;
     QSize textViewerSize;
-
     TreeWidget *TreeWidget_;
 
 };

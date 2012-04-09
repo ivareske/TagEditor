@@ -6,7 +6,8 @@
 #include "ui_settingsDialog.h"
  
  
-class SettingsDialog : public QDialog, private Ui::SettingsDialog{
+class SettingsDialog : public QDialog, private Ui::SettingsDialog
+{
     Q_OBJECT
  
 public:

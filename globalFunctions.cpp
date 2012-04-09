@@ -4,7 +4,6 @@
 namespace Global{
 
 
-
 QString columnText( Global::TagField t ){
 
     switch (t){

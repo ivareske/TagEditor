@@ -11,18 +11,17 @@ TreeWidget::TreeWidget(QWidget *parent) : QTreeWidget(parent){
     }
     defaultColumns_ = columns_;
 
-
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(treeWidgetContextMenu(const QPoint &)));
     showTagInfo_ = false;
     showFullFileName_ = false;
+
 
     setColumns();
 
     setSortingEnabled(true);
     this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
-
 
 void TreeWidget::clearTags(){
 
@@ -50,7 +49,6 @@ void TreeWidget::setColumnData( TagItem* item ){
     item->setColumnData( columns_, showFullFileName_, showTagInfo_ );
 }
 
-
 void TreeWidget::setColumns(){
 
     QStringList headers;
@@ -72,34 +70,6 @@ TagItem* TreeWidget::tagItem( int index ){
     return static_cast<TagItem*>(this->topLevelItem(index));
 }
 
-void TreeWidget::addTopLevelItems( const QList<QTreeWidgetItem*> &items ){
-
-    QString txt = "Adding files";
-    if( showTagInfo() ){
-        QString txt = "Adding files and reading tags";
-    }
-    QProgressDialog progress(txt, "Abort", 0, items.size(), this);
-    progress.setWindowModality(Qt::WindowModal);
-    for(int i=0;i<items.size();i++){
-        progress.setValue(i);
-        if(progress.wasCanceled()){
-            return;
-        }
-        TagItem *item_ = static_cast<TagItem*>(items[i]);
-        if( !item_->tagIsRead() && showTagInfo() ){
-            item_->readTags();
-        }
-        QString str = item_->fileInfo().fileName();
-        if( showFullFileName_ ){
-            str = item_->fileInfo().filePath();
-        }
-        item_->setText(Global::FileNameColumn,str);
-    }
-    progress.setValue(items.size());
-
-    QTreeWidget::addTopLevelItems(items);
-
-}
 
 void TreeWidget::addItem( QTreeWidgetItem *item ){
 
@@ -130,7 +100,7 @@ bool TreeWidget::showTagInfo() const{
 void TreeWidget::updateItems( QList<TagItem*> items ){
 
     bool sort = isSortingEnabled();
-    setSortingEnabled(false);    
+    setSortingEnabled(false);
     for(int i=0;i<items.size();i++){
         TagItem *item_ = items[i];
         QString str = item_->fileInfo().absoluteFilePath();
@@ -179,17 +149,9 @@ void TreeWidget::updateShowTagInfo( bool enable ){
 
     bool sort = isSortingEnabled();
     setSortingEnabled(false);
-    int n = topLevelItemCount();
-    QVector<TagItem*> items_; items_.resize(n);
+    QVector<TagItem*> items_; items_.resize(topLevelItemCount());
     int k=0;
-    QProgressDialog progress("Reading tags...", "Abort", 0, n, this);
-    progress.setWindowModality(Qt::WindowModal);
-    for(int i=n-1;i>=0;i--){
-        progress.setValue(i-n+1);
-        if(progress.wasCanceled()){
-            showTagInfo_ = false;
-            break;
-        }
+    for(int i=topLevelItemCount()-1;i>=0;i--){
         TagItem *item_ = static_cast<TagItem*>(takeTopLevelItem(i));
         if(!item_->tagIsRead()){
             item_->readTags();
@@ -202,7 +164,6 @@ void TreeWidget::updateShowTagInfo( bool enable ){
         addItem(items_[i]);
     }
     setSortingEnabled(sort);
-    progress.setValue(n);
 
 
 }
@@ -233,6 +194,7 @@ void TreeWidget::treeWidgetContextMenu(const QPoint &p){
     QAction* resizeColumnsAction = new QAction(tr("Resize columns to contents"), this);
     connect(resizeColumnsAction, SIGNAL(triggered()), this, SLOT(resizeColumns()));
 
+    //specify columns
     QAction* editColumnsAction = new QAction(tr("Edit columns..."), this);
     connect(editColumnsAction, SIGNAL(triggered()), this, SLOT(editColumns()));
 
@@ -247,7 +209,6 @@ void TreeWidget::treeWidgetContextMenu(const QPoint &p){
 }
 
 void TreeWidget::editColumns(){
-
 
     SetColumnsDialog d( columns_, this );
     if(d.exec()==QDialog::Accepted){

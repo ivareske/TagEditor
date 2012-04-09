@@ -8,7 +8,6 @@ TagItem::TagItem( const QString &fullfile, QTreeWidget *parent, int type ) : QTr
     album_="";
     comment_="";
     genre_="";
-
     year_=0;
     track_=0;
     tagOk_=false;
@@ -24,19 +23,6 @@ TagItem::TagItem( const QString &fullfile, QTreeWidget *parent, int type ) : QTr
 
     setToolTip( 0, fullfile );
     //setColumnData();
-
-
-}
-
-void TagItem::setColumnData( const QList<int> &columns ){
-
-    int k=0;
-    for(int i=0;i<columns.size();i++){
-        if( columns[i]!=-1 ){
-            QString str = Global::columnText(static_cast<Global::ColumnType>(columns[i]));
-            setData( k, Qt::DisplayRole, str ); k++;
-        }
-    }
 
 }
 
@@ -188,7 +174,6 @@ QFileInfo TagItem::fileInfo() const{
     return fileInfo_;
 }
 
-
 QVariant TagItem::getTag( Global::TagField field, bool read ){
 
 
@@ -256,40 +241,53 @@ void TagItem::readTags(){
         audioPropertiesOk_=true;
     }
 
-    //setColumnData();
-
-}
-
-void TagItem::setTag( TagItem::TagField field, const QVariant &tag ){
-
-    bool ok;
-    if(field==Artist){
-        ok = tag.canConvert(QVariant::String);
-        artist_ = tag.toString();
-    }else if(field==Album){
-        ok = tag.canConvert(QVariant::String);
-        album_ = tag.toString();
-    }else if(field==Title){
-        ok = tag.canConvert(QVariant::String);
-        title_ = tag.toString();
-    }else if(field==Genre){
-        ok = tag.canConvert(QVariant::String);
-        genre_ = tag.toString();
-    }else if(field==Comment){
-        ok = tag.canConvert(QVariant::String);
-        comment_ = tag.toString();
-    }else if(field==Year){
-        ok = tag.canConvert(QVariant::UInt);
-        year_ = tag.toInt();
-    }else if(field==Track){
-        ok = tag.canConvert(QVariant::UInt);
-        track_ = tag.toInt();
-    }
     unSavedChanges_ = false;
-
 }
 
+/*
+bool TagItem::setTag( Global::TagField field, const QVariant &tag ){
 
+    bool ok=false;
+    if(field==Global::Artist){
+        ok = tag.canConvert(QVariant::String);
+        if(ok){
+            setArtist(tag.toString());
+        }
+    }else if(field==Global::AlbumField){
+        ok = tag.canConvert(QVariant::String);
+        if(ok){
+            setAlbum(tag.toString());
+        }
+    }else if(field==Global::Title){
+        ok = tag.canConvert(QVariant::String);
+        if(ok){
+            setTitle(tag.toString());
+        }
+    }else if(field==Global::Genre){
+        ok = tag.canConvert(QVariant::String);
+        if(ok){
+            setGenre(tag.toString());
+        }
+    }else if(field==Global::Comment){
+        ok = tag.canConvert(QVariant::String);
+        if(ok){
+            setComment(tag.toString());
+        }
+    }else if(field==Global::Year){
+        ok = tag.canConvert(QVariant::UInt);
+        if(ok){
+            setYear(tag.toUInt());
+        }
+    }else if(field==Global::Track){
+        ok = tag.canConvert(QVariant::UInt);
+        if(ok){
+            setTrack(tag.toUInt());
+        }
+    }
+    return ok;
+
+}
+*/
 bool TagItem::saveTag(){
 
     TagLib::FileRef f( fileInfo_.absoluteFilePath().toStdString().c_str() );
@@ -316,7 +314,6 @@ void TagItem::clearTags(){
     genre_="";
     year_=0;
     track_=0;
-
     tagIsRead_=false;
     audioPropertiesOk_=false;
     tagOk_=false;
@@ -324,8 +321,6 @@ void TagItem::clearTags(){
     bitRate_=-1;
     sampleRate_=-1;
     channels_=-1;
-
     unSavedChanges_=false;
-
 
 }
