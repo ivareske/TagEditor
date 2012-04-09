@@ -12,7 +12,7 @@ TagEditor::TagEditor(QWidget *parent) : QMainWindow(parent){
     createActions();
 
     QFileSystemModel *model = new QFileSystemModel;
-    TreeView->setModel(model);
+    TreeWidget_->setModel(model);
 
     guiSettings = new QSettings(Global::settingsFile,QSettings::IniFormat,this);
     readSettings();
