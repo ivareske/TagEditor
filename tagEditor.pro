@@ -35,7 +35,7 @@ VERSION = 1.0
 
 #CONFIG += qt release warn_on
 #CONFIG += console silent
-QT += network webkit
+QT += network webkit script
 QT += xml
 #QTPLUGIN += qjpeg
 
@@ -55,7 +55,8 @@ HEADERS  = TagEditor.h SettingsDialog.h SearchDialog.h Album.h TextViewer.h glob
     Song.h \
     Artist.h \
     TreeWidget.h SetColumnsDialog.h \
-    TableWidget.h
+    TableWidget.h \
+    Script.h metaTypes.h CodeEditor.h
 
 FORMS     = TagEditor.ui SettingsDialog.ui SearchDialog.ui TextViewer.ui ReplaceDialog.ui RenameDialog.ui SearchForTagsDialog.ui SetColumnsDialog.ui
 
@@ -64,7 +65,8 @@ SOURCES = main.cpp TagEditor.cpp SettingsDialog.cpp SearchDialog.cpp Album.cpp T
     Song.cpp \
     Artist.cpp \
     TreeWidget.cpp SetColumnsDialog.cpp \
-    TableWidget.cpp
+    TableWidget.cpp \
+    Script.cpp CodeEditor.cpp
 
 RC_FILE = TagEditor.rc
 RESOURCES += TagEditor.qrc

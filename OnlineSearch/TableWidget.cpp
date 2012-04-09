@@ -26,7 +26,7 @@ TableWidget::TableWidget(QWidget *parent) : QTableWidget(parent){
 
     connect( this, SIGNAL( cellChanged( int, int )  ), this, SLOT( updateCell(int, int) ) );
 
-    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
+    settings = Global::guiSettings();
 
     resizeColumns( settings->value("SearchDialog/autoResizeColumns",true).toBool() );
     resizeColumnAction->setChecked( settings->value("SearchDialog/autoResizeColumns",true).toBool() );

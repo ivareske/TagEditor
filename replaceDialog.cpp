@@ -8,7 +8,7 @@ ReplaceDialog::ReplaceDialog( const QList<TagItem*> &items, QWidget *parent ) : 
     QStringList list; list<<"Artist"<<"Album"<<"Title"<<"Year"<<"Track"<<"Genre"<<"Comment";
     TagComboBox->addItems(list);
 
-    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,0);
+    settings = Global::guiSettings();
     CaseSensitive->setChecked( settings->value("ReplaceDialog/CaseSensitive",false).toBool() );
 
     connect( this, SIGNAL( finished( int ) ), this, SLOT( finito( int ) ) );
@@ -18,6 +18,7 @@ ReplaceDialog::ReplaceDialog( const QList<TagItem*> &items, QWidget *parent ) : 
 void ReplaceDialog::finito( int result ){
     settings->setValue( "ReplaceDialog/CaseSensitive", CaseSensitive->isChecked() );
     settings->sync();
+    delete settings;
 }
 
 void ReplaceDialog::replace(){
@@ -111,7 +112,7 @@ void ReplaceDialog::replace(){
     }
     log.append("\n\nReplaced "+Before->text()+" with "+After->text()+" in "+QString::number(nReplaced)+" tags");
     p.setValue(items_.size());
-    TextViewer t(0, &log);
+    TextViewer t(log);
     t.exec();
 
     accept();

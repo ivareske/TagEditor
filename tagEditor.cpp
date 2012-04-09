@@ -7,6 +7,10 @@ TagEditor::TagEditor(QWidget *parent) : QMainWindow(parent){
     setupUi(this); // this sets up GUI
 
 
+    QHBoxLayout *hl = static_cast<QHBoxLayout*>(tabWidget->widget(1)->layout());
+    scriptEditor_ = new CodeEditor;
+    hl->addWidget(scriptEditor_);
+
 
     TreeWidget_ = new TreeWidget(this);
     ListWidgetFrame->layout()->addWidget(TreeWidget_);
@@ -15,9 +19,15 @@ TagEditor::TagEditor(QWidget *parent) : QMainWindow(parent){
     QFileSystemModel *model = new QFileSystemModel;
     TreeView->setModel(model);
 
-    guiSettings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
+    guiSettings = Global::guiSettings();
     readSettings();    
     setGUIStyle( style );
+
+
+    //initialize scriptengine
+    qScriptRegisterSequenceMetaType< QList<QFileInfo> >(&engine_);
+    qScriptRegisterMetaType<QFileInfo>(&engine_, toQFileInfo,fromQFileInfo);
+    engine_.globalObject().setProperty("Tag",engine_.newFunction(constructTag) );
 
 
 
@@ -265,10 +275,8 @@ void TagEditor::rewriteTag(){
     p.setValue(indexes.size());
     statusBar()->showMessage("Finished rewriting tags", 8000);
     if(!log.isEmpty()){
-        TextViewer t(this, &log);
-        t.resize(textViewerSize);
+        TextViewer t(log);
         t.exec();
-        textViewerSize = t.size();
     }
 }
 
@@ -290,8 +298,7 @@ void TagEditor::saveSettings(){
     guiSettings->setValue("yearChecked", YearCheckbox->isChecked() );
     guiSettings->setValue("trackChecked", TrackCheckbox->isChecked() );
     guiSettings->setValue("genreChecked", GenreCheckbox->isChecked() );
-    guiSettings->setValue("commentChecked", CommentCheckbox->isChecked() );
-    guiSettings->setValue("textViewerSize", textViewerSize );
+    guiSettings->setValue("commentChecked", CommentCheckbox->isChecked() );    
     guiSettings->setValue("lastStyleSheetFolder", lastStyleSheetFolder );
 
     guiSettings->setValue("showFullFileName", TreeWidget_->showFullFileName() );
@@ -307,6 +314,8 @@ void TagEditor::saveSettings(){
         colslist.append(cols[i]);
     }    
     guiSettings->setValue("columns", colslist );    
+
+    guiSettings->setValue("script", scriptEditor_->toPlainText() );
 
     guiSettings->sync();
 }
@@ -341,7 +350,6 @@ void TagEditor::readSettings(){
     TrackCheckbox->setChecked( guiSettings->value("trackChecked",true).toBool() );
     GenreCheckbox->setChecked( guiSettings->value("genreChecked",true).toBool() );
     CommentCheckbox->setChecked( guiSettings->value("commentChecked",true).toBool() );
-    textViewerSize = guiSettings->value("textViewerSize", QSize(750, 350)).toSize();
     lastStyleSheetFolder = guiSettings->value("lastStyleSheetFolder","").toString();
     TreeWidget_->setShowFullFileName( guiSettings->value("showFullFileName",false).toBool() );
     TreeWidget_->setShowTagInfo( guiSettings->value("showTagInfo",false).toBool() );
@@ -363,6 +371,7 @@ void TagEditor::readSettings(){
 
     //splitter->setSizes(guiSettings->value("splittersizes").value< QList<int> >() );
 
+    scriptEditor_->setText(guiSettings->value("script","").toString());
 }
 
 
@@ -445,10 +454,8 @@ void TagEditor::serialize(){
 
     statusBar()->showMessage("Finished serializing tracks", 8000);
     if(!log.isEmpty()){
-        TextViewer t(this, &log);
-        t.resize(textViewerSize);
+        TextViewer t(log);
         t.exec();
-        textViewerSize = t.size();
     }
 }
 
@@ -577,10 +584,8 @@ void TagEditor::saveTag(){
         statusBar()->showMessage("Tag saved", 8000);
     }
     if(!log.isEmpty()){
-        TextViewer t(this, &log);
-        t.resize(textViewerSize);
-        t.exec();
-        textViewerSize = t.size();
+        TextViewer t(log);
+        t.exec();        
     }
 }
 
@@ -698,7 +703,7 @@ void TagEditor::searchAndAddFiles(){
 
         if(isdir){
             QString folder = m->filePath(index);
-            QList<QFileInfo> info = getDirContent( folder );
+            QList<QFileInfo> info = Global::getDirContent( folder, extensions, subfolders );
             infos.append(info);
         }else{
             infos.append( QFileInfo(m->filePath(index)) );
@@ -718,10 +723,33 @@ void TagEditor::searchAndAddFiles(){
 
 }
 
+bool TagEditor::runScript(const QString &script, bool guiMode){
+
+    QString script_=script;
+    if(script_.isEmpty() && QObject::sender()==0){
+        script_ = scriptEditor_->toPlainText();
+    }
+    engine_.evaluate(script_);
+    if(engine_.hasUncaughtException()){
+        QString err = "Uncaught exception at line "
+                + QString::number(engine_.uncaughtExceptionLineNumber()) + ": "
+                + qPrintable(engine_.uncaughtException().toString())
+                + "\nBacktrace: "
+                + qPrintable(engine_.uncaughtExceptionBacktrace().join(", "));
+        qDebug()<<err;
+        if(guiMode){
+            QMessageBox::critical(0,"Error",err);
+        }
+        return false;
+    }
+    qDebug()<<"Successfully evaluated script";
+    return true;
+}
+
 void TagEditor::addFiles(){
 
     QModelIndexList indexes = TreeView->selectionModel()->selectedRows(0);
-    QFileSystemModel *m = (QFileSystemModel *)TreeView->model();
+    QFileSystemModel *m = static_cast<QFileSystemModel*>(TreeView->model());
 
     for(int i=0;i<indexes.size();i++){
 
@@ -732,7 +760,7 @@ void TagEditor::addFiles(){
 
         if(isdir){
             QString folder = m->filePath(index);
-            QList<QFileInfo> info = getDirContent( folder );
+            QList<QFileInfo> info = Global::getDirContent( folder, extensions, subfolders );
             for(int j=0;j<info.size();j++){                
                 TagItem *newItem = new TagItem( info[j].filePath() );
                 TreeWidget_->addItem( newItem );
@@ -748,36 +776,11 @@ void TagEditor::addFiles(){
 
 }
 
-QList<QFileInfo> TagEditor::getDirContent( QString& aPath ){
-
-    qDebug()<<aPath;
-    //decide to include subfolder or not
-    QDirIterator::IteratorFlag subdirFlag;
-    if( subfolders ){
-        subdirFlag = QDirIterator::Subdirectories;
-    }else{
-        subdirFlag = QDirIterator::NoIteratorFlags;
-    }
-
-    // set dir iterator
-    QDirIterator dirIterator(aPath,
-                             extensions,
-                             QDir::Files|QDir::NoSymLinks,
-                             subdirFlag);
-
-    QList<QFileInfo> fileInfo;
-    while( dirIterator.hasNext() ){
-        dirIterator.next();
-        fileInfo.append( dirIterator.fileInfo() );
-    }
-
-    return fileInfo;
-
-}
 
 void TagEditor::closeEvent( QCloseEvent *event ){
 
     saveSettings();
+    delete guiSettings;
 }
 
 void TagEditor::replaceTags(){
@@ -810,8 +813,41 @@ void TagEditor::replaceTags(){
 
 }
 
+void TagEditor::loadScript(){
+
+    QString dir = guiSettings->value("Script/lastUsedDir",QDesktopServices::DocumentsLocation).toString();
+    QString fileName = QFileDialog::getOpenFileName(0,"Load file",dir, "Text files (*.txt);;All files (*.*)");
+    QFileInfo f(fileName);
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream in(&file);
+    QString text = in.readAll();
+    scriptEditor_->setText(text);
+    file.close();
+    guiSettings->setValue("Script/lastUsedDir",f.absoluteFilePath());
+
+
+}
+
+void TagEditor::saveScript(){
+
+    QString dir = guiSettings->value("Script/lastUsedDir",QDesktopServices::DocumentsLocation).toString();
+    QString fileName = QFileDialog::getSaveFileName(0,"Save file",dir,"Text files (*.txt);;All files (*.*)");
+    QFileInfo f(fileName);
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << scriptEditor_->toPlainText();
+    file.close();
+    guiSettings->setValue("Script/lastUsedDir",f.absoluteFilePath());
+
+}
 
 void TagEditor::createActions(){
+
+    connect(LoadScriptButton,SIGNAL(clicked()),this,SLOT(loadScript()));
+    connect(SaveScriptButton,SIGNAL(clicked()),this,SLOT(saveScript()));
+    connect(RunScriptButton,SIGNAL(clicked()),this, SLOT(runScript()));
 
     QAction* searchOnlineAction = new QAction(tr("Search for selected file/album in online musicdatabases..."), this);
     searchOnlineAction->setShortcut(tr("Ctrl+S"));
@@ -893,7 +929,7 @@ void TagEditor::searchOnline(){
     if(isdir){
         //folder/album
         QString folder = m->filePath(index);
-        info = getDirContent( folder );
+        info = Global::getDirContent( folder, extensions, subfolders );
     }else{
         for(int i=0;i<indexes.size();i++){
             info.append( m->fileInfo( indexes[i] ) );

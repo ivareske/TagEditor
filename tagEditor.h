@@ -19,22 +19,27 @@
 #include <tag.h>
 #include <taglib.h>
 #include <fileref.h>
-#include <QtPlugin>
+#include <QtGui>
+#include <QtScript>
 //#include "ListWidget.h"
-#include "ui_tagEditor.h"
 #include "TreeWidget.h"
-
+#include "ui_tagEditor.h"
+#include "Script.h"
+#include "metaTypes.h"
+#include "codeeditor.h"
 
 class TagEditor : public QMainWindow, private Ui::TagEditor{
     Q_OBJECT
 
 public:
 
-    TagEditor(QWidget *parent = 0);    
+    TagEditor(QWidget *parent = 0);
+
+public slots:
+    bool runScript(const QString &script="", bool guiMode=true);
 
 private slots:
 
-    QList<QFileInfo> getDirContent( QString& aPath );
     void addFiles();
     void clearTextFields();    
     void resizeColumn();
@@ -59,7 +64,9 @@ private slots:
     void clearTags();
     //void removeFrames();
     void replaceTags();
-    void searchAndAddFiles();
+    void searchAndAddFiles();    
+    void loadScript();
+    void saveScript();
 
     //protected:
 private:
@@ -70,21 +77,15 @@ private:
     QStringList extensions;
     //QString api_key;
     bool subfolders;
-/*
-    bool artistChecked;
-    bool titleChecked;
-    bool albumChecked;
-    bool yearChecked;
-    bool trackChecked;
-    bool genreChecked;
-    bool commentChecked;
-*/
+
     QString lastStyleSheetFolder;
     QString style;
     //QVector<tag> tags;
-    bool showSaveTagWarning;
-    QSize textViewerSize;
+    bool showSaveTagWarning;   
     TreeWidget *TreeWidget_;
+    QScriptEngine engine_;
+    CodeEditor *scriptEditor_;
+
 
 };
 

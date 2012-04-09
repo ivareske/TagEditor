@@ -27,7 +27,7 @@ SearchDialog::SearchDialog( const QList<TagItem*> &items, QWidget *parent ) : QD
 
     setItems();
 
-    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
+    settings = Global::guiSettings();
 
     api_key_ = settings->value("SearchDialog/api_key","").toString();
     currentCoverInd=0;  
@@ -585,7 +585,7 @@ void SearchDialog::save(){
     }
     //show log if any
     if(!log.isEmpty()){
-        TextViewer t(this, &log);
+        TextViewer t(log);
         t.exec();
     }
     info->setText("Tags saved");

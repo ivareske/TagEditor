@@ -23,6 +23,7 @@ public slots:
 
 private:
     QList<QFileInfo> fileInfos;
+    QSettings *settings;
 protected:
 
 

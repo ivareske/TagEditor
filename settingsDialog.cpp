@@ -4,7 +4,7 @@
 SettingsDialog::SettingsDialog(QWidget *parent){
     setupUi(this); // this sets up GUI
 
-    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,this);
+    settings = Global::guiSettings();
     api_key->setText( settings->value("SearchDialog/api_key","").toString() );
     QString defaultExt = "*.mp3;*.wma;*.wav;*.ogg;*.aac;*.ac3;*.m4a";
     extensions->setText( settings->value( "extensions", defaultExt.split(";") ).toStringList().join(";") );
@@ -28,5 +28,6 @@ void SettingsDialog::finito( int result ){
         settings->setValue( "SearchDialog/coverQuality", coverSpinBox->value() );
         settings->sync();
     }
+    delete settings;
 
 }

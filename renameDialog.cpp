@@ -3,7 +3,7 @@
 RenameDialog::RenameDialog( QList<TagItem*> tagitems, QWidget *parent ) : QDialog(parent){
     setupUi(this); // this sets up GUI
 
-    settings = new QSettings("TagEditor.ini",QSettings::IniFormat,0);
+    settings = Global::guiSettings();
     connect( RenameButton, SIGNAL( clicked()  ), this, SLOT(rename() ) );
     tagItems = tagitems;
 
@@ -57,10 +57,13 @@ void RenameDialog::updateReplaceFormat( QTableWidgetItem* item ){
 
 void RenameDialog::finito( int result ){
 
+    Q_UNUSED(result);
+
     settings->setValue( "RenameDialog/replaceFormat", replaceFormat );
     settings->setValue( "RenameDialog/renameFormat", Format->text() );
     settings->setValue( "RenameDialog/geometry", saveGeometry() );
     settings->sync();
+    delete settings;
 }
 
 void RenameDialog::setDefaultFormat(){
@@ -155,7 +158,7 @@ void RenameDialog::rename(){
     }
     p.setValue(tagItems.size());
     if(!log.isEmpty()){
-        TextViewer t(this, &log);
+        TextViewer t(log);
         t.exec();
     }
 

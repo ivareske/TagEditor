@@ -7,15 +7,15 @@ SearchForTagsDialog::SearchForTagsDialog( QList<QFileInfo> files, QWidget *paren
     connect( SearchButton, SIGNAL( clicked()  ), this, SLOT(search() ) );
     fileInfos = files;
 
-    QSettings settings("TagEditor.ini",QSettings::IniFormat,0);
-    CaseSensitive->setChecked( settings.value("SearchForTagsDialog/CaseSensitive",false).toBool() );
-    artistCheckbox->setChecked( settings.value("SearchForTagsDialog/artistChecked",true).toBool());
-    titleCheckbox->setChecked( settings.value("SearchForTagsDialog/titleChecked",true).toBool());
-    albumCheckbox->setChecked( settings.value("SearchForTagsDialog/albumChecked",true).toBool());
-    yearCheckbox->setChecked( settings.value("SearchForTagsDialog/yearChecked",true).toBool());
-    trackCheckbox->setChecked( settings.value("SearchForTagsDialog/trackChecked",true).toBool());
-    genreCheckbox->setChecked( settings.value("SearchForTagsDialog/genreChecked",true).toBool());
-    commentCheckbox->setChecked( settings.value("SearchForTagsDialog/commentChecked",true).toBool() );
+    settings = Global::guiSettings();
+    CaseSensitive->setChecked( settings->value("SearchForTagsDialog/CaseSensitive",false).toBool() );
+    artistCheckbox->setChecked( settings->value("SearchForTagsDialog/artistChecked",true).toBool());
+    titleCheckbox->setChecked( settings->value("SearchForTagsDialog/titleChecked",true).toBool());
+    albumCheckbox->setChecked( settings->value("SearchForTagsDialog/albumChecked",true).toBool());
+    yearCheckbox->setChecked( settings->value("SearchForTagsDialog/yearChecked",true).toBool());
+    trackCheckbox->setChecked( settings->value("SearchForTagsDialog/trackChecked",true).toBool());
+    genreCheckbox->setChecked( settings->value("SearchForTagsDialog/genreChecked",true).toBool());
+    commentCheckbox->setChecked( settings->value("SearchForTagsDialog/commentChecked",true).toBool() );
 
     connect( this, SIGNAL( finished( int ) ), this, SLOT( finito( int ) ) );
     connect( addToWorkSpaceButton, SIGNAL( clicked() ), this, SLOT( accept() ) );
@@ -34,16 +34,16 @@ QList<QFileInfo> SearchForTagsDialog::files(){
 
 
 void SearchForTagsDialog::finito( int result ){
-    QSettings settings("TagEditor.ini",QSettings::IniFormat,0);
-    settings.setValue( "SearchForTagsDialog/CaseSensitive", CaseSensitive->isChecked() );
-    settings.setValue("SearchForTagsDialog/artistChecked", artistCheckbox->isChecked() );
-    settings.setValue("SearchForTagsDialog/titleChecked", titleCheckbox->isChecked() );
-    settings.setValue("SearchForTagsDialog/albumChecked", albumCheckbox->isChecked() );
-    settings.setValue("SearchForTagsDialog/yearChecked", yearCheckbox->isChecked() );
-    settings.setValue("SearchForTagsDialog/trackChecked", trackCheckbox->isChecked() );
-    settings.setValue("SearchForTagsDialog/genreChecked", genreCheckbox->isChecked() );
-    settings.setValue("SearchForTagsDialog/commentChecked", commentCheckbox->isChecked() );
-    settings.sync();
+    settings->setValue( "SearchForTagsDialog/CaseSensitive", CaseSensitive->isChecked() );
+    settings->setValue("SearchForTagsDialog/artistChecked", artistCheckbox->isChecked() );
+    settings->setValue("SearchForTagsDialog/titleChecked", titleCheckbox->isChecked() );
+    settings->setValue("SearchForTagsDialog/albumChecked", albumCheckbox->isChecked() );
+    settings->setValue("SearchForTagsDialog/yearChecked", yearCheckbox->isChecked() );
+    settings->setValue("SearchForTagsDialog/trackChecked", trackCheckbox->isChecked() );
+    settings->setValue("SearchForTagsDialog/genreChecked", genreCheckbox->isChecked() );
+    settings->setValue("SearchForTagsDialog/commentChecked", commentCheckbox->isChecked() );
+    settings->sync();
+    delete settings;
 }
 
 void SearchForTagsDialog::compare( bool *include, QString tagtxt, QString txt, Qt::CaseSensitivity cs ){
@@ -123,7 +123,7 @@ void SearchForTagsDialog::search(){
     p.setValue(fileInfos.size());
     Info->setText(QString::number(foundList->count())+" of "+QString::number(fileInfos.size())+" files matches the search criteria");
     if(!log.isEmpty()){
-        TextViewer t(this, &log);
+        TextViewer t(log);
         t.exec();
     }
 }
